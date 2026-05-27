@@ -1,0 +1,40 @@
+{
+  "nav": {
+    "headerTitle": "应用导航",
+    "home": "首页",
+    "workspace": "工作区",
+    "projects": "项目",
+    "reports": "报表",
+    "messages": "消息",
+    "settings": "设置"
+  },
+  "settings": {
+    "title": "设置",
+    "themeLabel": "主题模式",
+    "themeHint": "选择浅色、深色或跟随系统。",
+    "languageLabel": "语言",
+    "languageHint": "选择英语或中文，默认中文。"
+  },
+  "theme": {
+    "light": "浅色",
+    "dark": "深色",
+    "system": "跟随系统"
+  },
+  "language": {
+    "zh": "中文",
+    "en": "英语"
+  },
+  "homeSetting": {
+    "title": "Mod 解压配置",
+    "folderLabel": "解压mod地址",
+    "folderPlaceholder": "输入本地目录路径",
+    "selectDirectory": "选择目录",
+    "submit": "提交",
+    "return": "返回",
+    "success": "成功！目录位于: {path}",
+    "operationFailed": "操作失败",
+    "selectDirFail": "选择目录失败",
+    "submitFail": "表单提交失败",
+    "enterPath": "请输入或选择解压mod地址"
+  }
+}

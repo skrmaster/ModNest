@@ -1,11 +1,13 @@
-import { app, shell, BrowserWindow, ipcMain, dialog } from 'electron'
+import { app, shell, BrowserWindow, ipcMain, dialog, session } from 'electron'
 import extract from 'extract-zip'
 import { join, resolve } from 'path'
 import { promises as fsPromises } from 'fs'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
+import { registerSettingsIpc } from './ipc/settings.ipc'
+import electronLocalshortcut from 'electron-localshortcut'
 import icon from '../../resources/icon.png?asset'
 
-function createWindow(): void {
+function createWindow(): BrowserWindow {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
     width: 1536,
@@ -15,7 +17,7 @@ function createWindow(): void {
 
     ...(process.platform === 'linux' ? { icon } : {}),
     webPreferences: {
-      preload: join(__dirname, '../preload/index.js'),
+      preload: join(__dirname, '../preload/index.mjs'),
       sandbox: false
     }
   })
@@ -36,12 +38,55 @@ function createWindow(): void {
   } else {
     mainWindow.loadFile(join(__dirname, '../renderer/index.html'))
   }
+
+  return mainWindow
+}
+
+function createCsp(): void {
+  const isDev = process.env.NODE_ENV === 'development'
+
+  session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
+    const csp = isDev
+      ? `
+          default-src 'self';
+          script-src 'self';
+          style-src 'self' 'unsafe-inline';
+          connect-src 'self' ws://localhost:5173 http://localhost:5173;
+          img-src 'self' data: blob:;
+          font-src 'self' data:;
+          object-src 'none';
+          base-uri 'self';
+          form-action 'self';
+        `
+      : `
+          default-src 'self';
+          script-src 'self';
+          style-src 'self' 'unsafe-inline';
+          connect-src 'self';
+          img-src 'self' data:;
+          font-src 'self' data:;
+          object-src 'none';
+          base-uri 'self';
+          form-action 'self';
+          frame-ancestors 'none';
+        `
+
+    callback({
+      responseHeaders: {
+        ...details.responseHeaders,
+        'Content-Security-Policy': [csp.replace(/\n/g, ' ')]
+      }
+    })
+  })
 }
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(() => {
+  //set csp
+  createCsp()
+
   // Set app user model id for windows
   electronApp.setAppUserModelId('com.electron')
 
@@ -51,6 +96,9 @@ app.whenReady().then(() => {
   app.on('browser-window-created', (_, window) => {
     optimizer.watchWindowShortcuts(window)
   })
+
+  // Register settings IPC
+  registerSettingsIpc()
 
   // IPC test
   ipcMain.on('ping', () => console.log('pong'))
@@ -108,7 +156,11 @@ app.whenReady().then(() => {
     }
   )
 
-  createWindow()
+  const win = createWindow()
+
+  electronLocalshortcut.register(win, 'F12', () => {
+    win.webContents.toggleDevTools()
+  })
 
   app.on('activate', function () {
     // On macOS it's common to re-create a window in the app when the

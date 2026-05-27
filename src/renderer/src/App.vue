@@ -2,9 +2,11 @@
   <v-app>
     <div class="w-screen h-screen flex">
       <LeftNav />
-      <div class="flex-1 overflow-hidden">
-        <router-view />
-      </div>
+      <v-main>
+        <div class="flex-1 overflow-hidden ml-3">
+          <router-view />
+        </div>
+      </v-main>
     </div>
   </v-app>
 </template>

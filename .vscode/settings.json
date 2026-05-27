@@ -3,6 +3,7 @@
   "editor.fontFamily": "'JetBrains Mono', Consolas, monospace",
   "editor.formatOnSave": true,
   "editor.defaultFormatter": "esbenp.prettier-vscode",
+
   "[typescript]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
@@ -14,5 +15,13 @@
   },
   "[vue]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
-  }
+  },
+
+  "explorer.fileNesting.enabled": true,
+  "explorer.fileNesting.patterns": {
+    "package.json": "package-lock.json"
+  },
+
+  "files.autoSave": "afterDelay",
+  "files.autoSaveDelay": 1000
 }

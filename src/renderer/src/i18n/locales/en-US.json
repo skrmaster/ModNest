@@ -1,0 +1,40 @@
+{
+  "nav": {
+    "headerTitle": "App Navigation",
+    "home": "Home",
+    "workspace": "Workspace",
+    "projects": "Projects",
+    "reports": "Reports",
+    "messages": "Messages",
+    "settings": "Settings"
+  },
+  "settings": {
+    "title": "Application Settings",
+    "themeLabel": "Theme Mode",
+    "themeHint": "Choose Light, Dark, or Follow System preferences.",
+    "languageLabel": "Language",
+    "languageHint": "Choose English or Chinese as the interface language."
+  },
+  "theme": {
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System"
+  },
+  "language": {
+    "zh": "Chinese",
+    "en": "English"
+  },
+  "homeSetting": {
+    "title": "Mod Extract Configuration",
+    "folderLabel": "Mod extraction path",
+    "folderPlaceholder": "Enter local directory path",
+    "selectDirectory": "Select Directory",
+    "submit": "Submit",
+    "return": "Return",
+    "success": "Success! Path: {path}",
+    "operationFailed": "Operation failed",
+    "selectDirFail": "Failed to select directory",
+    "submitFail": "Form submission failed",
+    "enterPath": "Please enter or select a mod extraction path"
+  }
+}

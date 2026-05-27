@@ -1,77 +1,130 @@
-import { computed, ref, watch } from 'vue'
-import type { ComputedRef } from 'vue'
+import { computed, ref, watch, onMounted } from 'vue'
 import { useTheme } from 'vuetify'
+import { i18n } from '@renderer/i18n'
+import type { ComputedRef, Ref } from 'vue'
+import type { ThemeMode, Language } from '@shared/types/settings'
 
-type ThemeMode = 'light' | 'dark' | 'system'
-type Language = 'en' | 'zh'
+const theme = (await window.settingsApi.get('theme')) as ThemeMode
+const lang = (await window.settingsApi.get('language')) as Language
 
-const STORAGE_THEME_KEY = 'app-theme-mode'
-const STORAGE_LANGUAGE_KEY = 'app-language'
+const themeMode = ref<ThemeMode>(theme)
+const language = ref<Language>(lang)
 
-const defaultThemeMode: ThemeMode = 'system'
-const defaultLanguage: Language = 'zh'
-
-const savedTheme = (window.localStorage.getItem(STORAGE_THEME_KEY) as ThemeMode) || defaultThemeMode
-const savedLanguage =
-  (window.localStorage.getItem(STORAGE_LANGUAGE_KEY) as Language) || defaultLanguage
-
-const themeMode = ref<ThemeMode>(savedTheme)
-const language = ref<Language>(savedLanguage)
-
-const getSystemTheme = (): 'light' | 'dark' =>
+const getSystemTheme = (): ThemeMode =>
   window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
 
 export function useAppSettings(): {
-  themeMode: typeof themeMode
-  language: typeof language
-  themeModeOptions: ComputedRef<Array<{ label: string; value: ThemeMode }>>
-  languageOptions: ComputedRef<Array<{ label: string; value: Language }>>
+  themeMode: Ref<ThemeMode>
+  language: Ref<Language>
+  themeModeOptions: ComputedRef<
+    Array<{
+      label: string
+      value: ThemeMode
+    }>
+  >
+  languageOptions: ComputedRef<
+    Array<{
+      label: string
+      value: Language
+    }>
+  >
+
+  initialize: () => Promise<void>
 } {
   const theme = useTheme()
 
   const applyTheme = (): void => {
     if (themeMode.value === 'system') {
-      theme.global.name.value = getSystemTheme()
+      theme.change(getSystemTheme())
     } else {
-      theme.global.name.value = themeMode.value
+      theme.change(themeMode.value)
     }
   }
 
-  applyTheme()
+  const initialize = async (): Promise<void> => {
+    const savedTheme = await window.settingsApi.get('themeMode')
 
-  watch(themeMode, (value) => {
-    window.localStorage.setItem(STORAGE_THEME_KEY, value)
+    const savedLanguage = await window.settingsApi.get('language')
+
+    if (savedTheme) {
+      themeMode.value = savedTheme as ThemeMode
+    }
+
+    if (savedLanguage) {
+      language.value = savedLanguage as Language
+    }
+
+    i18n.global.locale.value = language.value
+
+    applyTheme()
+  }
+
+  watch(themeMode, async (value) => {
+    await window.settingsApi.set('themeMode', value)
+
     applyTheme()
   })
 
-  watch(language, (value) => {
-    window.localStorage.setItem(STORAGE_LANGUAGE_KEY, value)
+  watch(language, async (value) => {
+    await window.settingsApi.set('language', value)
+
+    i18n.global.locale.value = value
   })
 
-  if ('matchMedia' in window) {
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
-    mediaQuery.addEventListener('change', () => {
-      if (themeMode.value === 'system') {
-        applyTheme()
+  onMounted(() => {
+    if ('matchMedia' in window) {
+      const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
+
+      mediaQuery.addEventListener('change', () => {
+        if (themeMode.value === 'system') {
+          applyTheme()
+        }
+      })
+    }
+  })
+
+  const themeModeOptions = computed(() => {
+    return [
+      {
+        label: i18n.global.t('theme.light') as string,
+        value: 'light' as ThemeMode
+      },
+
+      {
+        label: i18n.global.t('theme.dark') as string,
+        value: 'dark' as ThemeMode
+      },
+
+      {
+        label: i18n.global.t('theme.system') as string,
+        value: 'system' as ThemeMode
       }
-    })
-  }
+    ]
+  })
 
-  const themeModeOptions: ComputedRef<Array<{ label: string; value: ThemeMode }>> = computed(() => [
-    { label: '浅色', value: 'light' },
-    { label: '深色', value: 'dark' },
-    { label: '跟随系统', value: 'system' }
-  ])
+  const languageOptions = computed(() => {
+    return [
+      {
+        label: i18n.global.t('language.zh') as string,
+        value: 'zh' as Language
+      },
 
-  const languageOptions: ComputedRef<Array<{ label: string; value: Language }>> = computed(() => [
-    { label: '中文', value: 'zh' },
-    { label: 'English', value: 'en' }
-  ])
+      {
+        label: i18n.global.t('language.en') as string,
+        value: 'en' as Language
+      }
+    ]
+  })
 
   return {
     themeMode,
+
     language,
+
     themeModeOptions,
-    languageOptions
+
+    languageOptions,
+
+    initialize
   }
 }
