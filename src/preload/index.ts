@@ -16,6 +16,12 @@ if (process.contextIsolated) {
       get: (key: string) => ipcRenderer.invoke('settings:get', key),
       set: (key: string, value: unknown) => ipcRenderer.invoke('settings:set', key, value)
     })
+    contextBridge.exposeInMainWorld('fileApi', {
+      selectDirectory: () => ipcRenderer.invoke('select-directory'),
+      selectImage: () => ipcRenderer.invoke('select-image'),
+      downloadImage: (url: string, gameId: string) =>
+        ipcRenderer.invoke('download-image', { url, gameId })
+    })
   } catch (error) {
     console.error(error)
   }
@@ -24,4 +30,16 @@ if (process.contextIsolated) {
   window.electron = electronAPI
   // @ts-ignore (define in dts)
   window.api = api
+  // @ts-ignore (define in dts)
+  window.settingsApi = {
+    get: (key: string) => ipcRenderer.invoke('settings:get', key),
+    set: (key: string, value: unknown) => ipcRenderer.invoke('settings:set', key, value)
+  }
+  // @ts-ignore (define in dts)
+  window.fileApi = {
+    selectDirectory: () => ipcRenderer.invoke('select-directory'),
+    selectImage: () => ipcRenderer.invoke('select-image'),
+    downloadImage: (url: string, gameId: string) =>
+      ipcRenderer.invoke('download-image', { url, gameId })
+  }
 }

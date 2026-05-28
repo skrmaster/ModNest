@@ -1,6 +1,6 @@
 import { computed, ref, watch, onMounted } from 'vue'
 import { useTheme } from 'vuetify'
-import { i18n } from '@renderer/i18n'
+import i18n from '@renderer/i18n'
 import type { ComputedRef, Ref } from 'vue'
 import type { ThemeMode, Language } from '@shared/types/settings'
 

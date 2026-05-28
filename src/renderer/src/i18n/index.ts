@@ -1,14 +1,20 @@
 import { createI18n } from 'vue-i18n'
-import messages from '@intlify/unplugin-vue-i18n/messages'
+import zhCN from './locales/zh-CN.json'
+import enUS from './locales/en-US.json'
 
-export const i18n = createI18n({
+const i18n = createI18n({
   legacy: false,
-  globalInjection: true,
   locale: 'zh-CN',
   fallbackLocale: 'en-US',
-
-  messages,
-
+  messages: {
+    'zh-CN': zhCN,
+    'en-US': enUS
+  },
+  runtimeOnly: true,
+  strictMessage: false,
+  compositionOnly: true,
   missingWarn: false,
   fallbackWarn: false
 })
+
+export default i18n

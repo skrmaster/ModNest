@@ -24,6 +24,51 @@
     "zh": "Chinese",
     "en": "English"
   },
+  "games": {
+    "addGame": "Add Game",
+    "configuredCount": "{count} configured",
+    "configured": "Configured",
+    "notConfigured": "Needs configuration",
+    "dialogTitle": "Game List",
+    "defaultGame": "Default",
+    "customGame": "Custom Game",
+    "nameZh": "Chinese name",
+    "nameEn": "English name",
+    "modPath": "Target mod path",
+    "image": "Game image",
+    "imageUrl": "Image URL",
+    "localImage": "Local image",
+    "save": "Save",
+    "addCustom": "Add custom game",
+    "close": "Close",
+    "requiredError": "Chinese name, English name, and target mod path are required.",
+    "imageDownloadFailed": "Failed to download image."
+  },
+  "gameManager": {
+    "unknownGame": "Unknown game",
+    "characterHint": "Choose a character to review available mods and configuration.",
+    "modCount": "{count} mods",
+    "enabled": "Enabled",
+    "addedAt": "Added",
+    "modName": "Mod name",
+    "author": "Author",
+    "version": "Version",
+    "emptyMods": "No mods yet",
+    "modConfig": "Mod config",
+    "previewHint": "Only the preview image is shown for now. More config fields can be added later.",
+    "comingSoon": "This category is not connected yet.",
+    "sections": {
+      "characters": "Characters",
+      "weapons": "Weapons",
+      "custom": "Custom"
+    },
+    "categories": {
+      "all": "All",
+      "attack": "Attack",
+      "support": "Support",
+      "defense": "Defense"
+    }
+  },
   "homeSetting": {
     "title": "Mod Extract Configuration",
     "folderLabel": "Mod extraction path",

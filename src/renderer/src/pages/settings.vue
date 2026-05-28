@@ -48,8 +48,8 @@ const themeModeOptions = computed(() => [
 ])
 
 const languageOptions = computed(() => [
-  { label: t('language.zh'), value: 'zh' },
-  { label: t('language.en'), value: 'en' }
+  { label: t('language.zh'), value: 'zh-CN' },
+  { label: t('language.en'), value: 'en-US' }
 ])
 
 const labels = computed(() => ({

@@ -9,11 +9,14 @@ export default defineConfig(() => ({
   main: {},
   preload: {},
   renderer: {
+    define: {
+      __INTLIFY_JIT_COMPILATION__: true
+    },
     resolve: {
       alias: {
         '@renderer': resolve('src/renderer/src'),
         '@shared': resolve('src/shared'),
-        'vue-i18n': 'vue-i18n/dist/vue-i18n.runtime.global.prod.js'
+        'vue-i18n': 'vue-i18n/dist/vue-i18n.runtime.esm-bundler.js'
       }
     },
     plugins: [
@@ -31,10 +34,10 @@ export default defineConfig(() => ({
         }
       }),
       VueI18nPlugin({
-        include: [resolve('src/renderer/src/i18n/locales/**')],
+        include: resolve(__dirname, './src/renderer/src/i18n/locales/**/*.json'),
         runtimeOnly: true,
-        compositionOnly: true,
-        fullInstall: true
+        strictMessage: false,
+        compositionOnly: true
       })
     ]
   }

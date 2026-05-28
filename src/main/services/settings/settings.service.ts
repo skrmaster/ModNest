@@ -14,6 +14,27 @@ export class SettingsService extends BaseStoreService<SettingsStore> {
 
       modRootPath: '',
 
+      gameConfigs: [
+        {
+          id: 'genshin-impact',
+          nameZh: '原神',
+          nameEn: 'Genshin Impact',
+          modPath: '',
+          image: '',
+          imageUrl: '',
+          isDefault: true
+        },
+        {
+          id: 'zenless-zone-zero',
+          nameZh: '绝区零',
+          nameEn: 'Zenless Zone Zero',
+          modPath: '',
+          image: '',
+          imageUrl: '',
+          isDefault: true
+        }
+      ],
+
       windowBounds: {
         width: 1400,
         height: 900

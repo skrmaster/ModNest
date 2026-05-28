@@ -24,6 +24,51 @@
     "zh": "中文",
     "en": "英语"
   },
+  "games": {
+    "addGame": "添加游戏",
+    "configuredCount": "已配置 {count} 个",
+    "configured": "已配置",
+    "notConfigured": "待配置",
+    "dialogTitle": "游戏列表",
+    "defaultGame": "默认",
+    "customGame": "自定义游戏",
+    "nameZh": "游戏名称中文",
+    "nameEn": "游戏名称英文",
+    "modPath": "目标 Mod 路径",
+    "image": "游戏图片",
+    "imageUrl": "图片 URL",
+    "localImage": "本地图片",
+    "save": "保存",
+    "addCustom": "添加自定义游戏",
+    "close": "关闭",
+    "requiredError": "请填写游戏中文名、英文名和目标 Mod 路径。",
+    "imageDownloadFailed": "图片下载失败。"
+  },
+  "gameManager": {
+    "unknownGame": "未知游戏",
+    "characterHint": "选择人物查看可用 Mod 和配置。",
+    "modCount": "{count} 个 Mod",
+    "enabled": "启用",
+    "addedAt": "添加时间",
+    "modName": "Mod 名称",
+    "author": "作者",
+    "version": "版本",
+    "emptyMods": "暂无 Mod",
+    "modConfig": "Mod 配置",
+    "previewHint": "当前只展示 preview 图片，后续可扩展更多配置项。",
+    "comingSoon": "该分类暂未接入内容。",
+    "sections": {
+      "characters": "人物",
+      "weapons": "武器",
+      "custom": "自定义类"
+    },
+    "categories": {
+      "all": "全部",
+      "attack": "输出",
+      "support": "辅助",
+      "defense": "防护"
+    }
+  },
   "homeSetting": {
     "title": "Mod 解压配置",
     "folderLabel": "解压mod地址",
