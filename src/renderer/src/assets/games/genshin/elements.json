@@ -2,36 +2,43 @@
   {
     "internalName": "pyro",
     "displayName": "pyro",
+    "zhCN": "火元素",
     "image": "pyro.svg"
   },
   {
     "internalName": "hydro",
     "displayName": "hydro",
+    "zhCN": "水元素",
     "image": "hydro.svg"
   },
   {
     "internalName": "anemo",
     "displayName": "anemo",
+    "zhCN": "风元素",
     "image": "anemo.svg"
   },
   {
     "internalName": "electro",
     "displayName": "electro",
+    "zhCN": "雷元素",
     "image": "electro.svg"
   },
   {
     "internalName": "dendro",
     "displayName": "dendro",
+    "zhCN": "草元素",
     "image": "dendro.svg"
   },
   {
     "internalName": "cryo",
     "displayName": "cryo",
+    "zhCN": "冰元素",
     "image": "cryo.svg"
   },
   {
     "internalName": "geo",
     "displayName": "geo",
+    "zhCN": "岩元素",
     "image": "geo.svg"
   }
 ]

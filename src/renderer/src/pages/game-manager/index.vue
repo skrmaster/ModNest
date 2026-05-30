@@ -16,6 +16,7 @@ import type { ManagedItem, SectionKey, CharacterCategory } from '#types/game-man
 import characterData from '@renderer/assets/games/genshin/characters.json'
 import gsap from 'gsap'
 import { Flip } from 'gsap/Flip'
+import GenshinElements from '@renderer/components/genshin-elements.vue'
 
 gsap.registerPlugin(Flip)
 
@@ -37,7 +38,6 @@ const selectedItemId = ref<string>()
 const itemDialog = ref(false)
 const itemFormError = ref('')
 const editingItemId = ref<string>()
-let characterGridObserver: ResizeObserver | undefined
 
 type Character = {
   image: string
@@ -90,12 +90,7 @@ const itemForm = reactive<ManagedItem>({
   mods: []
 })
 
-const characterCategories: Array<{ key: CharacterCategory }> = [
-  { key: 'all' },
-  { key: 'attack' },
-  { key: 'support' },
-  { key: 'defense' }
-]
+const characterCategories: Array<{ key: CharacterCategory }> = []
 
 const sections: Array<{ key: SectionKey; icon: string }> = [
   { key: 'characters', icon: 'mdi-account-group-outline' },
@@ -406,6 +401,10 @@ async function animateLayout(): Promise<void> {
   })
 }
 
+function handleElementSelect(v?: string): void {
+  console.log(v)
+}
+
 watch(
   () => route.params.gameId,
   async () => {
@@ -431,43 +430,21 @@ onUnmounted(() => {
   window.removeEventListener('resize', animateLayout)
 })
 
-onBeforeUnmount(() => {
-  characterGridObserver?.disconnect()
-})
+onBeforeUnmount(() => {})
 </script>
 
 <template>
   <div class="h-full min-h-0 flex bg-background">
-    <aside class="w-44 shrink-0 border-r border-black/10 py-4 pr-3">
-      <div class="px-2 pb-4">
-        <div class="text-subtitle-1 font-medium truncate">{{ gameTitle }}</div>
-        <div class="text-caption opacity-70 truncate">{{ game?.modPath }}</div>
-      </div>
-
-      <v-list nav density="compact">
-        <v-list-item
-          v-for="section in sections"
-          :key="section.key"
-          :active="activeSection === section.key"
-          rounded="sm"
-          @click="activeSection = section.key"
-        >
-          <template #prepend>
-            <v-icon :icon="section.icon" />
-          </template>
-          <v-list-item-title>{{ t(`gameManager.sections.${section.key}`) }}</v-list-item-title>
-        </v-list-item>
-      </v-list>
-    </aside>
     <section class="min-w-0 flex-1 overflow-auto p-5">
       <div v-if="!selectedItem" class="grid gap-5">
         <div class="flex flex-wrap items-center justify-between gap-4">
           <div>
-            <h1 class="text-h6">{{ t(`gameManager.sections.${activeSection}`) }}</h1>
-            <div class="text-body-2 opacity-70">{{ t('gameManager.itemHint') }}</div>
+            <h1>角色</h1>
           </div>
 
           <div class="flex items-center gap-3">
+            <genshin-elements @select="handleElementSelect"></genshin-elements>
+
             <v-btn-toggle
               v-if="activeSection === 'characters'"
               v-model="activeCategory"
@@ -483,19 +460,28 @@ onBeforeUnmount(() => {
                 {{ t(`gameManager.categories.${category.key}`) }}
               </v-btn>
             </v-btn-toggle>
-
-            <v-btn color="primary" prepend-icon="mdi-plus" @click="openItemDialog()">
-              {{ t('gameManager.addItem') }}
-            </v-btn>
           </div>
         </div>
 
         <div>
           <div class="grid gap-4 grid-cols-[repeat(auto-fill,minmax(220px,1fr))]">
+            <v-tooltip key="add" text="添加" location="top">
+              <template #activator>
+                <v-card
+                  class="character-card cursor-pointer"
+                  variant="tonal"
+                  @click="openItemDialog()"
+                >
+                  <div class="flex items-center justify-center w-full h-full">
+                    <v-icon :size="40" color="ffffff">mdi-plus</v-icon>
+                  </div>
+                </v-card>
+              </template>
+            </v-tooltip>
             <div v-for="item in dataList" :key="item.name" class="card height-20">
               <v-card
                 class="character-card cursor-pointer"
-                variant="outlined"
+                variant="tonal"
                 @click="showItemDetail(item)"
               >
                 <div class="w-full p-3">
@@ -667,6 +653,12 @@ onBeforeUnmount(() => {
 
 .character-card:hover {
   transform: translateY(-2px);
+}
+
+.card {
+  will-change: transform;
+  transform: translateZ(0);
+  backface-visibility: hidden;
 }
 
 .character-card__body {

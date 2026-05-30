@@ -151,44 +151,47 @@ app.whenReady().then(() => {
     return null
   })
 
-  ipcMain.handle('download-image', async (_event, { url, gameId }: { url: string; gameId: string }) => {
-    const imageUrl = new URL(url)
+  ipcMain.handle(
+    'download-image',
+    async (_event, { url, gameId }: { url: string; gameId: string }) => {
+      const imageUrl = new URL(url)
 
-    if (!['http:', 'https:'].includes(imageUrl.protocol)) {
-      throw new Error('Only HTTP and HTTPS image URLs are supported')
+      if (!['http:', 'https:'].includes(imageUrl.protocol)) {
+        throw new Error('Only HTTP and HTTPS image URLs are supported')
+      }
+
+      const response = await fetch(imageUrl)
+
+      if (!response.ok) {
+        throw new Error(`Failed to download image: ${response.status}`)
+      }
+
+      const contentType = response.headers.get('content-type') ?? ''
+
+      if (!contentType.startsWith('image/')) {
+        throw new Error('URL did not return an image')
+      }
+
+      const extensionFromUrl = extname(imageUrl.pathname).toLowerCase()
+      const extensionFromType = contentType.includes('png')
+        ? '.png'
+        : contentType.includes('webp')
+          ? '.webp'
+          : contentType.includes('gif')
+            ? '.gif'
+            : '.jpg'
+      const extension = extensionFromUrl || extensionFromType
+      const hash = createHash('sha1').update(`${gameId}:${url}`).digest('hex').slice(0, 12)
+      const imageDirectory = getGameImageDirectory()
+      const fileName = `${gameId}-${hash}${extension}`
+      const imagePath = join(imageDirectory, fileName)
+
+      await fsPromises.mkdir(imageDirectory, { recursive: true })
+      await fsPromises.writeFile(imagePath, Buffer.from(await response.arrayBuffer()))
+
+      return getGameImageUrl(fileName)
     }
-
-    const response = await fetch(imageUrl)
-
-    if (!response.ok) {
-      throw new Error(`Failed to download image: ${response.status}`)
-    }
-
-    const contentType = response.headers.get('content-type') ?? ''
-
-    if (!contentType.startsWith('image/')) {
-      throw new Error('URL did not return an image')
-    }
-
-    const extensionFromUrl = extname(imageUrl.pathname).toLowerCase()
-    const extensionFromType = contentType.includes('png')
-      ? '.png'
-      : contentType.includes('webp')
-        ? '.webp'
-        : contentType.includes('gif')
-          ? '.gif'
-          : '.jpg'
-    const extension = extensionFromUrl || extensionFromType
-    const hash = createHash('sha1').update(`${gameId}:${url}`).digest('hex').slice(0, 12)
-    const imageDirectory = getGameImageDirectory()
-    const fileName = `${gameId}-${hash}${extension}`
-    const imagePath = join(imageDirectory, fileName)
-
-    await fsPromises.mkdir(imageDirectory, { recursive: true })
-    await fsPromises.writeFile(imagePath, Buffer.from(await response.arrayBuffer()))
-
-    return getGameImageUrl(fileName)
-  })
+  )
 
   // Handle mod directory creation
   ipcMain.handle('create-mod-directory', async (_event, { path }: { path: string }) => {

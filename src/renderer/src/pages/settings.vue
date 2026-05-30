@@ -36,7 +36,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { useAppSettings } from '@renderer/composables/useSettings'
+import { useAppSettings } from '@renderer/composables/useAppSettings'
 
 const { t } = useI18n()
 const { themeMode, language } = useAppSettings()

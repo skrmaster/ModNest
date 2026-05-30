@@ -300,6 +300,7 @@ onMounted(async () => {
             class="menu-item cursor-pointer"
             variant="plain"
             density="compact"
+            color="primary"
             @click="openGame(game)"
           >
             <template #prepend>
