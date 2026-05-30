@@ -1,0 +1,625 @@
+[
+  {
+    "image": "albedo.png",
+    "element": "geo",
+    "class": "sword",
+    "name": "Albedo",
+    "zhCn": "阿贝多"
+  },
+  {
+    "image": "alhaitham.png",
+    "element": "dendro",
+    "class": "sword",
+    "name": "Alhaitham",
+    "zhCn": "艾尔海森"
+  },
+  {
+    "image": "aloy.png",
+    "element": "cryo",
+    "class": "bow",
+    "name": "Aloy",
+    "zhCn": "埃洛伊"
+  },
+  {
+    "image": "amber.png",
+    "element": "pyro",
+    "class": "bow",
+    "name": "Amber",
+    "zhCn": "安柏"
+  },
+  {
+    "image": "arataki_Itto.png",
+    "element": "geo",
+    "class": "claymore",
+    "name": "Arataki Itto",
+    "zhCn": "荒泷一斗"
+  },
+  {
+    "image": "baizhu.png",
+    "element": "dendro",
+    "class": "catalyst",
+    "name": "Baizhu",
+    "zhCn": "白术"
+  },
+  {
+    "image": "barbara.png",
+    "element": "hydro",
+    "class": "catalyst",
+    "name": "Barbara",
+    "zhCn": "芭芭拉"
+  },
+  {
+    "image": "beidou.png",
+    "element": "electro",
+    "class": "claymore",
+    "name": "Beidou",
+    "zhCn": "北斗"
+  },
+  {
+    "image": "bennett.png",
+    "element": "pyro",
+    "class": "sword",
+    "name": "Bennett",
+    "zhCn": "班尼特"
+  },
+  {
+    "image": "candace.png",
+    "element": "hydro",
+    "class": "polearm",
+    "name": "Candace",
+    "zhCn": "坎蒂丝"
+  },
+  {
+    "image": "charlotte.png",
+    "element": "cryo",
+    "class": "",
+    "name": "Charlotte",
+    "zhCn": "夏洛蒂"
+  },
+  {
+    "image": "chongyun.png",
+    "element": "cryo",
+    "class": "claymore",
+    "name": "Chongyun",
+    "zhCn": "重云"
+  },
+  {
+    "image": "collei.png",
+    "element": "dendro",
+    "class": "bow",
+    "name": "Collei",
+    "zhCn": "柯莱"
+  },
+  {
+    "image": "cyno.png",
+    "element": "electro",
+    "class": "polearm",
+    "name": "Cyno",
+    "zhCn": "赛诺"
+  },
+  {
+    "image": "dehya.png",
+    "element": "pyro",
+    "class": "claymore",
+    "name": "Dehya",
+    "zhCn": "迪希雅"
+  },
+  {
+    "image": "diluc.png",
+    "element": "pyro",
+    "class": "claymore",
+    "name": "Diluc",
+    "zhCn": "迪卢克"
+  },
+  {
+    "image": "diona.png",
+    "element": "cryo",
+    "class": "bow",
+    "name": "Diona",
+    "zhCn": "迪奥娜"
+  },
+  {
+    "image": "dori.png",
+    "element": "electro",
+    "class": "claymore",
+    "name": "Dori",
+    "zhCn": "多莉"
+  },
+  {
+    "image": "eula.png",
+    "element": "cryo",
+    "class": "claymore",
+    "name": "Eula",
+    "zhCn": "优菈"
+  },
+  {
+    "image": "faruzan.png",
+    "element": "anemo",
+    "class": "bow",
+    "name": "Faruzan",
+    "zhCn": "珐露珊"
+  },
+  {
+    "image": "fischl.png",
+    "element": "electro",
+    "class": "bow",
+    "name": "Fischl",
+    "zhCn": "菲谢尔"
+  },
+  {
+    "image": "freminet.png",
+    "element": "cryo",
+    "class": "claymore",
+    "name": "Freminet",
+    "zhCn": "菲米尼"
+  },
+  {
+    "image": "furina.png",
+    "element": "hydro",
+    "class": "",
+    "name": "Furina",
+    "zhCn": "芙宁娜"
+  },
+  {
+    "image": "ganyu.png",
+    "element": "cryo",
+    "class": "bow",
+    "name": "Ganyu",
+    "zhCn": "甘雨"
+  },
+  {
+    "image": "gorou.png",
+    "element": "geo",
+    "class": "bow",
+    "name": "Gorou",
+    "zhCn": "五郎"
+  },
+  {
+    "image": "hu_Tao.png",
+    "element": "pyro",
+    "class": "polearm",
+    "name": "Hu Tao",
+    "zhCn": "胡桃"
+  },
+  {
+    "image": "jean.png",
+    "element": "anemo",
+    "class": "sword",
+    "name": "Jean",
+    "zhCn": "琴"
+  },
+  {
+    "image": "kaedehara_Kazuha.png",
+    "element": "anemo",
+    "class": "sword",
+    "name": "Kaedehara Kazuha",
+    "zhCn": "枫原万叶"
+  },
+  {
+    "image": "kaeya.png",
+    "element": "cryo",
+    "class": "sword",
+    "name": "Kaeya",
+    "zhCn": "凯亚"
+  },
+  {
+    "image": "kamisato_Ayaka.png",
+    "element": "cryo",
+    "class": "sword",
+    "name": "Kamisato Ayaka",
+    "zhCn": "神里绫华"
+  },
+  {
+    "image": "kamisato_Ayato.png",
+    "element": "hydro",
+    "class": "sword",
+    "name": "Kamisato Ayato",
+    "zhCn": "神里绫人"
+  },
+  {
+    "image": "kaveh.png",
+    "element": "dendro",
+    "class": "claymore",
+    "name": "Kaveh",
+    "zhCn": "卡维"
+  },
+  {
+    "image": "keqing.png",
+    "element": "electro",
+    "class": "sword",
+    "name": "Keqing",
+    "zhCn": "刻晴"
+  },
+  {
+    "image": "kirara.png",
+    "element": "dendro",
+    "class": "sword",
+    "name": "Kirara",
+    "zhCn": "绮良良"
+  },
+  {
+    "image": "klee.png",
+    "element": "pyro",
+    "class": "catalyst",
+    "name": "Klee",
+    "zhCn": "可莉"
+  },
+  {
+    "image": "kujou_Sara.png",
+    "element": "electro",
+    "class": "bow",
+    "name": "Kujou Sara",
+    "zhCn": "九条裟罗"
+  },
+  {
+    "image": "kuki_Shinobu.png",
+    "element": "electro",
+    "class": "sword",
+    "name": "Kuki Shinobu",
+    "zhCn": "久岐忍"
+  },
+  {
+    "image": "layla.png",
+    "element": "cryo",
+    "class": "sword",
+    "name": "Layla",
+    "zhCn": "莱依拉"
+  },
+  {
+    "image": "lisa.png",
+    "element": "electro",
+    "class": "catalyst",
+    "name": "Lisa",
+    "zhCn": "丽莎"
+  },
+  {
+    "image": "lynette.png",
+    "element": "anemo",
+    "class": "sword",
+    "name": "Lynette",
+    "zhCn": "琳妮特"
+  },
+  {
+    "image": "lyney.png",
+    "element": "pyro",
+    "class": "bow",
+    "name": "Lyney",
+    "zhCn": "林尼"
+  },
+  {
+    "image": "mika.png",
+    "element": "cryo",
+    "class": "polearm",
+    "name": "Mika",
+    "zhCn": "米卡"
+  },
+  {
+    "image": "mona.png",
+    "element": "hydro",
+    "class": "catalyst",
+    "name": "Mona",
+    "zhCn": "莫娜"
+  },
+  {
+    "image": "nahida.png",
+    "element": "dendro",
+    "class": "catalyst",
+    "name": "Nahida",
+    "zhCn": "纳西妲"
+  },
+  {
+    "image": "navia.png",
+    "element": "geo",
+    "class": "",
+    "name": "Navia",
+    "zhCn": "娜维娅"
+  },
+  {
+    "image": "neuvillette.png",
+    "element": "hydro",
+    "class": "catalyst",
+    "name": "Neuvillette",
+    "zhCn": "那维莱特"
+  },
+  {
+    "image": "nilou.png",
+    "element": "hydro",
+    "class": "sword",
+    "name": "Nilou",
+    "zhCn": "妮露"
+  },
+  {
+    "image": "ningguang.png",
+    "element": "geo",
+    "class": "catalyst",
+    "name": "Ningguang",
+    "zhCn": "凝光"
+  },
+  {
+    "image": "noelle.png",
+    "element": "geo",
+    "class": "claymore",
+    "name": "Noelle",
+    "zhCn": "诺艾尔"
+  },
+  {
+    "image": "paimon.png",
+    "element": "none",
+    "class": "",
+    "name": "Paimon",
+    "zhCn": "派蒙"
+  },
+  {
+    "image": "qiqi.png",
+    "element": "cryo",
+    "class": "sword",
+    "name": "Qiqi",
+    "zhCn": "七七"
+  },
+  {
+    "image": "raiden_Shogun.png",
+    "element": "electro",
+    "class": "polearm",
+    "name": "Raiden Shogun",
+    "zhCn": "雷电将军"
+  },
+  {
+    "image": "razor.png",
+    "element": "electro",
+    "class": "claymore",
+    "name": "Razor",
+    "zhCn": "雷泽"
+  },
+  {
+    "image": "rosaria.png",
+    "element": "cryo",
+    "class": "polearm",
+    "name": "Rosaria",
+    "zhCn": "罗莎莉亚"
+  },
+  {
+    "image": "sangonomiya_Kokomi.png",
+    "element": "hydro",
+    "class": "catalyst",
+    "name": "Sangonomiya Kokomi",
+    "zhCn": "珊瑚宫心海"
+  },
+  {
+    "image": "sayu.png",
+    "element": "anemo",
+    "class": "claymore",
+    "name": "Sayu",
+    "zhCn": "早柚"
+  },
+  {
+    "image": "shenhe.png",
+    "element": "cryo",
+    "class": "polearm",
+    "name": "Shenhe",
+    "zhCn": "申鹤"
+  },
+  {
+    "image": "shikanoin_Heizou.png",
+    "element": "anemo",
+    "class": "catalyst",
+    "name": "Shikanoin Heizou",
+    "zhCn": "鹿野院平藏"
+  },
+  {
+    "image": "sucrose.png",
+    "element": "anemo",
+    "class": "catalyst",
+    "name": "Sucrose",
+    "zhCn": "砂糖"
+  },
+  {
+    "image": "tartaglia.png",
+    "element": "hydro",
+    "class": "bow",
+    "name": "Tartaglia",
+    "zhCn": "达达利亚"
+  },
+  {
+    "image": "thoma.png",
+    "element": "pyro",
+    "class": "polearm",
+    "name": "Thoma",
+    "zhCn": "托马"
+  },
+  {
+    "image": "tighnari.png",
+    "element": "dendro",
+    "class": "bow",
+    "name": "Tighnari",
+    "zhCn": "提纳里"
+  },
+  {
+    "image": "traveler_(Female).png",
+    "element": "anemo",
+    "class": "sword",
+    "name": "Lumine",
+    "zhCn": "荧"
+  },
+  {
+    "image": "traveler_(Male).png",
+    "element": "anemo",
+    "class": "sword",
+    "name": "Aether",
+    "zhCn": "空"
+  },
+  {
+    "image": "venti.png",
+    "element": "anemo",
+    "class": "bow",
+    "name": "Venti",
+    "zhCn": "温迪"
+  },
+  {
+    "image": "wanderer.png",
+    "element": "anemo",
+    "class": "catalyst",
+    "name": "Wanderer",
+    "zhCn": "流浪者"
+  },
+  {
+    "image": "xiangling.png",
+    "element": "pyro",
+    "class": "polearm",
+    "name": "Xiangling",
+    "zhCn": "香菱"
+  },
+  {
+    "image": "xiao.png",
+    "element": "anemo",
+    "class": "polearm",
+    "name": "Xiao",
+    "zhCn": "魈"
+  },
+  {
+    "image": "xingqiu.png",
+    "element": "hydro",
+    "class": "sword",
+    "name": "Xingqiu",
+    "zhCn": "行秋"
+  },
+  {
+    "image": "xinyan.png",
+    "element": "pyro",
+    "class": "claymore",
+    "name": "Xinyan",
+    "zhCn": "辛焱"
+  },
+  {
+    "image": "yae_Miko.png",
+    "element": "electro",
+    "class": "catalyst",
+    "name": "Yae Miko",
+    "zhCn": "八重神子"
+  },
+  {
+    "image": "yanfei.png",
+    "element": "pyro",
+    "class": "catalyst",
+    "name": "Yanfei",
+    "zhCn": "烟绯"
+  },
+  {
+    "image": "yaoyao.png",
+    "element": "dendro",
+    "class": "polearm",
+    "name": "Yaoyao",
+    "zhCn": "瑶瑶"
+  },
+  {
+    "image": "yelan.png",
+    "element": "hydro",
+    "class": "bow",
+    "name": "Yelan",
+    "zhCn": "夜兰"
+  },
+  {
+    "image": "yoimiya.png",
+    "element": "pyro",
+    "class": "bow",
+    "name": "Yoimiya",
+    "zhCn": "宵宫"
+  },
+  {
+    "image": "yun_Jin.png",
+    "element": "geo",
+    "class": "polearm",
+    "name": "Yun Jin",
+    "zhCn": "云堇"
+  },
+  {
+    "image": "zhongli.png",
+    "element": "geo",
+    "class": "polearm",
+    "name": "Zhongli",
+    "zhCn": "钟离"
+  },
+  {
+    "image": "wriothesley.png",
+    "element": "cryo",
+    "class": "catalyst",
+    "name": "Wriothesley",
+    "zhCn": "莱欧斯利"
+  },
+  {
+    "image": "chevreuse.png",
+    "element": "pyro",
+    "class": "polearm",
+    "name": "Chevreuse",
+    "zhCn": "夏沃蕾"
+  },
+  {
+    "image": "xianyun.png",
+    "element": "anemo",
+    "class": "catalyst",
+    "name": "Xianyun",
+    "zhCn": "闲云"
+  },
+  {
+    "image": "gaming.png",
+    "element": "pyro",
+    "class": "claymore",
+    "name": "Gaming",
+    "zhCn": "嘉明"
+  },
+  {
+    "image": "chiori.png",
+    "element": "geo",
+    "class": "sword",
+    "name": "Chiori",
+    "zhCn": "千织"
+  },
+  {
+    "image": "arlecchino.png",
+    "element": "pyro",
+    "class": "polearm",
+    "name": "Arlecchino",
+    "zhCn": "阿蕾奇诺"
+  },
+  {
+    "image": "clorinde.png",
+    "element": "electro",
+    "class": "sword",
+    "name": "Clorinde",
+    "zhCn": "克洛琳德"
+  },
+  {
+    "image": "sigewinne.png",
+    "element": "hydro",
+    "class": "bow",
+    "name": "Sigewinne",
+    "zhCn": "希格雯"
+  },
+  {
+    "image": "sethos.png",
+    "element": "electro",
+    "class": "bow",
+    "name": "Sethos",
+    "zhCn": "赛索斯"
+  },
+  {
+    "image": "emilie.png",
+    "element": "dendro",
+    "class": "polearm",
+    "name": "Emilie",
+    "zhCn": "爱可菲"
+  },
+  {
+    "image": "mualani.png",
+    "element": "hydro",
+    "class": "catalyst",
+    "name": "Mualani",
+    "zhCn": "玛拉妮"
+  },
+  {
+    "image": "kinich.png",
+    "element": "dendro",
+    "class": "claymore",
+    "name": "Kinich",
+    "zhCn": "基尼奇"
+  }
+]

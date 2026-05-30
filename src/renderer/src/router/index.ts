@@ -15,7 +15,7 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: '/games/:gameId',
     name: 'GameManager',
-    component: () => import('../pages/game-manager.vue')
+    component: () => import('../pages/game-manager/index.vue')
   }
 ]
 

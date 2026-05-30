@@ -12,7 +12,7 @@
 </template>
 
 <script setup lang="ts">
-import LeftNav from './components/LeftNav.vue'
+import LeftNav from './components/left-nav.vue'
 </script>
 
 <style scoped></style>

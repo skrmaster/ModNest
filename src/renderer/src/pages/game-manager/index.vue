@@ -1,31 +1,23 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
+import {
+  computed,
+  nextTick,
+  onBeforeUnmount,
+  onMounted,
+  onUnmounted,
+  reactive,
+  ref,
+  watch
+} from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute } from 'vue-router'
 import type { GameConfig } from '@shared/types/settings'
+import type { ManagedItem, SectionKey, CharacterCategory } from '#types/game-manager'
+import characterData from '@renderer/assets/games/genshin/characters.json'
+import gsap from 'gsap'
+import { Flip } from 'gsap/Flip'
 
-type SectionKey = 'characters' | 'weapons' | 'custom'
-type CharacterCategory = 'all' | 'attack' | 'support' | 'defense'
-
-interface ManagedMod {
-  id: string
-  enabled: boolean
-  addedAt: string
-  name: string
-  author: string
-  version: string
-  preview: string
-}
-
-interface ManagedItem {
-  id: string
-  nameZh: string
-  nameEn: string
-  image: string
-  category?: Exclude<CharacterCategory, 'all'>
-  isDefault?: boolean
-  mods?: ManagedMod[]
-}
+gsap.registerPlugin(Flip)
 
 type ManagedCatalog = Record<SectionKey, ManagedItem[]>
 type StoredCatalogs = Record<string, ManagedCatalog>
@@ -45,9 +37,45 @@ const selectedItemId = ref<string>()
 const itemDialog = ref(false)
 const itemFormError = ref('')
 const editingItemId = ref<string>()
-const characterGridWrap = ref<HTMLElement>()
-const characterGridWidth = ref(0)
 let characterGridObserver: ResizeObserver | undefined
+
+type Character = {
+  image: string
+  element: string
+  class: string
+  avatar: string
+  zhCn: string
+  name: string
+}
+const imageMap: Record<string, string> = {}
+const imageModules = import.meta.glob(
+  '@renderer/assets/games/genshin/images/characters/*.{png,jpg,jpeg,webp}',
+  {
+    eager: true,
+    import: 'default'
+  }
+)
+
+function charactersList(): Character[] {
+  for (const path in imageModules) {
+    const match = path.match(/\/([^/]+)\.(png|jpg|jpeg|webp)$/)
+
+    if (!match) continue
+
+    const fileName = match[1]
+
+    imageMap[fileName] = imageModules[path] as string
+  }
+
+  return (characterData as Character[]).map((item) => {
+    return {
+      ...item,
+      avatar: imageMap[item.image.split('.')[0]]
+    }
+  })
+}
+
+const dataList = charactersList()
 
 const fallbackPreview =
   'https://fastcdn.mihoyo.com/static-resource-v2/2025/07/03/516186272072a512a460c81222aecf1d_5955932201223190759.jpg'
@@ -62,12 +90,6 @@ const itemForm = reactive<ManagedItem>({
   mods: []
 })
 
-const sections: Array<{ key: SectionKey; icon: string }> = [
-  { key: 'characters', icon: 'mdi-account-group-outline' },
-  { key: 'weapons', icon: 'mdi-sword' },
-  { key: 'custom', icon: 'mdi-shape-outline' }
-]
-
 const characterCategories: Array<{ key: CharacterCategory }> = [
   { key: 'all' },
   { key: 'attack' },
@@ -75,7 +97,11 @@ const characterCategories: Array<{ key: CharacterCategory }> = [
   { key: 'defense' }
 ]
 
-const game = computed(() => games.value.find((item) => item.id === route.params.gameId))
+const sections: Array<{ key: SectionKey; icon: string }> = [
+  { key: 'characters', icon: 'mdi-account-group-outline' },
+  { key: 'weapons', icon: 'mdi-sword' },
+  { key: 'custom', icon: 'mdi-shape-outline' }
+]
 
 const gameTitle = computed(() => {
   if (!game.value) {
@@ -86,6 +112,8 @@ const gameTitle = computed(() => {
     ? game.value.nameZh || game.value.nameEn
     : game.value.nameEn || game.value.nameZh
 })
+
+const game = computed(() => games.value.find((item) => item.id === route.params.gameId))
 
 const defaultCatalog = computed<ManagedCatalog>(() => {
   const preview = game.value?.image || fallbackPreview
@@ -193,24 +221,6 @@ const filteredItems = computed(() => {
   }
 
   return activeItems.value.filter((item) => item.category === activeCategory.value)
-})
-
-const characterGridStyle = computed(() => {
-  const minCardWidth = 260
-  const gap = 16
-  const columns = Math.max(1, Math.floor((characterGridWidth.value + gap) / (minCardWidth + gap)))
-  const cardWidth = Math.max(
-    minCardWidth,
-    (characterGridWidth.value - gap * (columns - 1)) / columns
-  )
-  const cardHeight = Math.round((cardWidth / 310) * 360)
-  const imageHeight = Math.max(220, cardHeight - 82)
-
-  return {
-    '--character-card-height': `${cardHeight}px`,
-    '--character-image-height': `${imageHeight}px`,
-    gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))`
-  }
 })
 
 const selectedItem = computed(() =>
@@ -384,6 +394,18 @@ const backToItems = (): void => {
   selectedItemId.value = undefined
 }
 
+async function animateLayout(): Promise<void> {
+  const state = Flip.getState('.card')
+
+  await nextTick()
+
+  Flip.from(state, {
+    duration: 0.2,
+    ease: 'power1.out',
+    absolute: true
+  })
+}
+
 watch(
   () => route.params.gameId,
   async () => {
@@ -402,13 +424,11 @@ watch(activeSection, () => {
 onMounted(async () => {
   await loadGames()
   await loadCatalog()
+  window.addEventListener('resize', animateLayout)
+})
 
-  if (characterGridWrap.value) {
-    characterGridObserver = new ResizeObserver(([entry]) => {
-      characterGridWidth.value = entry.contentRect.width
-    })
-    characterGridObserver.observe(characterGridWrap.value)
-  }
+onUnmounted(() => {
+  window.removeEventListener('resize', animateLayout)
 })
 
 onBeforeUnmount(() => {
@@ -439,7 +459,6 @@ onBeforeUnmount(() => {
         </v-list-item>
       </v-list>
     </aside>
-
     <section class="min-w-0 flex-1 overflow-auto p-5">
       <div v-if="!selectedItem" class="grid gap-5">
         <div class="flex flex-wrap items-center justify-between gap-4">
@@ -471,48 +490,52 @@ onBeforeUnmount(() => {
           </div>
         </div>
 
-        <div ref="characterGridWrap">
-          <TransitionGroup
-            name="character-shuffle"
-            tag="div"
-            class="character-grid"
-            :style="characterGridStyle"
-          >
-            <v-card
-              v-for="item in filteredItems"
-              :key="item.id"
-              class="character-card cursor-pointer"
-              variant="outlined"
-              @click="showItemDetail(item)"
-            >
-              <v-img class="character-card__image" :src="item.image" cover />
-              <v-card-text class="character-card__body">
-                <div class="flex w-full items-center justify-between gap-3">
-                  <div class="min-w-0">
-                    <div class="text-subtitle-1 truncate">{{ item.nameZh }}</div>
-                    <div class="text-body-2 opacity-70 truncate">{{ item.nameEn }}</div>
-                  </div>
-                  <div class="flex shrink-0 items-center gap-1">
-                    <v-chip v-if="activeSection === 'characters'" size="small" color="primary" variant="tonal">
-                      {{ t('gameManager.modCount', { count: item.mods?.length ?? 0 }) }}
-                    </v-chip>
-                    <v-btn
-                      icon="mdi-pencil-outline"
-                      size="small"
-                      variant="text"
-                      @click.stop="openItemDialog(item)"
-                    />
-                    <v-btn
-                      icon="mdi-delete-outline"
-                      size="small"
-                      variant="text"
-                      @click.stop="deleteItem(item)"
-                    />
+        <div>
+          <div class="grid gap-4 grid-cols-[repeat(auto-fill,minmax(220px,1fr))]">
+            <div v-for="item in dataList" :key="item.name" class="card height-20">
+              <v-card
+                class="character-card cursor-pointer"
+                variant="outlined"
+                @click="showItemDetail(item)"
+              >
+                <div class="w-full p-3">
+                  <div class="w-50 mx-auto">
+                    <v-img :src="item.avatar" cover />
                   </div>
                 </div>
-              </v-card-text>
-            </v-card>
-          </TransitionGroup>
+                <v-card-text class="character-card__body">
+                  <div class="w-full gap-3">
+                    <div class="min-w-0 text-center">
+                      <div class="text-subtitle-1 truncate">{{ item.name }}</div>
+                      <div class="text-body-2 opacity-70 truncate">{{ item.zhCn }}</div>
+                    </div>
+                    <div class="flex shrink-0 items-center gap-1">
+                      <v-chip
+                        v-if="activeSection === 'characters'"
+                        size="small"
+                        color="primary"
+                        variant="tonal"
+                      >
+                        {{ t('gameManager.modCount', { count: item.mods?.length ?? 0 }) }}
+                      </v-chip>
+                      <v-btn
+                        icon="mdi-pencil-outline"
+                        size="small"
+                        variant="text"
+                        @click.stop="openItemDialog(item)"
+                      />
+                      <v-btn
+                        icon="mdi-delete-outline"
+                        size="small"
+                        variant="text"
+                        @click.stop="deleteItem(item)"
+                      />
+                    </div>
+                  </div>
+                </v-card-text>
+              </v-card>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -580,8 +603,16 @@ onBeforeUnmount(() => {
           <div class="grid gap-3">
             <v-img v-if="itemForm.image" :src="itemForm.image" height="180" cover />
             <div class="grid gap-3 md:grid-cols-2">
-              <v-text-field v-model="itemForm.nameZh" :label="t('games.nameZh')" density="compact" />
-              <v-text-field v-model="itemForm.nameEn" :label="t('games.nameEn')" density="compact" />
+              <v-text-field
+                v-model="itemForm.nameZh"
+                :label="t('games.nameZh')"
+                density="compact"
+              />
+              <v-text-field
+                v-model="itemForm.nameEn"
+                :label="t('games.nameEn')"
+                density="compact"
+              />
             </div>
             <v-text-field v-model="itemForm.image" :label="t('games.image')" density="compact" />
             <v-select
@@ -593,10 +624,10 @@ onBeforeUnmount(() => {
               density="compact"
             >
               <template #selection="{ item }">
-                {{ t(`gameManager.categories.${item.value}`) }}
+                {{ t(`gameManager.categories.${item.key}`) }}
               </template>
               <template #item="{ props: itemProps, item }">
-                <v-list-item v-bind="itemProps" :title="t(`gameManager.categories.${item.value}`)" />
+                <v-list-item v-bind="itemProps" :title="t(`gameManager.categories.${item.key}`)" />
               </template>
             </v-select>
             <v-alert v-if="itemFormError" type="error" variant="tonal" density="compact">
@@ -626,7 +657,7 @@ onBeforeUnmount(() => {
 
 .character-card {
   width: 100%;
-  height: var(--character-card-height, 360px);
+  height: var(--character-card-height, 260px);
   overflow: hidden;
   transition:
     transform 220ms ease,
@@ -636,10 +667,6 @@ onBeforeUnmount(() => {
 
 .character-card:hover {
   transform: translateY(-2px);
-}
-
-.character-card__image {
-  height: var(--character-image-height, 278px);
 }
 
 .character-card__body {
@@ -663,6 +690,22 @@ onBeforeUnmount(() => {
 }
 
 .character-shuffle-leave-active {
+  position: absolute;
+}
+
+.card-move,
+.card-enter-active,
+.card-leave-active {
+  transition: all 0.35s ease;
+}
+
+.card-enter-from,
+.card-leave-to {
+  opacity: 0;
+  transform: scale(0.9);
+}
+
+.card-leave-active {
   position: absolute;
 }
 </style>

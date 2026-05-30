@@ -16,6 +16,7 @@ export default defineConfig(() => ({
       alias: {
         '@renderer': resolve('src/renderer/src'),
         '@shared': resolve('src/shared'),
+        '#types': resolve('src/renderer/src/types'),
         'vue-i18n': 'vue-i18n/dist/vue-i18n.runtime.esm-bundler.js'
       }
     },

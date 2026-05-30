@@ -57,6 +57,7 @@
     "modConfig": "Mod 配置",
     "previewHint": "当前只展示 preview 图片，后续可扩展更多配置项。",
     "comingSoon": "该分类暂未接入内容。",
+    "addItem": "添加",
     "sections": {
       "characters": "人物",
       "weapons": "武器",
