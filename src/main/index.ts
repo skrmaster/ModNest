@@ -8,6 +8,7 @@ import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import { registerSettingsIpc } from './ipc/settings.ipc'
 import electronLocalshortcut from 'electron-localshortcut'
 import icon from '../../resources/icon.png?asset'
+import { DatabaseManager } from './db/base'
 
 const gameImageProtocol = 'app-image'
 
@@ -33,6 +34,7 @@ function registerGameImageProtocol(): void {
 }
 
 function createWindow(): BrowserWindow {
+  DatabaseManager.init()
   // Create the browser window.
   const mainWindow = new BrowserWindow({
     width: 1536,

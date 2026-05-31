@@ -1,0 +1,17 @@
+import type Database from 'better-sqlite3'
+
+export function up(db: Database.Database) {
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS "main"."t_game_item" (
+      "id" integer NOT NULL ON CONFLICT ABORT PRIMARY KEY AUTOINCREMENT,
+      "name" text,
+      "name_zh_cn" text,
+      "cover" text NOT NULL,
+      "mod_count" integer NOT NULL,
+      "category_id" integer,
+      "game_id" integer NOT NULL,
+      FOREIGN KEY ("category_id") REFERENCES "t_game_categroy" ("id") ON DELETE SET NULL ON UPDATE CASCADE,
+      FOREIGN KEY ("game_id") REFERENCES "t_user_game" ("id") ON DELETE SET NULL ON UPDATE CASCADE
+    );
+  `)
+}
