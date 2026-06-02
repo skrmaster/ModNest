@@ -2,7 +2,10 @@
 import { computed, onMounted, reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
-import type { GameConfig } from '@shared/types/settings'
+import { useGameCover } from '@renderer/composables/useGameCover'
+import { apiGetGameList } from '@renderer/api/game'
+import type { UserGame } from '@shared/entities/game'
+import type { CreateGameDto } from '@shared/dto/game'
 
 interface NavConfig {
   expandedWidth?: number
@@ -29,129 +32,44 @@ const config = computed(() => ({
   ...props.config
 }))
 
-const defaultGames: GameConfig[] = [
-  {
-    id: 'genshin-impact',
-    nameZh: '原神',
-    nameEn: 'Genshin Impact',
-    modPath: '',
-    image: '',
-    imageUrl: '',
-    isDefault: true
-  },
-  {
-    id: 'zenless-zone-zero',
-    nameZh: '绝区零',
-    nameEn: 'Zenless Zone Zero',
-    modPath: '',
-    image: '',
-    imageUrl: '',
-    isDefault: true
-  }
-]
-
-const legacyDefaultIds = new Set(['cyberpunk-2077', 'baldurs-gate-3'])
+type ListItem = UserGame
 
 const { locale, t } = useI18n()
 const router = useRouter()
-
 const isExpanded = ref(true)
 const drawer = ref(true)
 const gameDialog = ref(false)
-const games = ref<GameConfig[]>([])
-const selectedGameId = ref<string>()
+const games = ref<ListItem[]>([])
+const selectedGameId = ref<number>()
 const isSaving = ref(false)
 const formError = ref('')
-const gameForm = reactive<GameConfig>({
-  id: '',
-  nameZh: '',
-  nameEn: '',
-  modPath: '',
-  image: '',
-  imageUrl: '',
-  isDefault: false
+const gameForm = reactive<CreateGameDto>({
+  name: '',
+  name_zh_cn: '',
+  mod_root_path: '',
+  cover: ''
 })
+
+const isDefaultGame = (gameId?: number): boolean => gameId === 1 || gameId === 2
+const isDefaultSelected = computed(() => isDefaultGame(selectedGameId.value))
 
 const currentWidth = computed(() =>
   isExpanded.value ? config.value.expandedWidth : config.value.collapsedWidth
 )
 
-const selectedGame = computed(() => games.value.find((game) => game.id === selectedGameId.value))
-
 const toggleMenu = (): void => {
   isExpanded.value = !isExpanded.value
 }
 
-const getGameName = (game: GameConfig): string => {
-  return locale.value === 'zh-CN' ? game.nameZh || game.nameEn : game.nameEn || game.nameZh
+const getGameName = (game: ListItem): string => {
+  return locale.value === 'zh-CN' ? game.name_zh_cn || game.name : game.name || game.name_zh_cn
 }
 
-const normalizeGameImage = (image: string): string => {
-  if (!image.startsWith('file:///')) {
-    return image
-  }
+const persistGames = async (): Promise<void> => {}
 
-  const normalizedImage = image.replace(/\\/g, '/')
-  const marker = '/game-images/'
-  const fileName = normalizedImage.slice(normalizedImage.lastIndexOf(marker) + marker.length)
-
-  return fileName && normalizedImage.includes(marker)
-    ? `app-image://cache/${encodeURIComponent(fileName)}`
-    : image
-}
-
-const getStoredGames = async (): Promise<GameConfig[]> => {
-  const storedGames = await window.settingsApi.get<GameConfig[]>('gameConfigs')
-
-  if (!Array.isArray(storedGames) || storedGames.length === 0) {
-    return defaultGames
-  }
-
-  const storedById = new Map(storedGames.map((game) => [game.id, game]))
-  const mergedDefaults = defaultGames.map((game) => ({
-    ...game,
-    ...storedById.get(game.id),
-    isDefault: true
-  }))
-  const customGames = storedGames.filter(
-    (game) =>
-      !defaultGames.some((defaultGame) => defaultGame.id === game.id) &&
-      !legacyDefaultIds.has(game.id)
-  )
-
-  return [...mergedDefaults, ...customGames].map((game) => ({
-    ...game,
-    image: normalizeGameImage(game.image)
-  }))
-}
-
-const persistGames = async (): Promise<void> => {
-  const plainGames = games.value.map((game) => ({
-    id: game.id,
-    nameZh: game.nameZh,
-    nameEn: game.nameEn,
-    modPath: game.modPath,
-    image: game.image,
-    imageUrl: game.imageUrl ?? '',
-    isDefault: game.isDefault
-  }))
-
-  await window.settingsApi.set('gameConfigs', plainGames)
-}
-
-const openGameConfig = (game: GameConfig): void => {
-  selectedGameId.value = game.id
-  formError.value = ''
-  Object.assign(gameForm, {
-    ...game,
-    imageUrl: game.imageUrl ?? ''
-  })
-  gameDialog.value = true
-}
-
-const openGame = (game: GameConfig): void => {
-  if (!game.modPath) {
-    openGameConfig(game)
+const openGame = (game: ListItem): void => {
+  if (!game.mod_root_path) {
+    router.push({ name: 'DefaultSetup', params: { gameId: game.id } })
     return
   }
 
@@ -164,100 +82,83 @@ const openGame = (game: GameConfig): void => {
 }
 
 const openCustomGame = (): void => {
-  const customId = `custom-${Date.now()}`
-
-  selectedGameId.value = customId
+  selectedGameId.value = undefined
   formError.value = ''
   Object.assign(gameForm, {
-    id: customId,
-    nameZh: '',
-    nameEn: '',
-    modPath: '',
-    image: '',
-    imageUrl: '',
-    isDefault: false
+    id: undefined,
+    name_zh_cn: '',
+    name: '',
+    mod_root_path: '',
+    cover: ''
   })
   gameDialog.value = true
 }
 
 const chooseModPath = async (): Promise<void> => {
-  const selectedPath = await window.fileApi.selectDirectory()
+  const selectedPath = await window.api.fileApi.selectDirectory()
 
   if (selectedPath) {
-    gameForm.modPath = selectedPath
+    gameForm.mod_root_path = selectedPath
   }
 }
 
-const chooseGameImage = async (): Promise<void> => {
-  const selectedPath = await window.fileApi.selectImage()
+const { selectCover, downloadCover } = useGameCover()
 
-  if (selectedPath) {
-    gameForm.image = `file:///${selectedPath.replace(/\\/g, '/')}`
-  }
-}
-
-const downloadGameImage = async (): Promise<string> => {
-  if (!gameForm.imageUrl) {
-    return gameForm.image
-  }
-
-  try {
-    if (typeof window.fileApi.downloadImage === 'function') {
-      return await window.fileApi.downloadImage(gameForm.imageUrl, gameForm.id)
-    }
-
-    const invoke = window.electron?.ipcRenderer?.invoke
-
-    if (typeof invoke === 'function') {
-      return await invoke('download-image', { url: gameForm.imageUrl, gameId: gameForm.id })
-    }
-  } catch (error) {
-    const message = error instanceof Error ? error.message : String(error)
-
-    if (!message.includes('No handler registered')) {
-      throw error
-    }
-  }
-
-  return gameForm.imageUrl
+const chooseCover = async (): Promise<void> => {
+  gameForm.cover = await selectCover()
 }
 
 const saveGame = async (): Promise<void> => {
   formError.value = ''
-  gameForm.nameZh = gameForm.nameZh.trim()
-  gameForm.nameEn = gameForm.nameEn.trim()
-  gameForm.modPath = gameForm.modPath.trim()
-  gameForm.image = gameForm.image.trim()
-  gameForm.imageUrl = gameForm.imageUrl?.trim() ?? ''
+  gameForm.name_zh_cn = gameForm.name_zh_cn.trim()
+  gameForm.name = gameForm.name.trim()
+  gameForm.mod_root_path = gameForm.mod_root_path.trim()
+  gameForm.cover = gameForm.cover?.trim()
 
-  if (!gameForm.nameZh || !gameForm.nameEn || !gameForm.modPath) {
-    formError.value = t('games.requiredError')
-    return
+  const isDefault = isDefaultGame(selectedGameId.value)
+
+  if (!isDefault) {
+    if (!gameForm.name_zh_cn || !gameForm.name || !gameForm.mod_root_path) {
+      formError.value = t('games.requiredError')
+      return
+    }
+  } else {
+    if (!gameForm.mod_root_path) {
+      formError.value = t('games.requiredError')
+      return
+    }
   }
 
   isSaving.value = true
 
   try {
-    if (gameForm.imageUrl) {
-      gameForm.image = await downloadGameImage()
+    if (isDefault && selectedGameId.value) {
+      await window.api.gameApi.update(selectedGameId.value, {
+        mod_root_path: gameForm.mod_root_path
+      })
+      gameDialog.value = false
+      router.push({ name: 'GameManager', params: { gameId: selectedGameId.value } })
+      return
     }
 
-    const savedGame = { ...gameForm }
-    const existingIndex = games.value.findIndex((game) => game.id === savedGame.id)
-
-    if (existingIndex >= 0) {
-      games.value[existingIndex] = savedGame
-    } else {
-      games.value.push(savedGame)
+    if (gameForm.cover) {
+      gameForm.cover = await downloadCover(gameForm.cover, gameForm.name)
     }
 
-    await persistGames()
+    const result = await window.api.gameApi.create({
+      name: gameForm.name,
+      name_zh_cn: gameForm.name_zh_cn,
+      mod_root_path: gameForm.mod_root_path,
+      cover: gameForm.cover
+    })
+
+    games.value = await apiGetGameList()
     gameDialog.value = false
 
     router.push({
       name: 'GameManager',
       params: {
-        gameId: savedGame.id
+        gameId: result.id
       }
     })
   } catch (error) {
@@ -268,7 +169,7 @@ const saveGame = async (): Promise<void> => {
 }
 
 onMounted(async () => {
-  games.value = await getStoredGames()
+  games.value = await apiGetGameList()
   await persistGames()
 })
 </script>
@@ -285,9 +186,7 @@ onMounted(async () => {
           </template>
 
           <transition name="fade" :duration="config.transitionDuration">
-            <v-list-item-title v-if="isExpanded" key="title">
-              {{ t('nav.headerTitle') }}
-            </v-list-item-title>
+            <v-list-item-title v-if="isExpanded" key="title"> 导航 </v-list-item-title>
           </transition>
         </v-list-item>
 
@@ -309,7 +208,7 @@ onMounted(async () => {
                 :class="[isExpanded ? 'gap-3' : 'justify-center']"
               >
                 <v-avatar size="34" rounded="0">
-                  <v-img v-if="game.image" :src="game.image" cover />
+                  <v-img v-if="game.cover" :src="game.cover" cover />
                   <v-icon v-else size="large">mdi-gamepad-variant</v-icon>
                 </v-avatar>
 
@@ -317,7 +216,7 @@ onMounted(async () => {
                   <div v-if="isExpanded" key="game-item" class="min-w-0 flex-1">
                     <v-list-item-title>{{ getGameName(game) }}</v-list-item-title>
                     <v-list-item-subtitle>
-                      {{ game.modPath ? t('games.configured') : t('games.notConfigured') }}
+                      {{ game.mod_root_path ? '已配置' : '未配置' }}
                     </v-list-item-subtitle>
                   </div>
                 </transition>
@@ -339,9 +238,7 @@ onMounted(async () => {
                 <v-icon size="large">mdi-plus-circle-outline</v-icon>
 
                 <transition name="fade" :duration="config.transitionDuration">
-                  <v-list-item-title v-if="isExpanded" key="add-game">
-                    {{ t('games.addGame') }}
-                  </v-list-item-title>
+                  <v-list-item-title v-if="isExpanded" key="add-game">添加游戏</v-list-item-title>
                 </transition>
               </div>
             </template>
@@ -351,29 +248,28 @@ onMounted(async () => {
         <v-dialog v-model="gameDialog" max-width="680">
           <v-card>
             <v-card-title class="flex items-center gap-2">
-              <v-icon icon="mdi-gamepad-variant" />
-              {{ selectedGame ? getGameName(selectedGame) : t('games.customGame') }}
+              {{ !gameForm.id ? '添加游戏' : '配置游戏信息' }}
             </v-card-title>
 
             <v-card-text>
               <div class="grid gap-4">
-                <div class="flex items-center gap-4">
+                <div v-if="!isDefaultSelected" class="flex items-center gap-4">
                   <v-avatar rounded="0" size="96">
-                    <v-img v-if="gameForm.image" :src="gameForm.image" cover />
+                    <v-img v-if="gameForm.cover" :src="gameForm.cover" cover />
                     <v-icon v-else size="42">mdi-image-plus</v-icon>
                   </v-avatar>
 
                   <div class="grid flex-1 gap-3">
                     <v-text-field
-                      v-model="gameForm.imageUrl"
-                      :label="t('games.imageUrl')"
+                      v-model="gameForm.cover"
+                      :label="'图片URL'"
                       density="compact"
                       hide-details
                     />
 
                     <v-text-field
-                      v-model="gameForm.image"
-                      :label="t('games.localImage')"
+                      v-model="gameForm.cover"
+                      :label="'本地图片'"
                       density="compact"
                       hide-details
                     >
@@ -382,29 +278,29 @@ onMounted(async () => {
                           icon="mdi-image-outline"
                           size="small"
                           variant="text"
-                          @click="chooseGameImage"
+                          @click="chooseCover"
                         />
                       </template>
                     </v-text-field>
                   </div>
                 </div>
 
-                <div class="grid gap-3 md:grid-cols-2">
+                <div v-if="!isDefaultSelected" class="grid gap-3 md:grid-cols-2">
                   <v-text-field
-                    v-model="gameForm.nameZh"
-                    :label="t('games.nameZh')"
+                    v-model="gameForm.name_zh_cn"
+                    :label="'游戏名称-中文'"
                     density="compact"
                   />
                   <v-text-field
-                    v-model="gameForm.nameEn"
-                    :label="t('games.nameEn')"
+                    v-model="gameForm.name"
+                    :label="'游戏名称-英文'"
                     density="compact"
                   />
                 </div>
 
                 <v-text-field
-                  v-model="gameForm.modPath"
-                  :label="t('games.modPath')"
+                  v-model="gameForm.mod_root_path"
+                  :label="'mod存放目录'"
                   density="compact"
                   required
                 >
@@ -426,12 +322,8 @@ onMounted(async () => {
 
             <v-card-actions>
               <v-spacer />
-              <v-btn variant="text" @click="gameDialog = false">
-                {{ t('games.close') }}
-              </v-btn>
-              <v-btn color="primary" :loading="isSaving" @click="saveGame">
-                {{ t('games.save') }}
-              </v-btn>
+              <v-btn variant="text" @click="gameDialog = false"> 取消 </v-btn>
+              <v-btn color="primary" :loading="isSaving" @click="saveGame"> 保存 </v-btn>
             </v-card-actions>
           </v-card>
         </v-dialog>
@@ -445,9 +337,7 @@ onMounted(async () => {
           </template>
 
           <transition name="fade" :duration="config.transitionDuration">
-            <v-list-item-title v-if="isExpanded" key="settings">
-              {{ t('nav.settings') }}
-            </v-list-item-title>
+            <v-list-item-title v-if="isExpanded" key="settings"> 设置 </v-list-item-title>
           </transition>
         </v-list-item>
       </v-list>

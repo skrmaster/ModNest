@@ -1,5 +1,5 @@
 import type Database from 'better-sqlite3'
-import data from '../seed/category.json'
+import items from '../seed/category.json'
 
 export function up(db: Database.Database) {
   db.exec(`
@@ -14,11 +14,13 @@ export function up(db: Database.Database) {
 
   const stmt = db.prepare(`
     INSERT OR IGNORE INTO t_game_category (
+      id,
       name,
       name_zh_cn,
       icon
     )
     VALUES (
+      @id,
       @name,
       @name_zh_cn,
       @icon
@@ -26,7 +28,7 @@ export function up(db: Database.Database) {
   `)
 
   const transaction = db.transaction(() => {
-    for (const item of data) {
+    for (const item of items) {
       stmt.run(item)
     }
   })

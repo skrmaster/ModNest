@@ -13,6 +13,11 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import('../pages/settings.vue')
   },
   {
+    path: '/default-setup/:gameId',
+    name: 'DefaultSetup',
+    component: () => import('../pages/default-setup.vue')
+  },
+  {
     path: '/games/:gameId',
     name: 'GameManager',
     component: () => import('../pages/game-manager/index.vue')

@@ -3,6 +3,7 @@ import './assets/main.css'
 import { createApp } from 'vue'
 import App from './App.vue'
 import { setupRouter } from './router'
+import router from './router'
 import i18n from './i18n'
 
 // Vuetify
@@ -14,7 +15,7 @@ import { ThemeMode } from '@shared/types/settings'
 
 async function bootstrap(): Promise<void> {
   const app = createApp(App)
-  const theme = (await window.settingsApi.get('theme')) as ThemeMode
+  const theme = (await window.api.settingsApi.get('theme')) as ThemeMode
 
   const vuetify = createVuetify({
     components,
@@ -57,6 +58,21 @@ async function bootstrap(): Promise<void> {
   setupRouter(app)
   app.use(vuetify)
   app.use(i18n)
+  // Automatic navigation: go to first game or default-setup
+  try {
+    const games = await window.api.gameApi.list()
+    if (games && games.length > 0) {
+      const first = games[0]
+      if (first.mod_root_path) {
+        router.push({ name: 'GameManager', params: { gameId: first.id } })
+      } else {
+        router.push({ name: 'DefaultSetup', params: { gameId: first.id } })
+      }
+    }
+  } catch (e) {
+    // ignore
+  }
+
   app.mount('#app')
 }
 

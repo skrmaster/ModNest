@@ -1,20 +1,24 @@
 [
   {
+    "id": 1,
     "name": "role",
     "icon": "",
     "name_zh_cn": "角色"
   },
   {
+    "id": 2,
     "name": "weapon",
     "icon": "",
     "name_zh_cn": "武器"
   },
   {
+    "id": 3,
     "name": "npc",
     "icon": "",
     "name_zh_cn": "NPC"
   },
   {
+    "id": 4,
     "name": "item",
     "icon": "",
     "name_zh_cn": "物品"

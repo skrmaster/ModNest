@@ -1,40 +1,12 @@
-import { app, shell, BrowserWindow, ipcMain, dialog, session, protocol, net } from 'electron'
-import extract from 'extract-zip'
-import { basename, extname, join, resolve } from 'path'
-import { promises as fsPromises } from 'fs'
-import { createHash } from 'crypto'
-import { pathToFileURL } from 'url'
+import { app, shell, BrowserWindow, ipcMain, session } from 'electron'
+import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
-import { registerSettingsIpc } from './ipc/settings.ipc'
 import electronLocalshortcut from 'electron-localshortcut'
 import icon from '../../resources/icon.png?asset'
-import { DatabaseManager } from './db/base'
-
-const gameImageProtocol = 'app-image'
-
-function getGameImageDirectory(): string {
-  return join(app.getPath('userData'), 'game-images')
-}
-
-function getGameImageUrl(fileName: string): string {
-  return `${gameImageProtocol}://cache/${encodeURIComponent(fileName)}`
-}
-
-function registerGameImageProtocol(): void {
-  protocol.handle(gameImageProtocol, (request) => {
-    const url = new URL(request.url)
-    const fileName = decodeURIComponent(url.pathname.replace(/^\//, ''))
-
-    if (!fileName || fileName !== basename(fileName)) {
-      return new Response(null, { status: 400 })
-    }
-
-    return net.fetch(pathToFileURL(join(getGameImageDirectory(), fileName)).toString())
-  })
-}
+import { DatabaseManager } from './db'
+import { registerIpcHandlers } from './ipc'
 
 function createWindow(): BrowserWindow {
-  DatabaseManager.init()
   // Create the browser window.
   const mainWindow = new BrowserWindow({
     width: 1536,
@@ -110,10 +82,11 @@ function createCsp(): void {
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
-app.whenReady().then(() => {
+app.whenReady().then(async () => {
+  DatabaseManager.init()
+
   //set csp
   createCsp()
-  registerGameImageProtocol()
 
   // Set app user model id for windows
   electronApp.setAppUserModelId('com.electron')
@@ -125,117 +98,11 @@ app.whenReady().then(() => {
     optimizer.watchWindowShortcuts(window)
   })
 
-  // Register settings IPC
-  registerSettingsIpc()
-
   // IPC test
   ipcMain.on('ping', () => console.log('pong'))
 
-  // Handle directory selection
-  ipcMain.handle('select-directory', async () => {
-    const result = await dialog.showOpenDialog({
-      properties: ['openDirectory']
-    })
-    if (!result.canceled && result.filePaths.length > 0) {
-      return result.filePaths[0]
-    }
-    return null
-  })
-
-  ipcMain.handle('select-image', async () => {
-    const result = await dialog.showOpenDialog({
-      properties: ['openFile'],
-      filters: [{ name: 'Images', extensions: ['jpg', 'jpeg', 'png', 'webp', 'gif'] }]
-    })
-    if (!result.canceled && result.filePaths.length > 0) {
-      return result.filePaths[0]
-    }
-    return null
-  })
-
-  ipcMain.handle(
-    'download-image',
-    async (_event, { url, gameId }: { url: string; gameId: string }) => {
-      const imageUrl = new URL(url)
-
-      if (!['http:', 'https:'].includes(imageUrl.protocol)) {
-        throw new Error('Only HTTP and HTTPS image URLs are supported')
-      }
-
-      const response = await fetch(imageUrl)
-
-      if (!response.ok) {
-        throw new Error(`Failed to download image: ${response.status}`)
-      }
-
-      const contentType = response.headers.get('content-type') ?? ''
-
-      if (!contentType.startsWith('image/')) {
-        throw new Error('URL did not return an image')
-      }
-
-      const extensionFromUrl = extname(imageUrl.pathname).toLowerCase()
-      const extensionFromType = contentType.includes('png')
-        ? '.png'
-        : contentType.includes('webp')
-          ? '.webp'
-          : contentType.includes('gif')
-            ? '.gif'
-            : '.jpg'
-      const extension = extensionFromUrl || extensionFromType
-      const hash = createHash('sha1').update(`${gameId}:${url}`).digest('hex').slice(0, 12)
-      const imageDirectory = getGameImageDirectory()
-      const fileName = `${gameId}-${hash}${extension}`
-      const imagePath = join(imageDirectory, fileName)
-
-      await fsPromises.mkdir(imageDirectory, { recursive: true })
-      await fsPromises.writeFile(imagePath, Buffer.from(await response.arrayBuffer()))
-
-      return getGameImageUrl(fileName)
-    }
-  )
-
-  // Handle mod directory creation
-  ipcMain.handle('create-mod-directory', async (_event, { path }: { path: string }) => {
-    try {
-      const resolvedPath = resolve(path)
-      const pathExists = await fsPromises
-        .stat(resolvedPath)
-        .then((stats) => stats.isDirectory())
-        .catch(() => false)
-
-      if (!pathExists) {
-        await fsPromises.mkdir(resolvedPath, { recursive: true })
-      }
-
-      return { success: true, path: resolvedPath }
-    } catch (err: unknown) {
-      console.error('Error creating directory:', err)
-      const errorMsg = err instanceof Error ? err.message : String(err)
-      return { success: false, error: `创建目录失败: ${errorMsg}` }
-    }
-  })
-
-  // Handle zip extraction from renderer
-  ipcMain.handle(
-    'extract-zip',
-    async (_event, { zipPath, destPath }: { zipPath: string; destPath?: string }) => {
-      const zipExists = await fsPromises
-        .stat(zipPath)
-        .then(() => true)
-        .catch(() => false)
-      if (!zipExists) throw new Error('Zip file not found')
-      const dest = destPath ? resolve(destPath) : app.getPath('downloads')
-      await fsPromises.mkdir(dest, { recursive: true })
-      try {
-        await extract(zipPath, { dir: dest })
-        return { ok: true, dest }
-      } catch (err: unknown) {
-        console.error(err)
-        throw err
-      }
-    }
-  )
+  //set ipc
+  registerIpcHandlers()
 
   const win = createWindow()
 

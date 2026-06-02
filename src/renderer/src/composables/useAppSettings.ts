@@ -4,8 +4,8 @@ import i18n from '@renderer/i18n'
 import type { ComputedRef, Ref } from 'vue'
 import type { ThemeMode, Language } from '@shared/types/settings'
 
-const theme = (await window.settingsApi.get('theme')) as ThemeMode
-const lang = (await window.settingsApi.get('language')) as Language
+const theme = (await window.api.settingsApi.get('theme')) as ThemeMode
+const lang = (await window.api.settingsApi.get('language')) as Language
 
 const themeMode = ref<ThemeMode>(theme)
 const language = ref<Language>(lang)
@@ -42,9 +42,9 @@ export function useAppSettings(): {
   }
 
   const initialize = async (): Promise<void> => {
-    const savedTheme = await window.settingsApi.get('themeMode')
+    const savedTheme = await window.api.settingsApi.get('themeMode')
 
-    const savedLanguage = await window.settingsApi.get('language')
+    const savedLanguage = await window.api.settingsApi.get('language')
 
     if (savedTheme) {
       themeMode.value = savedTheme as ThemeMode
@@ -60,13 +60,13 @@ export function useAppSettings(): {
   }
 
   watch(themeMode, async (value) => {
-    await window.settingsApi.set('themeMode', value)
+    await window.api.settingsApi.set('themeMode', value)
 
     applyTheme()
   })
 
   watch(language, async (value) => {
-    await window.settingsApi.set('language', value)
+    await window.api.settingsApi.set('language', value)
 
     i18n.global.locale.value = value
   })

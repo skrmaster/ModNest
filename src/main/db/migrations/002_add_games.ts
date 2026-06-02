@@ -1,5 +1,5 @@
 import type Database from 'better-sqlite3'
-import data from '../seed/games.json'
+import items from '../seed/games.json'
 
 export function up(db: Database.Database) {
   db.exec(`
@@ -15,12 +15,14 @@ export function up(db: Database.Database) {
 
   const stmt = db.prepare(`
     INSERT OR IGNORE INTO t_user_game (
+      id,
       name,
       name_zh_cn,
       cover,
       mod_root_path
     )
     VALUES (
+      @id,
       @name,
       @name_zh_cn,
       @cover,
@@ -29,7 +31,7 @@ export function up(db: Database.Database) {
   `)
 
   const transaction = db.transaction(() => {
-    for (const item of data) {
+    for (const item of items) {
       stmt.run(item)
     }
   })

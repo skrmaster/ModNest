@@ -11,7 +11,8 @@ import {
 } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute } from 'vue-router'
-import type { GameConfig } from '@shared/types/settings'
+import { apiGetGameList } from '@renderer/api/game'
+import type { UserGame } from '@shared/entities/game'
 import type { ManagedItem, SectionKey, CharacterCategory } from '#types/game-manager'
 import characterData from '@renderer/assets/games/genshin/characters.json'
 import gsap from 'gsap'
@@ -28,7 +29,7 @@ const { locale, t } = useI18n()
 
 const activeSection = ref<SectionKey>('characters')
 const activeCategory = ref<CharacterCategory>('all')
-const games = ref<GameConfig[]>([])
+const games = ref<UserGame[]>([])
 const catalog = ref<ManagedCatalog>({
   characters: [],
   weapons: [],
@@ -104,18 +105,27 @@ const gameTitle = computed(() => {
   }
 
   return locale.value === 'zh-CN'
-    ? game.value.nameZh || game.value.nameEn
-    : game.value.nameEn || game.value.nameZh
+    ? game.value.name_zh_cn || game.value.name
+    : game.value.name || game.value.name_zh_cn
 })
 
-const game = computed(() => games.value.find((item) => item.id === route.params.gameId))
+const game = computed(() => games.value.find((item) => item.id === Number(route.params.gameId)))
 
 const defaultCatalog = computed<ManagedCatalog>(() => {
-  const preview = game.value?.image || fallbackPreview
-  const isZzz = game.value?.id === 'zenless-zone-zero'
+  const preview = game.value?.cover || fallbackPreview
+  const isZzz = game.value?.id === 2
+  const characterDefaults: ManagedItem[] = dataList.map((item) => ({
+    id: `default-character-${item.name}`,
+    nameZh: item.zhCn,
+    nameEn: item.name,
+    image: item.avatar || preview,
+    category: 'attack',
+    isDefault: true,
+    mods: []
+  }))
 
   return {
-    characters: [
+    characters: characterDefaults.length ? characterDefaults : [
       {
         id: 'default-character-1',
         nameZh: isZzz ? '安比' : '荧',
@@ -296,25 +306,24 @@ const toPlainCatalog = (source: ManagedCatalog): ManagedCatalog => ({
 
 const persistCatalog = async (): Promise<void> => {
   const gameId = String(route.params.gameId)
-  const storedCatalogs = await window.settingsApi.get<StoredCatalogs>('gameManagedCatalogs')
+  const storedCatalogs = (await window.api.settingsApi.get('gameManagedCatalogs')) as StoredCatalogs
   const nextCatalogs = {
     ...(storedCatalogs && typeof storedCatalogs === 'object' ? storedCatalogs : {}),
     [gameId]: toPlainCatalog(catalog.value)
   }
 
-  await window.settingsApi.set('gameManagedCatalogs', nextCatalogs)
+  await window.api.settingsApi.set('gameManagedCatalogs', nextCatalogs)
 }
 
 const loadCatalog = async (): Promise<void> => {
   const gameId = String(route.params.gameId)
-  const storedCatalogs = await window.settingsApi.get<StoredCatalogs>('gameManagedCatalogs')
+  const storedCatalogs = (await window.api.settingsApi.get('gameManagedCatalogs')) as StoredCatalogs
   catalog.value = mergeCatalog(storedCatalogs?.[gameId])
   await persistCatalog()
 }
 
 const loadGames = async (): Promise<void> => {
-  const storedGames = await window.settingsApi.get<GameConfig[]>('gameConfigs')
-  games.value = Array.isArray(storedGames) ? storedGames : []
+  games.value = await apiGetGameList()
 }
 
 const openItemDialog = (item?: ManagedItem): void => {
@@ -435,6 +444,28 @@ onBeforeUnmount(() => {})
 
 <template>
   <div class="h-full min-h-0 flex bg-background">
+    <aside class="w-44 shrink-0 border-r border-black/10 py-4 pr-3">
+      <div class="px-2 pb-4">
+        <div class="text-subtitle-1 font-medium truncate">{{ gameTitle }}</div>
+        <div class="text-caption opacity-70 truncate">{{ game?.mod_root_path }}</div>
+      </div>
+
+      <v-list nav density="compact">
+        <v-list-item
+          v-for="section in sections"
+          :key="section.key"
+          :active="activeSection === section.key"
+          rounded="sm"
+          @click="activeSection = section.key"
+        >
+          <template #prepend>
+            <v-icon :icon="section.icon" />
+          </template>
+          <v-list-item-title>{{ t(`gameManager.sections.${section.key}`) }}</v-list-item-title>
+        </v-list-item>
+      </v-list>
+    </aside>
+
     <section class="min-w-0 flex-1 overflow-auto p-5">
       <div v-if="!selectedItem" class="grid gap-5">
         <div class="flex flex-wrap items-center justify-between gap-4">
@@ -443,7 +474,10 @@ onBeforeUnmount(() => {})
           </div>
 
           <div class="flex items-center gap-3">
-            <genshin-elements @select="handleElementSelect"></genshin-elements>
+            <genshin-elements
+              v-if="activeSection === 'characters'"
+              @select="handleElementSelect"
+            ></genshin-elements>
 
             <v-btn-toggle
               v-if="activeSection === 'characters'"
@@ -478,7 +512,7 @@ onBeforeUnmount(() => {})
                 </v-card>
               </template>
             </v-tooltip>
-            <div v-for="item in dataList" :key="item.name" class="card height-20">
+            <div v-for="item in filteredItems" :key="item.id" class="card height-20">
               <v-card
                 class="character-card cursor-pointer"
                 variant="tonal"
@@ -486,14 +520,14 @@ onBeforeUnmount(() => {})
               >
                 <div class="w-full p-3">
                   <div class="w-50 mx-auto">
-                    <v-img :src="item.avatar" cover />
+                    <v-img :src="item.image" cover />
                   </div>
                 </div>
                 <v-card-text class="character-card__body">
                   <div class="w-full gap-3">
                     <div class="min-w-0 text-center">
-                      <div class="text-subtitle-1 truncate">{{ item.name }}</div>
-                      <div class="text-body-2 opacity-70 truncate">{{ item.zhCn }}</div>
+                      <div class="text-subtitle-1 truncate">{{ item.nameEn }}</div>
+                      <div class="text-body-2 opacity-70 truncate">{{ item.nameZh }}</div>
                     </div>
                     <div class="flex shrink-0 items-center gap-1">
                       <v-chip

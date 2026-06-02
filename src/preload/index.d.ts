@@ -1,13 +1,9 @@
 import { ElectronAPI } from '@electron-toolkit/preload'
+import type { api } from './api'
 
 declare global {
   interface Window {
     electron: ElectronAPI
-    api: unknown
-    fileApi: {
-      selectDirectory: () => Promise<string | null>
-      selectImage: () => Promise<string | null>
-      downloadImage: (url: string, gameId: string) => Promise<string>
-    }
+    api: typeof api
   }
 }
