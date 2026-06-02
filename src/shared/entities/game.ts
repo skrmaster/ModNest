@@ -1,5 +1,5 @@
 export interface UserGame {
-  id: number
+  id: string
 
   name: string
 

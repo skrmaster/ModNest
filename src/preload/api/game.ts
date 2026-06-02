@@ -6,18 +6,22 @@ export const gameApi = {
     return ipcRenderer.invoke('game:create', data)
   },
 
-  update(id: number, data: UpdateDto) {
+  update(id: string, data: UpdateDto) {
     return ipcRenderer.invoke('game:update', {
       id,
       ...data
     })
   },
 
-  remove(id: number) {
+  remove(id: string) {
     return ipcRenderer.invoke('game:remove', id)
   },
 
   list() {
     return ipcRenderer.invoke('game:list')
+  },
+
+  getById(id: string) {
+    return ipcRenderer.invoke('game:getInfoById', id)
   }
 }

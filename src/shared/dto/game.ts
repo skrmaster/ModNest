@@ -1,5 +1,5 @@
 export interface CreateGameDto {
-  id?: number
+  id?: string
 
   name: string
 

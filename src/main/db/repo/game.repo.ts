@@ -31,18 +31,19 @@ export class GameRepository {
         `
           SELECT *
           FROM t_user_game
-          ORDER BY id DESC
+          ORDER BY id
         `
       )
       .all() as UserGame[]
 
     return rows.map((row) => ({
       ...row,
-      cover: row.cover ? `app-image://seed-images/${row.cover}` : null
+      cover: row.cover ? `app-image://seed-images/${row.cover}` : null,
+      id: row.id.toString()
     }))
   }
 
-  update(id: number, data: Partial<UserGame>) {
+  update(id: string, data: Partial<UserGame>) {
     const fields: string[] = []
     const params: Record<string, unknown> = { id }
 
@@ -69,8 +70,31 @@ export class GameRepository {
     return stmt.run(params)
   }
 
-  remove(id: number) {
+  remove(id: string) {
     const stmt = this.db.prepare('DELETE FROM t_user_game WHERE id = ?')
     return stmt.run(id)
+  }
+
+  findById(id: string): UserGame | null {
+    const row = this.db
+      .prepare(
+        `
+        SELECT *
+        FROM t_user_game
+        WHERE id = ?
+        LIMIT 1
+        `
+      )
+      .get(id) as UserGame | undefined
+
+    if (!row) {
+      return null
+    }
+
+    return {
+      ...row,
+      cover: row.cover ? `app-image://seed-images/${row.cover}` : null,
+      id: row.id.toString()
+    }
   }
 }

@@ -109,11 +109,11 @@ const gameTitle = computed(() => {
     : game.value.name || game.value.name_zh_cn
 })
 
-const game = computed(() => games.value.find((item) => item.id === Number(route.params.gameId)))
+const game = computed(() => games.value.find((item) => item.id === route.params.gameId))
 
 const defaultCatalog = computed<ManagedCatalog>(() => {
   const preview = game.value?.cover || fallbackPreview
-  const isZzz = game.value?.id === 2
+  const isZzz = game.value?.id === '2'
   const characterDefaults: ManagedItem[] = dataList.map((item) => ({
     id: `default-character-${item.name}`,
     nameZh: item.zhCn,
@@ -125,64 +125,66 @@ const defaultCatalog = computed<ManagedCatalog>(() => {
   }))
 
   return {
-    characters: characterDefaults.length ? characterDefaults : [
-      {
-        id: 'default-character-1',
-        nameZh: isZzz ? '安比' : '荧',
-        nameEn: isZzz ? 'Anby' : 'Lumine',
-        image: preview,
-        category: 'attack',
-        isDefault: true,
-        mods: [
+    characters: characterDefaults.length
+      ? characterDefaults
+      : [
           {
-            id: 'mod-1',
-            enabled: true,
-            addedAt: '2026-05-28',
-            name: 'Classic outfit replacement',
-            author: 'Local',
-            version: '1.0.0',
-            preview
+            id: 'default-character-1',
+            nameZh: isZzz ? '安比' : '荧',
+            nameEn: isZzz ? 'Anby' : 'Lumine',
+            image: preview,
+            category: 'attack',
+            isDefault: true,
+            mods: [
+              {
+                id: 'mod-1',
+                enabled: true,
+                addedAt: '2026-05-28',
+                name: 'Classic outfit replacement',
+                author: 'Local',
+                version: '1.0.0',
+                preview
+              },
+              {
+                id: 'mod-2',
+                enabled: false,
+                addedAt: '2026-05-27',
+                name: 'High resolution texture pack',
+                author: 'Local',
+                version: '1.2.0',
+                preview
+              }
+            ]
           },
           {
-            id: 'mod-2',
-            enabled: false,
-            addedAt: '2026-05-27',
-            name: 'High resolution texture pack',
-            author: 'Local',
-            version: '1.2.0',
-            preview
-          }
-        ]
-      },
-      {
-        id: 'default-character-2',
-        nameZh: isZzz ? '妮可' : '派蒙',
-        nameEn: isZzz ? 'Nicole' : 'Paimon',
-        image: preview,
-        category: 'support',
-        isDefault: true,
-        mods: [
+            id: 'default-character-2',
+            nameZh: isZzz ? '妮可' : '派蒙',
+            nameEn: isZzz ? 'Nicole' : 'Paimon',
+            image: preview,
+            category: 'support',
+            isDefault: true,
+            mods: [
+              {
+                id: 'mod-3',
+                enabled: true,
+                addedAt: '2026-05-26',
+                name: 'Voice line helper',
+                author: 'Local',
+                version: '0.9.1',
+                preview
+              }
+            ]
+          },
           {
-            id: 'mod-3',
-            enabled: true,
-            addedAt: '2026-05-26',
-            name: 'Voice line helper',
-            author: 'Local',
-            version: '0.9.1',
-            preview
+            id: 'default-character-3',
+            nameZh: isZzz ? '本' : '诺艾尔',
+            nameEn: isZzz ? 'Ben' : 'Noelle',
+            image: preview,
+            category: 'defense',
+            isDefault: true,
+            mods: []
           }
-        ]
-      },
-      {
-        id: 'default-character-3',
-        nameZh: isZzz ? '本' : '诺艾尔',
-        nameEn: isZzz ? 'Ben' : 'Noelle',
-        image: preview,
-        category: 'defense',
-        isDefault: true,
-        mods: []
-      }
-    ],
+        ],
     weapons: [
       {
         id: 'default-weapon-1',

@@ -40,7 +40,7 @@ const isExpanded = ref(true)
 const drawer = ref(true)
 const gameDialog = ref(false)
 const games = ref<ListItem[]>([])
-const selectedGameId = ref<number>()
+const selectedGameId = ref<string>()
 const isSaving = ref(false)
 const formError = ref('')
 const gameForm = reactive<CreateGameDto>({
@@ -50,7 +50,7 @@ const gameForm = reactive<CreateGameDto>({
   cover: ''
 })
 
-const isDefaultGame = (gameId?: number): boolean => gameId === 1 || gameId === 2
+const isDefaultGame = (gameId?: string): boolean => gameId === '1' || gameId === '2'
 const isDefaultSelected = computed(() => isDefaultGame(selectedGameId.value))
 
 const currentWidth = computed(() =>

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { apiGetGameList } from '@renderer/api/game'
+import { apiGetGameById } from '@renderer/api/game'
 import type { UserGame } from '@shared/entities/game'
 
 const route = useRoute()
@@ -13,9 +13,18 @@ const saving = ref(false)
 const error = ref('')
 
 async function loadGame(gameIdParam: unknown): Promise<void> {
-  const gameId = Number(gameIdParam)
-  const games = await apiGetGameList()
-  game.value = games.find((item) => item.id === gameId) ?? null
+  const gameId = gameIdParam
+  game.value = await apiGetGameById(gameId as string)
+
+  if (game.value?.mod_root_path) {
+    router.push({
+      name: 'GameManager',
+      params: {
+        gameId: gameIdParam as string
+      }
+    })
+    return
+  }
 
   if (!game.value) {
     router.push({ name: 'Home' })
@@ -71,15 +80,20 @@ async function save(): Promise<void> {
   <div class="h-full p-6">
     <div class="mx-auto grid max-w-xl gap-5">
       <div>
-        <h2 class="text-2xl font-medium">配置默认游戏</h2>
-        <p class="mt-1 text-body-2 opacity-70">默认游戏只需要配置 Mod 路径。</p>
+        <h2 class="text-2xl font-medium">配置</h2>
+        <p class="mt-1 text-body-2 opacity-70">默认游戏只需要配置 Mod 路径</p>
       </div>
 
       <v-card v-if="game" variant="outlined">
         <v-card-text class="grid gap-4">
-          <div>
-            <div class="text-subtitle-1">{{ game.name_zh_cn || game.name }}</div>
-            <div class="text-body-2 opacity-70">{{ game.name }}</div>
+          <div class="flex items-center gap-2">
+            <v-avatar rounded="0" size="40">
+              <v-img v-if="game.cover" :src="game.cover" cover />
+            </v-avatar>
+            <div>
+              <div class="text-subtitle-1">{{ game.name_zh_cn || game.name }}</div>
+              <div class="text-body-2 opacity-70">{{ game.name }}</div>
+            </div>
           </div>
 
           <v-text-field v-model="modPath" label="Mod 路径" density="compact">

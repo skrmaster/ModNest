@@ -1,3 +1,4 @@
+import { UpdateDto } from '@shared/dto/game'
 import { GameRepository } from '../db/repo/game.repo'
 import { ipcMain } from 'electron'
 
@@ -18,13 +19,18 @@ export function register(): void {
     return result
   })
 
-  ipcMain.handle('game:update', (_, { id, ...data }: { id: number } & Record<string, unknown>) => {
-    const result = gameRepository.update(id, data)
+  ipcMain.handle('game:update', (_, { id, ...data }: UpdateDto) => {
+    const result = gameRepository.update(id as string, data)
     return result
   })
 
-  ipcMain.handle('game:remove', (_, id: number) => {
+  ipcMain.handle('game:remove', (_, id: string) => {
     const result = gameRepository.remove(id)
+    return result
+  })
+
+  ipcMain.handle('game:getInfoById', (_, id: string) => {
+    const result = gameRepository.findById(id)
     return result
   })
 }
