@@ -5,6 +5,7 @@ import App from './App.vue'
 import { setupRouter } from './router'
 import router from './router'
 import i18n from './i18n'
+import { gameStore } from './stores/game-store'
 
 // Vuetify
 import 'vuetify/styles'
@@ -60,7 +61,9 @@ async function bootstrap(): Promise<void> {
   app.use(i18n)
   // Automatic navigation: go to first game or default-setup
   try {
-    const games = await window.api.gameApi.list()
+    const gameStore = gameStore()
+    await gameStore.loadGames()
+    const games = gameStore.state.games
     if (games && games.length > 0) {
       const first = games[0]
       if (first.mod_root_path) {

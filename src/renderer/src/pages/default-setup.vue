@@ -1,20 +1,20 @@
 <script setup lang="ts">
 import { onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { apiGetGameById } from '@renderer/api/game'
 import type { UserGame } from '@shared/entities/game'
+import { gameStore } from '@renderer/stores/game-store'
 
 const route = useRoute()
 const router = useRouter()
 
-const game = ref<UserGame | null>(null)
+const game = ref<UserGame | undefined>()
 const modPath = ref('')
 const saving = ref(false)
 const error = ref('')
 
 async function loadGame(gameIdParam: unknown): Promise<void> {
   const gameId = gameIdParam
-  game.value = await apiGetGameById(gameId as string)
+  game.value = gameStore.getById(gameId as string)
 
   if (game.value?.mod_root_path) {
     router.push({
@@ -67,6 +67,7 @@ async function save(): Promise<void> {
     }
 
     await window.api.gameApi.update(game.value.id, { mod_root_path: nextPath })
+    gameStore.refresh()
     router.push({ name: 'GameManager', params: { gameId: game.value.id } })
   } catch (err: unknown) {
     error.value = err instanceof Error ? err.message : String(err)

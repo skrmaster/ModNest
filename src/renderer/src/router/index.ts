@@ -5,7 +5,14 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: '/',
     name: 'Home',
-    component: () => import('../pages/home.vue')
+    redirect: () => {
+      return {
+        path: '/games/1',
+        query: {
+          categoryId: '1'
+        }
+      }
+    }
   },
   {
     path: '/settings',

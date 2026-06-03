@@ -9,10 +9,6 @@ function getGameImageDirectory(): string {
   return join(app.getPath('userData'), 'game-images')
 }
 
-function getGameImageUrl(fileName: string): string {
-  return `${gameImageProtocol}://cache/${encodeURIComponent(fileName)}`
-}
-
 export function register(): void {
   registerGameImageProtocol()
 
@@ -76,7 +72,7 @@ export function register(): void {
       await fsPromises.mkdir(imageDirectory, { recursive: true })
       await fsPromises.writeFile(imagePath, Buffer.from(await response.arrayBuffer()))
 
-      return getGameImageUrl(fileName)
+      return fileName
     }
   )
 

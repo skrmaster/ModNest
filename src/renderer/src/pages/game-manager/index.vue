@@ -11,8 +11,8 @@ import {
 } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute } from 'vue-router'
-import { apiGetGameList } from '@renderer/api/game'
-import type { UserGame } from '@shared/entities/game'
+import { gameStore } from '@renderer/stores/game-store'
+import { categoryStore } from '@renderer/stores/category-store'
 import type { ManagedItem, SectionKey, CharacterCategory } from '#types/game-manager'
 import characterData from '@renderer/assets/games/genshin/characters.json'
 import gsap from 'gsap'
@@ -29,7 +29,8 @@ const { locale, t } = useI18n()
 
 const activeSection = ref<SectionKey>('characters')
 const activeCategory = ref<CharacterCategory>('all')
-const games = ref<UserGame[]>([])
+const games = computed(() => gameStore.getState().items)
+const category = computed(() => categoryStore.getState().items)
 const catalog = ref<ManagedCatalog>({
   characters: [],
   weapons: [],
@@ -324,10 +325,6 @@ const loadCatalog = async (): Promise<void> => {
   await persistCatalog()
 }
 
-const loadGames = async (): Promise<void> => {
-  games.value = await apiGetGameList()
-}
-
 const openItemDialog = (item?: ManagedItem): void => {
   editingItemId.value = item?.id
   itemFormError.value = ''
@@ -422,7 +419,9 @@ watch(
     selectedItemId.value = undefined
     activeSection.value = 'characters'
     activeCategory.value = 'all'
-    await loadGames()
+    if (!gameStore.getState().loaded) {
+      await gameStore.load()
+    }
     await loadCatalog()
   }
 )
@@ -432,7 +431,11 @@ watch(activeSection, () => {
 })
 
 onMounted(async () => {
-  await loadGames()
+  categoryStore.load()
+  console.log(route.params, route.query)
+  if (!gameStore.getState().loaded) {
+    await gameStore.load()
+  }
   await loadCatalog()
   window.addEventListener('resize', animateLayout)
 })
@@ -445,36 +448,31 @@ onBeforeUnmount(() => {})
 </script>
 
 <template>
-  <div class="h-full min-h-0 flex bg-background">
-    <aside class="w-44 shrink-0 border-r border-black/10 py-4 pr-3">
-      <div class="px-2 pb-4">
-        <div class="text-subtitle-1 font-medium truncate">{{ gameTitle }}</div>
-        <div class="text-caption opacity-70 truncate">{{ game?.mod_root_path }}</div>
-      </div>
-
-      <v-list nav density="compact">
-        <v-list-item
-          v-for="section in sections"
-          :key="section.key"
-          :active="activeSection === section.key"
-          rounded="sm"
-          @click="activeSection = section.key"
-        >
-          <template #prepend>
-            <v-icon :icon="section.icon" />
-          </template>
-          <v-list-item-title>{{ t(`gameManager.sections.${section.key}`) }}</v-list-item-title>
-        </v-list-item>
-      </v-list>
-    </aside>
-
-    <section class="min-w-0 flex-1 overflow-auto p-5">
-      <div v-if="!selectedItem" class="grid gap-5">
-        <div class="flex flex-wrap items-center justify-between gap-4">
+  <div class="h-full w-full">
+    <section class="h-full w-full">
+      <div v-if="!selectedItem" class="flex flex-col gap-5 h-full w-full">
+        <div class="flex items-center gap-4">
           <div>
             <h1>角色</h1>
           </div>
-
+          <aside class="w-44 shrink-0 border-r border-black/10 py-4 pr-3">
+            <v-list nav density="compact">
+              <v-list-item
+                v-for="section in sections"
+                :key="section.key"
+                :active="activeSection === section.key"
+                rounded="sm"
+                @click="activeSection = section.key"
+              >
+                <template #prepend>
+                  <v-icon :icon="section.icon" />
+                </template>
+                <v-list-item-title>{{
+                  t(`gameManager.sections.${section.key}`)
+                }}</v-list-item-title>
+              </v-list-item>
+            </v-list>
+          </aside>
           <div class="flex items-center gap-3">
             <genshin-elements
               v-if="activeSection === 'characters'"
@@ -499,63 +497,65 @@ onBeforeUnmount(() => {})
           </div>
         </div>
 
-        <div>
-          <div class="grid gap-4 grid-cols-[repeat(auto-fill,minmax(220px,1fr))]">
-            <v-tooltip key="add" text="添加" location="top">
-              <template #activator>
+        <div class="flex-1 overflow-hidden">
+          <div class="w-full h-full overflow-auto">
+            <div class="grid gap-4 grid-cols-[repeat(auto-fill,minmax(220px,1fr))]">
+              <v-tooltip key="add" text="添加" location="top">
+                <template #activator>
+                  <v-card
+                    class="character-card cursor-pointer"
+                    variant="tonal"
+                    @click="openItemDialog()"
+                  >
+                    <div class="flex items-center justify-center w-full h-full">
+                      <v-icon :size="40" color="ffffff">mdi-plus</v-icon>
+                    </div>
+                  </v-card>
+                </template>
+              </v-tooltip>
+              <div v-for="item in filteredItems" :key="item.id" class="card height-20">
                 <v-card
                   class="character-card cursor-pointer"
                   variant="tonal"
-                  @click="openItemDialog()"
+                  @click="showItemDetail(item)"
                 >
-                  <div class="flex items-center justify-center w-full h-full">
-                    <v-icon :size="40" color="ffffff">mdi-plus</v-icon>
+                  <div class="w-full p-3">
+                    <div class="w-50 mx-auto">
+                      <v-img :src="item.image" cover />
+                    </div>
                   </div>
+                  <v-card-text class="character-card__body">
+                    <div class="w-full gap-3">
+                      <div class="min-w-0 text-center">
+                        <div class="text-subtitle-1 truncate">{{ item.nameEn }}</div>
+                        <div class="text-body-2 opacity-70 truncate">{{ item.nameZh }}</div>
+                      </div>
+                      <div class="flex shrink-0 items-center gap-1">
+                        <v-chip
+                          v-if="activeSection === 'characters'"
+                          size="small"
+                          color="primary"
+                          variant="tonal"
+                        >
+                          {{ t('gameManager.modCount', { count: item.mods?.length ?? 0 }) }}
+                        </v-chip>
+                        <v-btn
+                          icon="mdi-pencil-outline"
+                          size="small"
+                          variant="text"
+                          @click.stop="openItemDialog(item)"
+                        />
+                        <v-btn
+                          icon="mdi-delete-outline"
+                          size="small"
+                          variant="text"
+                          @click.stop="deleteItem(item)"
+                        />
+                      </div>
+                    </div>
+                  </v-card-text>
                 </v-card>
-              </template>
-            </v-tooltip>
-            <div v-for="item in filteredItems" :key="item.id" class="card height-20">
-              <v-card
-                class="character-card cursor-pointer"
-                variant="tonal"
-                @click="showItemDetail(item)"
-              >
-                <div class="w-full p-3">
-                  <div class="w-50 mx-auto">
-                    <v-img :src="item.image" cover />
-                  </div>
-                </div>
-                <v-card-text class="character-card__body">
-                  <div class="w-full gap-3">
-                    <div class="min-w-0 text-center">
-                      <div class="text-subtitle-1 truncate">{{ item.nameEn }}</div>
-                      <div class="text-body-2 opacity-70 truncate">{{ item.nameZh }}</div>
-                    </div>
-                    <div class="flex shrink-0 items-center gap-1">
-                      <v-chip
-                        v-if="activeSection === 'characters'"
-                        size="small"
-                        color="primary"
-                        variant="tonal"
-                      >
-                        {{ t('gameManager.modCount', { count: item.mods?.length ?? 0 }) }}
-                      </v-chip>
-                      <v-btn
-                        icon="mdi-pencil-outline"
-                        size="small"
-                        variant="text"
-                        @click.stop="openItemDialog(item)"
-                      />
-                      <v-btn
-                        icon="mdi-delete-outline"
-                        size="small"
-                        variant="text"
-                        @click.stop="deleteItem(item)"
-                      />
-                    </div>
-                  </div>
-                </v-card-text>
-              </v-card>
+              </div>
             </div>
           </div>
         </div>

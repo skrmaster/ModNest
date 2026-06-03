@@ -2,8 +2,8 @@
   <v-app>
     <div class="w-screen h-screen flex">
       <LeftNav />
-      <v-main>
-        <div class="flex-1 overflow-hidden ml-3">
+      <v-main class="flex-1 overflow-hidden">
+        <div class="pl-3 w-full h-full">
           <router-view />
         </div>
       </v-main>
