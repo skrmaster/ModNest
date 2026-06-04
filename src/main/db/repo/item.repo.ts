@@ -29,20 +29,38 @@ export class ItemRepo {
     return stmt.run(data)
   }
 
-  list(gameId: string, categoryId: string): ItemEntity[] {
-    const rows = this.db
-      .prepare(
-        `
-      SELECT *
-      FROM t_game_item
-      WHERE game_id = ?
-        AND category_id = ?
-      ORDER BY id
-      `
-      )
-      .all(gameId, categoryId) as ItemEntity[]
+  list(gameId: string, primaryCategoryId: string, secondaryCategoryId?: string): ItemEntity[] {
+    const rows = secondaryCategoryId
+      ? this.db
+          .prepare(
+            `
+              SELECT gi.*
+              FROM t_game_item gi
+              JOIN t_category_records cr
+                ON cr.item_id = gi.id
+              WHERE gi.game_id = ?
+                AND cr.category_id IN (?, ?)
+              GROUP BY gi.id
+              HAVING COUNT(DISTINCT cr.category_id) = 2
+              ORDER BY gi.id
+            `
+          )
+          .all(gameId, primaryCategoryId, secondaryCategoryId)
+      : this.db
+          .prepare(
+            `
+              SELECT gi.*
+              FROM t_game_item gi
+              JOIN t_category_records cr
+                ON cr.item_id = gi.id
+              WHERE gi.game_id = ?
+                AND cr.category_id = ?
+              ORDER BY gi.id
+            `
+          )
+          .all(gameId, primaryCategoryId)
 
-    return rows.map((row) => ({
+    return (rows as ItemEntity[]).map((row) => ({
       ...row,
       cover: row.cover ? `app-image://seed-images/${row.cover}` : null,
       id: row.id.toString()
@@ -68,11 +86,6 @@ export class ItemRepo {
     if (data.mod_count !== undefined) {
       fields.push('mod_count = @mod_count')
       params.mod_count = data.mod_count
-    }
-
-    if (data.category_id !== undefined) {
-      fields.push('category_id = @category_id')
-      params.category_id = data.category_id
     }
     if (data.game_id !== undefined) {
       fields.push('game_id = @game_id')

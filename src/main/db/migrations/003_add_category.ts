@@ -8,30 +8,24 @@ export function up(db: Database.Database) {
       "name" text NOT NULL,
       "icon" text,
       "name_zh_cn" text NOT NULL,
+      "level" integer,
+      "cover" text,
       UNIQUE ("name")
     );
   `)
 
   const stmt = db.prepare(`
-    INSERT OR IGNORE INTO t_game_category (
-      id,
+    INSERT INTO t_game_category (
       name,
       name_zh_cn,
-      icon
+      icon,
+      level,
+      cover
     )
-    VALUES (
-      @id,
-      @name,
-      @name_zh_cn,
-      @icon
-    )
+    VALUES (?, ?, ?, ?, ?)
   `)
 
-  const transaction = db.transaction(() => {
-    for (const item of items) {
-      stmt.run(item)
-    }
-  })
-
-  transaction()
+  for (const category of items) {
+    stmt.run(category.name, category.name_zh_cn, category.icon, category.level, category.cover)
+  }
 }

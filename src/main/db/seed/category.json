@@ -1,26 +1,90 @@
 [
   {
     "id": 1,
-    "name": "role",
+    "name": "character",
     "icon": "",
-    "name_zh_cn": "角色"
+    "name_zh_cn": "角色",
+    "level": 0,
+    "cover": ""
   },
   {
     "id": 2,
     "name": "weapon",
     "icon": "",
-    "name_zh_cn": "武器"
+    "name_zh_cn": "武器",
+    "level": 0,
+    "cover": ""
   },
   {
     "id": 3,
     "name": "npc",
     "icon": "",
-    "name_zh_cn": "NPC"
+    "name_zh_cn": "NPC",
+    "level": 0,
+    "cover": ""
   },
   {
     "id": 4,
     "name": "item",
     "icon": "",
-    "name_zh_cn": "物品"
+    "name_zh_cn": "物品",
+    "level": 0,
+    "cover": ""
+  },
+  {
+    "id": 5,
+    "name": "pyro",
+    "icon": "",
+    "name_zh_cn": "火元素",
+    "level": 1,
+    "cover": "genshin/elements/pyro.svg"
+  },
+  {
+    "id": 6,
+    "name": "hydro",
+    "icon": "",
+    "name_zh_cn": "水元素",
+    "level": 1,
+    "cover": "genshin/elements/hydro.svg"
+  },
+  {
+    "id": 7,
+    "name": "anemo",
+    "icon": "",
+    "name_zh_cn": "风元素",
+    "level": 1,
+    "cover": "genshin/elements/anemo.svg"
+  },
+  {
+    "id": 8,
+    "name": "electro",
+    "icon": "",
+    "name_zh_cn": "雷元素",
+    "level": 1,
+    "cover": "genshin/elements/electro.svg"
+  },
+  {
+    "id": 9,
+    "name": "dendro",
+    "icon": "",
+    "name_zh_cn": "草元素",
+    "level": 1,
+    "cover": "genshin/elements/dendro.svg"
+  },
+  {
+    "id": 10,
+    "name": "cryo",
+    "icon": "",
+    "name_zh_cn": "冰元素",
+    "level": 1,
+    "cover": "genshin/elements/cryo.svg"
+  },
+  {
+    "id": 11,
+    "name": "geo",
+    "icon": "",
+    "name_zh_cn": "岩元素",
+    "level": 1,
+    "cover": "genshin/elements/geo.svg"
   }
 ]

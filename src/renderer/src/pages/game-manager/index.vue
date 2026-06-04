@@ -1,448 +1,164 @@
 <script setup lang="ts">
-import {
-  computed,
-  nextTick,
-  onBeforeUnmount,
-  onMounted,
-  onUnmounted,
-  reactive,
-  ref,
-  watch
-} from 'vue'
+import { computed, onBeforeUnmount, onMounted, onUnmounted, reactive, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { gameStore } from '@renderer/stores/game-store'
 import { categoryStore } from '@renderer/stores/category-store'
-import type { ManagedItem, SectionKey, CharacterCategory } from '#types/game-manager'
-import characterData from '@renderer/assets/games/genshin/characters.json'
-import gsap from 'gsap'
-import { Flip } from 'gsap/Flip'
 import GenshinElements from '@renderer/components/genshin-elements.vue'
+import { apiGetItemList } from '@renderer/api/item'
+import { ItemEntity } from '@shared/entities/item'
+import type { CreateItemDto } from '@shared/dto/item'
+import { QueryParams } from '@shared/types/item'
 
-gsap.registerPlugin(Flip)
+const router = useRouter()
+router.beforeEach(async (to) => {
+  if (!to.meta.requireModPath) {
+    return true
+  }
 
-type ManagedCatalog = Record<SectionKey, ManagedItem[]>
-type StoredCatalogs = Record<string, ManagedCatalog>
+  const gameId = to.params.gameId as string
+
+  const game = await window.api.gameApi.getById(gameId)
+
+  if (!game.mod_root_path) {
+    return {
+      name: 'DefaultSetup',
+      params: {
+        gameId
+      }
+    }
+  }
+
+  return true
+})
 
 const route = useRoute()
-const { locale, t } = useI18n()
+const { t } = useI18n()
 
-const activeSection = ref<SectionKey>('characters')
-const activeCategory = ref<CharacterCategory>('all')
-const games = computed(() => gameStore.getState().items)
+const activeSection = ref<string>('1')
+const { gameId } = route.params
+
 const category = computed(() => categoryStore.getState().items)
-const catalog = ref<ManagedCatalog>({
-  characters: [],
-  weapons: [],
-  custom: []
+const level0Filter = computed(() => category.value.filter((e) => e.level === 0))
+
+const queryParams = reactive<QueryParams>({
+  gameId: gameId as string,
+  primaryCategoryId: '1',
+  secondaryCategoryId: undefined
 })
+const selectedItem = ref()
 const selectedItemId = ref<string>()
 const itemDialog = ref(false)
 const itemFormError = ref('')
 const editingItemId = ref<string>()
 
-type Character = {
-  image: string
-  element: string
-  class: string
-  avatar: string
-  zhCn: string
-  name: string
-}
-const imageMap: Record<string, string> = {}
-const imageModules = import.meta.glob(
-  '@renderer/assets/games/genshin/images/characters/*.{png,jpg,jpeg,webp}',
-  {
-    eager: true,
-    import: 'default'
-  }
-)
-
-function charactersList(): Character[] {
-  for (const path in imageModules) {
-    const match = path.match(/\/([^/]+)\.(png|jpg|jpeg|webp)$/)
-
-    if (!match) continue
-
-    const fileName = match[1]
-
-    imageMap[fileName] = imageModules[path] as string
-  }
-
-  return (characterData as Character[]).map((item) => {
-    return {
-      ...item,
-      avatar: imageMap[item.image.split('.')[0]]
-    }
-  })
-}
-
-const dataList = charactersList()
-
-const fallbackPreview =
-  'https://fastcdn.mihoyo.com/static-resource-v2/2025/07/03/516186272072a512a460c81222aecf1d_5955932201223190759.jpg'
-
-const itemForm = reactive<ManagedItem>({
-  id: '',
-  nameZh: '',
-  nameEn: '',
-  image: '',
-  category: 'attack',
-  isDefault: false,
-  mods: []
+const itemForm = reactive<CreateItemDto>({
+  name: '',
+  name_zh_cn: '',
+  cover: null,
+  mod_count: 0,
+  game_id: ''
 })
 
-const characterCategories: Array<{ key: CharacterCategory }> = []
-
-const sections: Array<{ key: SectionKey; icon: string }> = [
-  { key: 'characters', icon: 'mdi-account-group-outline' },
-  { key: 'weapons', icon: 'mdi-sword' },
-  { key: 'custom', icon: 'mdi-shape-outline' }
-]
-
-const gameTitle = computed(() => {
-  if (!game.value) {
-    return t('gameManager.unknownGame')
-  }
-
-  return locale.value === 'zh-CN'
-    ? game.value.name_zh_cn || game.value.name
-    : game.value.name || game.value.name_zh_cn
-})
-
-const game = computed(() => games.value.find((item) => item.id === route.params.gameId))
-
-const defaultCatalog = computed<ManagedCatalog>(() => {
-  const preview = game.value?.cover || fallbackPreview
-  const isZzz = game.value?.id === '2'
-  const characterDefaults: ManagedItem[] = dataList.map((item) => ({
-    id: `default-character-${item.name}`,
-    nameZh: item.zhCn,
-    nameEn: item.name,
-    image: item.avatar || preview,
-    category: 'attack',
-    isDefault: true,
-    mods: []
-  }))
-
-  return {
-    characters: characterDefaults.length
-      ? characterDefaults
-      : [
-          {
-            id: 'default-character-1',
-            nameZh: isZzz ? '安比' : '荧',
-            nameEn: isZzz ? 'Anby' : 'Lumine',
-            image: preview,
-            category: 'attack',
-            isDefault: true,
-            mods: [
-              {
-                id: 'mod-1',
-                enabled: true,
-                addedAt: '2026-05-28',
-                name: 'Classic outfit replacement',
-                author: 'Local',
-                version: '1.0.0',
-                preview
-              },
-              {
-                id: 'mod-2',
-                enabled: false,
-                addedAt: '2026-05-27',
-                name: 'High resolution texture pack',
-                author: 'Local',
-                version: '1.2.0',
-                preview
-              }
-            ]
-          },
-          {
-            id: 'default-character-2',
-            nameZh: isZzz ? '妮可' : '派蒙',
-            nameEn: isZzz ? 'Nicole' : 'Paimon',
-            image: preview,
-            category: 'support',
-            isDefault: true,
-            mods: [
-              {
-                id: 'mod-3',
-                enabled: true,
-                addedAt: '2026-05-26',
-                name: 'Voice line helper',
-                author: 'Local',
-                version: '0.9.1',
-                preview
-              }
-            ]
-          },
-          {
-            id: 'default-character-3',
-            nameZh: isZzz ? '本' : '诺艾尔',
-            nameEn: isZzz ? 'Ben' : 'Noelle',
-            image: preview,
-            category: 'defense',
-            isDefault: true,
-            mods: []
-          }
-        ],
-    weapons: [
-      {
-        id: 'default-weapon-1',
-        nameZh: isZzz ? '音擎 A' : '单手剑',
-        nameEn: isZzz ? 'W-Engine A' : 'Sword',
-        image: preview,
-        isDefault: true
-      },
-      {
-        id: 'default-weapon-2',
-        nameZh: isZzz ? '音擎 B' : '弓',
-        nameEn: isZzz ? 'W-Engine B' : 'Bow',
-        image: preview,
-        isDefault: true
-      }
-    ],
-    custom: [
-      {
-        id: 'default-custom-1',
-        nameZh: '材质',
-        nameEn: 'Textures',
-        image: preview,
-        isDefault: true
-      },
-      {
-        id: 'default-custom-2',
-        nameZh: '界面',
-        nameEn: 'UI',
-        image: preview,
-        isDefault: true
-      }
-    ]
-  }
-})
-
-const activeItems = computed(() => catalog.value[activeSection.value])
+const activeItems = ref<ItemEntity[]>()
+const searchText = ref<string | undefined>()
 
 const filteredItems = computed(() => {
-  if (activeSection.value !== 'characters' || activeCategory.value === 'all') {
+  const keyword = searchText.value?.trim().toLowerCase()
+
+  if (!keyword) {
     return activeItems.value
   }
 
-  return activeItems.value.filter((item) => item.category === activeCategory.value)
-})
+  return activeItems.value?.filter((item) => {
+    const name = (item.name ?? '').toLowerCase()
+    const nameZhCn = (item.name_zh_cn ?? '').toLowerCase()
 
-const selectedItem = computed(() =>
-  catalog.value.characters.find((item) => item.id === selectedItemId.value)
-)
-
-const selectedPreview = computed(() => {
-  return selectedItem.value?.mods?.find((mod) => mod.enabled)?.preview || selectedItem.value?.image
-})
-
-const getItemName = (item: ManagedItem): string => {
-  return locale.value === 'zh-CN' ? item.nameZh || item.nameEn : item.nameEn || item.nameZh
-}
-
-const cloneCatalog = (source: ManagedCatalog): ManagedCatalog => ({
-  characters: source.characters.map((item) => ({
-    ...item,
-    mods: item.mods?.map((mod) => ({ ...mod })) ?? []
-  })),
-  weapons: source.weapons.map((item) => ({ ...item })),
-  custom: source.custom.map((item) => ({ ...item }))
-})
-
-const mergeCatalog = (savedCatalog?: ManagedCatalog): ManagedCatalog => {
-  const defaults = cloneCatalog(defaultCatalog.value)
-
-  if (!savedCatalog) {
-    return defaults
-  }
-
-  const mergeSection = (section: SectionKey): ManagedItem[] => {
-    const savedItems = Array.isArray(savedCatalog[section]) ? savedCatalog[section] : []
-    const savedById = new Map(savedItems.map((item) => [item.id, item]))
-    const defaultItems = defaults[section].map((item) => ({
-      ...item,
-      ...savedById.get(item.id),
-      isDefault: true
-    }))
-    const customItems = savedItems.filter(
-      (item) => !defaults[section].some((defaultItem) => defaultItem.id === item.id)
-    )
-
-    return [...defaultItems, ...customItems]
-  }
-
-  return {
-    characters: mergeSection('characters'),
-    weapons: mergeSection('weapons'),
-    custom: mergeSection('custom')
-  }
-}
-
-const toPlainCatalog = (source: ManagedCatalog): ManagedCatalog => ({
-  characters: source.characters.map((item) => ({
-    id: item.id,
-    nameZh: item.nameZh,
-    nameEn: item.nameEn,
-    image: item.image,
-    category: item.category ?? 'attack',
-    isDefault: item.isDefault,
-    mods: item.mods?.map((mod) => ({ ...mod })) ?? []
-  })),
-  weapons: source.weapons.map((item) => ({
-    id: item.id,
-    nameZh: item.nameZh,
-    nameEn: item.nameEn,
-    image: item.image,
-    isDefault: item.isDefault
-  })),
-  custom: source.custom.map((item) => ({
-    id: item.id,
-    nameZh: item.nameZh,
-    nameEn: item.nameEn,
-    image: item.image,
-    isDefault: item.isDefault
-  }))
-})
-
-const persistCatalog = async (): Promise<void> => {
-  const gameId = String(route.params.gameId)
-  const storedCatalogs = (await window.api.settingsApi.get('gameManagedCatalogs')) as StoredCatalogs
-  const nextCatalogs = {
-    ...(storedCatalogs && typeof storedCatalogs === 'object' ? storedCatalogs : {}),
-    [gameId]: toPlainCatalog(catalog.value)
-  }
-
-  await window.api.settingsApi.set('gameManagedCatalogs', nextCatalogs)
-}
-
-const loadCatalog = async (): Promise<void> => {
-  const gameId = String(route.params.gameId)
-  const storedCatalogs = (await window.api.settingsApi.get('gameManagedCatalogs')) as StoredCatalogs
-  catalog.value = mergeCatalog(storedCatalogs?.[gameId])
-  await persistCatalog()
-}
-
-const openItemDialog = (item?: ManagedItem): void => {
-  editingItemId.value = item?.id
-  itemFormError.value = ''
-  Object.assign(itemForm, {
-    id: item?.id ?? `${activeSection.value}-${Date.now()}`,
-    nameZh: item?.nameZh ?? '',
-    nameEn: item?.nameEn ?? '',
-    image: item?.image ?? '',
-    category: item?.category ?? 'attack',
-    isDefault: item?.isDefault ?? false,
-    mods: item?.mods?.map((mod) => ({ ...mod })) ?? []
+    return name.includes(keyword) || nameZhCn.includes(keyword)
   })
-  itemDialog.value = true
+})
+
+async function getItems() {
+  activeItems.value = await apiGetItemList(queryParams)
+}
+
+const openItemDialog = (item?: ItemEntity): void => {
+  editingItemId.value = item?.id
 }
 
 const saveItem = async (): Promise<void> => {
-  itemForm.nameZh = itemForm.nameZh.trim()
-  itemForm.nameEn = itemForm.nameEn.trim()
-  itemForm.image = itemForm.image.trim()
+  itemForm.name_zh_cn = itemForm.name_zh_cn.trim()
+  itemForm.name = itemForm.name.trim()
+  itemForm.cover = itemForm.cover?.trim() || null
 
-  if (!itemForm.nameZh || !itemForm.nameEn || !itemForm.image) {
-    itemFormError.value = t('gameManager.itemRequiredError')
+  if (!itemForm.name_zh_cn || !itemForm.name || !itemForm.cover) {
+    itemFormError.value = '报错'
     return
   }
 
-  const item: ManagedItem = {
+  const item: CreateItemDto = {
     id: itemForm.id,
-    nameZh: itemForm.nameZh,
-    nameEn: itemForm.nameEn,
-    image: itemForm.image,
-    isDefault: itemForm.isDefault,
-    category: activeSection.value === 'characters' ? itemForm.category : undefined,
-    mods: activeSection.value === 'characters' ? (itemForm.mods ?? []) : undefined
-  }
-  const items = catalog.value[activeSection.value]
-  const existingIndex = items.findIndex((currentItem) => currentItem.id === item.id)
-
-  if (existingIndex >= 0) {
-    items[existingIndex] = item
-  } else {
-    items.push(item)
+    name_zh_cn: itemForm.name_zh_cn,
+    name: itemForm.name,
+    cover: itemForm.cover,
+    mod_count: 0,
+    game_id: '1'
   }
 
-  await persistCatalog()
   itemDialog.value = false
-}
-
-const deleteItem = async (item: ManagedItem): Promise<void> => {
-  catalog.value[activeSection.value] = catalog.value[activeSection.value].filter(
-    (currentItem) => currentItem.id !== item.id
-  )
-
-  if (selectedItemId.value === item.id) {
-    selectedItemId.value = undefined
-  }
-
-  await persistCatalog()
-}
-
-const showItemDetail = (item: ManagedItem): void => {
-  if (activeSection.value !== 'characters') {
-    openItemDialog(item)
-    return
-  }
-
-  selectedItemId.value = item.id
 }
 
 const backToItems = (): void => {
   selectedItemId.value = undefined
 }
 
-async function animateLayout(): Promise<void> {
-  const state = Flip.getState('.card')
+const elementMap = new Map()
 
-  await nextTick()
+async function handleElementSelect(v?: string) {
+  const categoryItem = category.value.find((e) => e.name === v)
 
-  Flip.from(state, {
-    duration: 0.2,
-    ease: 'power1.out',
-    absolute: true
-  })
-}
-
-function handleElementSelect(v?: string): void {
-  console.log(v)
+  if (categoryItem) {
+    queryParams.secondaryCategoryId = categoryItem.id
+  } else {
+    queryParams.secondaryCategoryId = undefined
+  }
+  await getItems()
 }
 
 watch(
   () => route.params.gameId,
   async () => {
     selectedItemId.value = undefined
-    activeSection.value = 'characters'
-    activeCategory.value = 'all'
+    activeSection.value = '1'
     if (!gameStore.getState().loaded) {
       await gameStore.load()
     }
-    await loadCatalog()
   }
 )
 
-watch(activeSection, () => {
+watch(activeSection, async (v) => {
   selectedItemId.value = undefined
+  queryParams.primaryCategoryId = v
+  await getItems()
 })
 
 onMounted(async () => {
-  categoryStore.load()
-  console.log(route.params, route.query)
+  if (!categoryStore.getState().loaded) {
+    await categoryStore.load()
+  }
+
+  category.value.forEach((e) => {
+    elementMap.set(e.name, e.id)
+  })
+
   if (!gameStore.getState().loaded) {
     await gameStore.load()
   }
-  await loadCatalog()
-  window.addEventListener('resize', animateLayout)
+
+  await getItems()
 })
 
-onUnmounted(() => {
-  window.removeEventListener('resize', animateLayout)
-})
+onUnmounted(() => {})
 
 onBeforeUnmount(() => {})
 </script>
@@ -450,50 +166,41 @@ onBeforeUnmount(() => {})
 <template>
   <div class="h-full w-full">
     <section class="h-full w-full">
-      <div v-if="!selectedItem" class="flex flex-col gap-5 h-full w-full">
-        <div class="flex items-center gap-4">
-          <div>
-            <h1>角色</h1>
+      <div v-if="!selectedItem" class="flex flex-col h-full w-full">
+        <div class="flex items-center gap-4 justify-between py-4 pr-3 flex-wrap">
+          <div class="shrink-0 flex gap-3 justify-center">
+            <v-chip-group v-model="activeSection" filter mandatory>
+              <v-chip
+                v-for="section in level0Filter"
+                :key="section.id"
+                :variant="activeSection === section.id ? 'elevated' : 'tonal'"
+                class="cursor-pointer"
+                :value="section.id"
+              >
+                {{ section.name_zh_cn }}
+              </v-chip>
+            </v-chip-group>
           </div>
-          <aside class="w-44 shrink-0 border-r border-black/10 py-4 pr-3">
-            <v-list nav density="compact">
-              <v-list-item
-                v-for="section in sections"
-                :key="section.key"
-                :active="activeSection === section.key"
-                rounded="sm"
-                @click="activeSection = section.key"
-              >
-                <template #prepend>
-                  <v-icon :icon="section.icon" />
-                </template>
-                <v-list-item-title>{{
-                  t(`gameManager.sections.${section.key}`)
-                }}</v-list-item-title>
-              </v-list-item>
-            </v-list>
-          </aside>
-          <div class="flex items-center gap-3">
-            <genshin-elements
-              v-if="activeSection === 'characters'"
-              @select="handleElementSelect"
-            ></genshin-elements>
-
-            <v-btn-toggle
-              v-if="activeSection === 'characters'"
-              v-model="activeCategory"
-              mandatory
+          <div class="flex-1 flex justify-center-safe">
+            <div class="mx-auto">
+              <genshin-elements
+                v-if="activeSection == '1'"
+                @select="handleElementSelect"
+              ></genshin-elements>
+            </div>
+          </div>
+          <div class="w-full max-w-120 mx-auto">
+            <v-text-field
+              v-model="searchText"
+              label="搜索"
+              placeholder="请输入搜索内容"
+              prepend-icon="mdi-magnify"
+              clearable
+              single-line
+              hide-details
               density="comfortable"
-              variant="outlined"
-            >
-              <v-btn
-                v-for="category in characterCategories"
-                :key="category.key"
-                :value="category.key"
-              >
-                {{ t(`gameManager.categories.${category.key}`) }}
-              </v-btn>
-            </v-btn-toggle>
+              color="primary"
+            ></v-text-field>
           </div>
         </div>
 
@@ -513,44 +220,25 @@ onBeforeUnmount(() => {})
                   </v-card>
                 </template>
               </v-tooltip>
-              <div v-for="item in filteredItems" :key="item.id" class="card height-20">
-                <v-card
-                  class="character-card cursor-pointer"
-                  variant="tonal"
-                  @click="showItemDetail(item)"
-                >
+              <div v-for="(item, index) in filteredItems" :key="index" class="card height-20">
+                <v-card class="character-card cursor-pointer" variant="tonal">
                   <div class="w-full p-3">
                     <div class="w-50 mx-auto">
-                      <v-img :src="item.image" cover />
+                      <v-img v-if="item.cover" :src="item.cover" cover />
                     </div>
                   </div>
                   <v-card-text class="character-card__body">
                     <div class="w-full gap-3">
                       <div class="min-w-0 text-center">
-                        <div class="text-subtitle-1 truncate">{{ item.nameEn }}</div>
-                        <div class="text-body-2 opacity-70 truncate">{{ item.nameZh }}</div>
+                        <div class="text-subtitle-1 truncate">{{ item.name }}</div>
+                        <div class="text-body-2 opacity-70 truncate">{{ item.name_zh_cn }}</div>
                       </div>
                       <div class="flex shrink-0 items-center gap-1">
-                        <v-chip
-                          v-if="activeSection === 'characters'"
-                          size="small"
-                          color="primary"
-                          variant="tonal"
-                        >
-                          {{ t('gameManager.modCount', { count: item.mods?.length ?? 0 }) }}
+                        <v-chip size="small" color="primary" variant="tonal">
+                          {{ item.mod_count }}
                         </v-chip>
-                        <v-btn
-                          icon="mdi-pencil-outline"
-                          size="small"
-                          variant="text"
-                          @click.stop="openItemDialog(item)"
-                        />
-                        <v-btn
-                          icon="mdi-delete-outline"
-                          size="small"
-                          variant="text"
-                          @click.stop="deleteItem(item)"
-                        />
+                        <v-btn icon="mdi-pencil-outline" size="small" variant="text" />
+                        <v-btn icon="mdi-delete-outline" size="small" variant="text" />
                       </div>
                     </div>
                   </v-card-text>
@@ -566,7 +254,7 @@ onBeforeUnmount(() => {})
           <v-btn icon="mdi-arrow-left" variant="text" @click="backToItems" />
           <div>
             <h1 class="text-h6">{{ getItemName(selectedItem) }}</h1>
-            <div class="text-body-2 opacity-70">{{ selectedItem.nameEn }}</div>
+            <div class="text-body-2 opacity-70">{{ selectedItem.name }}</div>
           </div>
         </div>
 
@@ -574,7 +262,7 @@ onBeforeUnmount(() => {})
           <section class="border-r border-black/10 pr-4">
             <v-img :src="selectedItem.image" aspect-ratio="1" cover />
             <div class="mt-3 text-subtitle-1">{{ selectedItem.nameZh }}</div>
-            <div class="text-body-2 opacity-70">{{ selectedItem.nameEn }}</div>
+            <div class="text-body-2 opacity-70">{{ selectedItem.name }}</div>
           </section>
 
           <section class="min-w-0 overflow-auto">
@@ -623,35 +311,13 @@ onBeforeUnmount(() => {})
         </v-card-title>
         <v-card-text>
           <div class="grid gap-3">
-            <v-img v-if="itemForm.image" :src="itemForm.image" height="180" cover />
+            <v-img v-if="itemForm.cover" :src="itemForm.cover" height="180" cover />
             <div class="grid gap-3 md:grid-cols-2">
-              <v-text-field
-                v-model="itemForm.nameZh"
-                :label="t('games.nameZh')"
-                density="compact"
-              />
-              <v-text-field
-                v-model="itemForm.nameEn"
-                :label="t('games.nameEn')"
-                density="compact"
-              />
+              <v-text-field v-model="itemForm.name_zh_cn" label="中文名" density="compact" />
+              <v-text-field v-model="itemForm.name" label="英文名" density="compact" />
             </div>
-            <v-text-field v-model="itemForm.image" :label="t('games.image')" density="compact" />
-            <v-select
-              v-if="activeSection === 'characters'"
-              v-model="itemForm.category"
-              :items="characterCategories.filter((category) => category.key !== 'all')"
-              :label="t('gameManager.category')"
-              item-value="key"
-              density="compact"
-            >
-              <template #selection="{ item }">
-                {{ t(`gameManager.categories.${item.key}`) }}
-              </template>
-              <template #item="{ props: itemProps, item }">
-                <v-list-item v-bind="itemProps" :title="t(`gameManager.categories.${item.key}`)" />
-              </template>
-            </v-select>
+            <v-text-field v-model="itemForm.cover" label="图片" density="compact" />
+
             <v-alert v-if="itemFormError" type="error" variant="tonal" density="compact">
               {{ itemFormError }}
             </v-alert>
@@ -659,8 +325,8 @@ onBeforeUnmount(() => {})
         </v-card-text>
         <v-card-actions>
           <v-spacer />
-          <v-btn variant="text" @click="itemDialog = false">{{ t('games.close') }}</v-btn>
-          <v-btn color="primary" @click="saveItem">{{ t('games.save') }}</v-btn>
+          <v-btn variant="tonal" @click="itemDialog = false">关闭</v-btn>
+          <v-btn variant="tonal" color="primary" @click="saveItem">保存</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>

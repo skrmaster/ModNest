@@ -1,7 +1,7 @@
 import { createHash } from 'crypto'
 import { pathToFileURL } from 'url'
 import { app, ipcMain, protocol, net, dialog } from 'electron'
-import { basename, extname, join, resolve } from 'path'
+import { extname, join, resolve } from 'path'
 import { promises as fsPromises } from 'fs'
 
 const gameImageProtocol = 'app-image'
@@ -10,7 +10,34 @@ function getGameImageDirectory(): string {
 }
 
 export function register(): void {
-  registerGameImageProtocol()
+  protocol.handle(gameImageProtocol, async (request) => {
+    try {
+      const url = new URL(request.url)
+
+      let filePath = ''
+
+      if (url.hostname === 'seed-images') {
+        filePath = join(
+          process.cwd(),
+          'resources',
+          'seed-images',
+          decodeURIComponent(url.pathname.replace(/^\//, ''))
+        )
+      } else {
+        return new Response('not found', {
+          status: 404
+        })
+      }
+
+      return net.fetch(pathToFileURL(filePath).toString())
+    } catch (e) {
+      console.error('protocol error:', e)
+
+      return new Response(String(e), {
+        status: 500
+      })
+    }
+  })
 
   // Handle directory selection
   ipcMain.handle('select-directory', async () => {
@@ -96,29 +123,4 @@ export function register(): void {
       return { success: false, error: `创建目录失败: ${errorMsg}` }
     }
   })
-}
-
-function registerGameImageProtocol(): void {
-  protocol.handle(gameImageProtocol, (request) => {
-    const url = new URL(request.url)
-    const fileName = decodeURIComponent(url.pathname.replace(/^\//, ''))
-
-    if (!fileName || fileName !== basename(fileName)) {
-      return new Response(null, { status: 400 })
-    }
-
-    return net.fetch(pathToFileURL(join(getGameImageDirectory(), fileName)).toString())
-  })
-
-  // protocol.handle('app-image', async (request) => {
-  //   const url = new URL(request.url)
-
-  //   const filePath = path.join(
-  //     process.resourcesPath,
-  //     'seed-images',
-  //     decodeURIComponent(url.pathname)
-  //   )
-
-  //   return Response.json(filePath)
-  // })
 }

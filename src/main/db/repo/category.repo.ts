@@ -8,7 +8,7 @@ export class CategoryRepository {
 
   create(data: Category) {
     const stmt = this.db.prepare(`
-      INSERT INTO t_user_game (
+      INSERT INTO t_game_category (
         name,
         name_zh_cn,
         icon
@@ -28,7 +28,7 @@ export class CategoryRepository {
       .prepare(
         `
           SELECT *
-          FROM t_user_game
+          FROM t_game_category
           ORDER BY id
         `
       )

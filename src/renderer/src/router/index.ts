@@ -5,14 +5,7 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: '/',
     name: 'Home',
-    redirect: () => {
-      return {
-        path: '/games/1',
-        query: {
-          categoryId: '1'
-        }
-      }
-    }
+    redirect: '/default-setup/1'
   },
   {
     path: '/settings',
@@ -27,6 +20,9 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: '/games/:gameId',
     name: 'GameManager',
+    meta: {
+      requireModPath: true
+    },
     component: () => import('../pages/game-manager/index.vue')
   }
 ]

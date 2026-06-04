@@ -6,4 +6,6 @@ export interface Category {
   name_zh_cn: string
 
   icon: string
+
+  level: number
 }

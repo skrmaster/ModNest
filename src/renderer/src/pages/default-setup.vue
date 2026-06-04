@@ -27,14 +27,16 @@ async function loadGame(gameIdParam: unknown): Promise<void> {
   }
 
   if (!game.value) {
-    router.push({ name: 'Home' })
+    router.push('/')
     return
   }
 
   modPath.value = game.value.mod_root_path ?? ''
 }
 
-onMounted(() => loadGame(route.params.gameId))
+onMounted(() => {
+  loadGame(route.params.gameId)
+})
 
 watch(
   () => route.params.gameId,
