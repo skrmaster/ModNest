@@ -16,9 +16,6 @@ export function register(): void {
 
   ipcMain.handle('item:list', (_, payload: QueryParams) => {
     const result = repo.list(payload.gameId, payload.primaryCategoryId, payload.secondaryCategoryId)
-
-    console.log(result)
-
     return result
   })
 

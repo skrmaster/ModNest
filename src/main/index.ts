@@ -5,6 +5,7 @@ import electronLocalshortcut from 'electron-localshortcut'
 import icon from '../../resources/icon.png?asset'
 import { DatabaseManager } from './db'
 import { registerIpcHandlers } from './ipc'
+import { registerModIpc } from './mod/Mod.ipc'
 
 function createWindow(): BrowserWindow {
   // Create the browser window.
@@ -103,6 +104,7 @@ app.whenReady().then(async () => {
 
   //set ipc
   registerIpcHandlers()
+  registerModIpc()
 
   const win = createWindow()
 

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, onMounted, onUnmounted, reactive, ref, watch } from 'vue'
+import { computed, onBeforeUnmount, onMounted, onUnmounted, reactive, ref, toRaw, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 import { gameStore } from '@renderer/stores/game-store'
@@ -9,6 +9,8 @@ import { apiGetItemList } from '@renderer/api/item'
 import { ItemEntity } from '@shared/entities/item'
 import type { CreateItemDto } from '@shared/dto/item'
 import { QueryParams } from '@shared/types/item'
+import { UserGame } from '@shared/entities/game'
+import modInspect from './components/mod-inspect.vue'
 
 const router = useRouter()
 router.beforeEach(async (to) => {
@@ -37,6 +39,7 @@ const { t } = useI18n()
 
 const activeSection = ref<string>('1')
 const { gameId } = route.params
+const game = ref<UserGame | undefined>()
 
 const category = computed(() => categoryStore.getState().items)
 const level0Filter = computed(() => category.value.filter((e) => e.level === 0))
@@ -46,11 +49,17 @@ const queryParams = reactive<QueryParams>({
   primaryCategoryId: '1',
   secondaryCategoryId: undefined
 })
-const selectedItem = ref()
+const selectedItem = ref<ItemEntity>()
 const selectedItemId = ref<string>()
 const itemDialog = ref(false)
 const itemFormError = ref('')
 const editingItemId = ref<string>()
+
+const getCategoryName = computed(() => {
+  const item = category.value.find((e) => e.id == queryParams.primaryCategoryId)
+
+  return item ? item.name : ''
+})
 
 const itemForm = reactive<CreateItemDto>({
   name: '',
@@ -82,6 +91,10 @@ async function getItems() {
   activeItems.value = await apiGetItemList(queryParams)
 }
 
+function handleDetail(item: ItemEntity) {
+  selectedItem.value = item
+}
+
 const openItemDialog = (item?: ItemEntity): void => {
   editingItemId.value = item?.id
 }
@@ -96,20 +109,37 @@ const saveItem = async (): Promise<void> => {
     return
   }
 
-  const item: CreateItemDto = {
-    id: itemForm.id,
-    name_zh_cn: itemForm.name_zh_cn,
-    name: itemForm.name,
-    cover: itemForm.cover,
-    mod_count: 0,
-    game_id: '1'
-  }
-
   itemDialog.value = false
 }
 
+async function handleModInstall(event: DragEvent) {
+  const files = event.dataTransfer?.files
+
+  if (!files?.length) {
+    return
+  }
+
+  if (!game.value) {
+    return
+  }
+
+  const archivePath = window.api.fileApi.getPathForFile(files[0])
+
+  if (game.value.mod_root_path && selectedItem.value?.name) {
+    const items = await window.api.modApi.inspectArchive({
+      archivePath: archivePath,
+      category: toRaw(getCategoryName.value),
+      itemName: selectedItem.value.name,
+      modsRoot: game.value.mod_root_path
+    })
+    console.log(items)
+    Object.assign(modData, items)
+    dialogVisible.value = true
+  }
+}
+
 const backToItems = (): void => {
-  selectedItemId.value = undefined
+  selectedItem.value = undefined
 }
 
 const elementMap = new Map()
@@ -142,6 +172,51 @@ watch(activeSection, async (v) => {
   await getItems()
 })
 
+function handleDragEnter(e: DragEvent) {
+  e.preventDefault()
+  if (e.dataTransfer) {
+    e.dataTransfer.dropEffect = 'copy'
+  }
+}
+
+function handleDragOver(e: DragEvent) {
+  e.preventDefault()
+  if (e.dataTransfer) {
+    e.dataTransfer.dropEffect = 'copy'
+  }
+}
+
+const dialogVisible = ref(false)
+
+// 模拟从 inspectArchive 获取的数据
+const modData = ref({
+  archivePath: 'C:/test.zip',
+  category: 'characters',
+  itemName: 'furina',
+  modName: '芙宁娜-白礼服',
+  createdAt: '2025-01-01T12:00:00.000Z',
+  exists: false, // 改为 true 即可看到覆盖安装按钮
+  previewImage: 'preview.png'
+})
+
+// 预览图（可以是本地路径、网络地址、base64）
+const previewUrl = ref('https://xxx.com/preview.jpg')
+
+// 取消
+const onCancel = () => {
+  console.log('用户取消')
+}
+
+// 安装
+const onInstall = (form) => {
+  console.log('执行安装：', form)
+}
+
+// 覆盖安装
+const onOverrideInstall = (form) => {
+  console.log('执行覆盖安装：', form)
+}
+
 onMounted(async () => {
   if (!categoryStore.getState().loaded) {
     await categoryStore.load()
@@ -154,6 +229,8 @@ onMounted(async () => {
   if (!gameStore.getState().loaded) {
     await gameStore.load()
   }
+
+  game.value = gameStore.getById(gameId as string)
 
   await getItems()
 })
@@ -221,7 +298,11 @@ onBeforeUnmount(() => {})
                 </template>
               </v-tooltip>
               <div v-for="(item, index) in filteredItems" :key="index" class="card height-20">
-                <v-card class="character-card cursor-pointer" variant="tonal">
+                <v-card
+                  class="character-card cursor-pointer"
+                  variant="tonal"
+                  @click="handleDetail(item)"
+                >
                   <div class="w-full p-3">
                     <div class="w-50 mx-auto">
                       <v-img v-if="item.cover" :src="item.cover" cover />
@@ -249,57 +330,51 @@ onBeforeUnmount(() => {})
         </div>
       </div>
 
-      <div v-else class="grid gap-4">
+      <div
+        v-else
+        class="flex flex-col w-full h-full"
+        @dragenter="handleDragEnter"
+        @dragover="handleDragOver"
+        @drop="handleModInstall"
+      >
         <div class="flex items-center gap-3">
           <v-btn icon="mdi-arrow-left" variant="text" @click="backToItems" />
           <div>
-            <h1 class="text-h6">{{ getItemName(selectedItem) }}</h1>
             <div class="text-body-2 opacity-70">{{ selectedItem.name }}</div>
           </div>
         </div>
 
-        <div class="grid min-h-130 gap-4 xl:grid-cols-[280px_1fr_320px]">
-          <section class="border-r border-black/10 pr-4">
-            <v-img :src="selectedItem.image" aspect-ratio="1" cover />
-            <div class="mt-3 text-subtitle-1">{{ selectedItem.nameZh }}</div>
-            <div class="text-body-2 opacity-70">{{ selectedItem.name }}</div>
-          </section>
+        <div class="flex-1 overflow-hidden">
+          <div class="grid min-h-130 h-full gap-4 xl:grid-cols-[280px_1fr_320px]">
+            <section class="border-r border-black/10 pr-4">
+              <v-img v-if="selectedItem.cover" :src="selectedItem.cover" aspect-ratio="1" cover />
+              <div class="mt-3 text-subtitle-1">{{ selectedItem.name_zh_cn }}</div>
+              <div class="text-body-2 opacity-70">{{ selectedItem.name }}</div>
+            </section>
 
-          <section class="min-w-0 overflow-auto">
-            <table class="w-full border-collapse text-sm">
-              <thead>
-                <tr class="border-b text-left">
-                  <th class="w-12 py-3">{{ t('gameManager.enabled') }}</th>
-                  <th class="py-3">{{ t('gameManager.addedAt') }}</th>
-                  <th class="py-3">{{ t('gameManager.modName') }}</th>
-                  <th class="py-3">{{ t('gameManager.author') }}</th>
-                  <th class="py-3">{{ t('gameManager.version') }}</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="mod in selectedItem.mods" :key="mod.id" class="border-b">
-                  <td class="py-2">
-                    <v-checkbox-btn v-model="mod.enabled" density="compact" />
-                  </td>
-                  <td class="py-2">{{ mod.addedAt }}</td>
-                  <td class="py-2">{{ mod.name }}</td>
-                  <td class="py-2">{{ mod.author }}</td>
-                  <td class="py-2">{{ mod.version }}</td>
-                </tr>
-                <tr v-if="!selectedItem.mods?.length">
-                  <td colspan="5" class="py-8 text-center opacity-70">
-                    {{ t('gameManager.emptyMods') }}
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </section>
+            <section class="min-w-0 overflow-auto">
+              <v-table>
+                <thead>
+                  <tr>
+                    <th class="text-left">启用</th>
+                    <th class="text-left">mod名称</th>
+                    <th class="text-left">添加时间</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <!-- <tr v-for="item in desserts" :key="item.name">
+                  <td>{{ item.name }}</td>
+                  <td>{{ item.calories }}</td>
+                </tr> -->
+                </tbody>
+              </v-table>
+            </section>
 
-          <section class="border-l border-black/10 pl-4">
-            <div class="mb-3 text-subtitle-1">{{ t('gameManager.modConfig') }}</div>
-            <v-img v-if="selectedPreview" :src="selectedPreview" aspect-ratio="1" cover />
-            <div class="mt-3 text-body-2 opacity-70">{{ t('gameManager.previewHint') }}</div>
-          </section>
+            <section class="border-l border-black/10 pl-4">
+              <div class="mb-3 text-subtitle-1">配置</div>
+              <div class="mt-3 text-body-2 opacity-70">预览</div>
+            </section>
+          </div>
         </div>
       </div>
     </section>
@@ -331,6 +406,15 @@ onBeforeUnmount(() => {})
       </v-card>
     </v-dialog>
   </div>
+
+  <mod-inspect
+    v-model="dialogVisible"
+    :data="modData"
+    :preview-image-url="previewUrl"
+    @cancel="onCancel"
+    @install="onInstall"
+    @override-install="onOverrideInstall"
+  />
 </template>
 
 <style scoped>
