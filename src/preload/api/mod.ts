@@ -22,7 +22,7 @@ export const modApi = {
     return ipcRenderer.invoke('mod:disable', data)
   },
 
-  uninstall(data: ModUninstall) {
+  uninstall(data: ModUninstall): Promise<[boolean, string]> {
     return ipcRenderer.invoke('mod:uninstall', data)
   }
 }

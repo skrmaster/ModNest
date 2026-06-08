@@ -8,6 +8,7 @@ import { ensureOverwrite, exists } from '../utils/file'
 import { existsSync } from 'node:fs'
 import { ItemRepo } from '../db/repo/item.repo'
 import { ItemEntity } from '@shared/entities/item'
+import trash from 'trash'
 
 export class ModRepository {
   private getCategoryPath(modRootPath: string, categoryPathString: string[]): string {
@@ -223,39 +224,44 @@ export class ModRepository {
     modRootPath: string,
     itemName: string,
     modName: string,
-    categoryPathString: string[]
-  ): Promise<void> {
+    categoryPathString: string[],
+    toTrash: boolean = false
+  ): Promise<[boolean, string]> {
     const categoryPath = this.getCategoryPath(modRootPath, categoryPathString)
     const itemPath = this.getItemPath(categoryPath, itemName)
 
     const enabledPath = join(itemPath, modName)
-
     const disabledPath = join(itemPath, `DISABLED_${modName}`)
-    const item = new ItemRepo()
+
+    const itemRepo = new ItemRepo()
+    let targetPath: string | null = null
 
     if (await exists(enabledPath)) {
-      await rm(enabledPath, {
-        recursive: true,
-        force: true
-      })
-      item.update(itemData.id, {
-        mod_count: itemData.mod_count_enable - 1
-      })
-      return
+      targetPath = enabledPath
+    } else if (await exists(disabledPath)) {
+      targetPath = disabledPath
     }
 
-    if (await exists(disabledPath)) {
-      await rm(disabledPath, {
-        recursive: true,
-        force: true
-      })
+    if (!targetPath) {
+      return [false, `Mod不存在: ${modName}`]
+    }
+    let res = false
+    try {
+      if (toTrash) {
+        await trash(targetPath)
+      } else {
+        await rm(targetPath, { recursive: true, force: true })
+      }
 
-      item.update(itemData.id, {
+      itemRepo.update(itemData.id, {
         mod_count: itemData.mod_count_enable - 1
       })
-      return
+      res = true
+    } catch (err) {
+      res = false
+      console.log(`删除失败: ${(err as Error).message}`)
     }
 
-    throw new Error(`Mod不存在: ${modName}`)
+    return [res, '删除失败']
   }
 }

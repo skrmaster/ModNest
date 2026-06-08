@@ -54,7 +54,8 @@ export function registerModIpc(): void {
       payload.modRootPath,
       payload.itemName,
       payload.modName,
-      payload.categoryPathString
+      payload.categoryPathString,
+      payload.toTrash
     )
   })
 }

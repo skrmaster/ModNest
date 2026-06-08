@@ -41,6 +41,7 @@ export interface ModUninstall {
   itemName: string
   modName: string
   categoryPathString: string[]
+  toTrash: boolean
 }
 
 export interface InspectArchive {
