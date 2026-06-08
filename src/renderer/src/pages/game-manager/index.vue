@@ -1,5 +1,15 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, onMounted, onUnmounted, reactive, ref, toRaw, watch } from 'vue'
+import {
+  computed,
+  onBeforeUnmount,
+  onMounted,
+  onUnmounted,
+  reactive,
+  ref,
+  toRaw,
+  useTemplateRef,
+  watch
+} from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 import { gameStore } from '@renderer/stores/game-store'
@@ -7,10 +17,13 @@ import { categoryStore } from '@renderer/stores/category-store'
 import GenshinElements from '@renderer/components/genshin-elements.vue'
 import { apiGetItemList } from '@renderer/api/item'
 import { ItemEntity } from '@shared/entities/item'
-import type { CreateItemDto } from '@shared/dto/item'
+import type { CreateItemDto, UpdateItemDto } from '@shared/dto/item'
 import { QueryParams } from '@shared/types/item'
 import { UserGame } from '@shared/entities/game'
 import modInspect from './components/mod-inspect.vue'
+import { ListQuery, ModInfo, ModOpt, ModPreviewData } from '@shared/types/mod.js'
+import dayjs from 'dayjs'
+import { useNotify } from '@renderer/composables/useNotify.js'
 
 const router = useRouter()
 router.beforeEach(async (to) => {
@@ -93,6 +106,7 @@ async function getItems() {
 
 function handleDetail(item: ItemEntity) {
   selectedItem.value = item
+  getModList()
 }
 
 const openItemDialog = (item?: ItemEntity): void => {
@@ -110,6 +124,59 @@ const saveItem = async (): Promise<void> => {
   }
 
   itemDialog.value = false
+}
+
+const notify = useNotify()
+const saveItemInfoLoading = ref(false)
+
+let timer: null | ReturnType<typeof setTimeout> = null
+
+async function saveItemInfo() {
+  saveItemInfoLoading.value = true
+  try {
+    if (!selectedItem.value) {
+      return
+    }
+
+    const updateItem: UpdateItemDto = {
+      name: selectedItem.value.name,
+      name_zh_cn: selectedItem.value.name_zh_cn
+    }
+
+    await window.api.itemApi.update(toRaw(selectedItem.value.id), updateItem)
+  } catch (error) {
+    console.log(error)
+  } finally {
+    if (timer) clearTimeout(timer)
+
+    timer = setTimeout(() => {
+      saveItemInfoLoading.value = false
+      notify.success('保存成功')
+    }, 500)
+  }
+}
+
+const dialogRef = useTemplateRef('dialogRef')
+
+const tableData = ref<ModInfo[]>([])
+const selectTableRow = ref<ModInfo>()
+
+function handleRowSelect(item: ModInfo) {
+  selectTableRow.value = item
+}
+
+async function handleDelete(data: ModInfo) {
+  if (!game.value || !game.value?.mod_root_path || !selectedItem.value) {
+    return
+  }
+
+  window.api.modApi.uninstall({
+    itemData: toRaw(selectedItem.value),
+    modRootPath: game.value.mod_root_path,
+    itemName: data.name,
+    modName: data.name,
+    categoryPathString: [getCategoryName.value]
+  })
 }
 
 async function handleModInstall(event: DragEvent) {
@@ -132,9 +199,8 @@ async function handleModInstall(event: DragEvent) {
       itemName: selectedItem.value.name,
       modsRoot: game.value.mod_root_path
     })
-    console.log(items)
-    Object.assign(modData, items)
-    dialogVisible.value = true
+
+    dialogRef.value?.openModal(items)
   }
 }
 
@@ -186,35 +252,63 @@ function handleDragOver(e: DragEvent) {
   }
 }
 
-const dialogVisible = ref(false)
-
-// 模拟从 inspectArchive 获取的数据
-const modData = ref({
-  archivePath: 'C:/test.zip',
-  category: 'characters',
-  itemName: 'furina',
-  modName: '芙宁娜-白礼服',
-  createdAt: '2025-01-01T12:00:00.000Z',
-  exists: false, // 改为 true 即可看到覆盖安装按钮
-  previewImage: 'preview.png'
-})
-
-// 预览图（可以是本地路径、网络地址、base64）
-const previewUrl = ref('https://xxx.com/preview.jpg')
-
-// 取消
 const onCancel = () => {
   console.log('用户取消')
 }
 
-// 安装
-const onInstall = (form) => {
-  console.log('执行安装：', form)
+const onInstall = async (form: Partial<ModPreviewData>, data: ModPreviewData) => {
+  if (!game.value || !game.value?.mod_root_path || !form.modName || !selectedItem.value) {
+    return
+  }
+
+  await window.api.modApi.install({
+    itemData: toRaw(selectedItem.value),
+    modRootPath: game.value?.mod_root_path,
+    itemName: data.itemName,
+    categoryPathString: [getCategoryName.value],
+    archivePath: data.archivePath
+  })
+  getModList()
 }
 
-// 覆盖安装
 const onOverrideInstall = (form) => {
   console.log('执行覆盖安装：', form)
+  getModList()
+}
+
+async function handleModEnabled(_: unknown, data: ModInfo) {
+  const fuc = !data.enabled ? window.api.modApi.disable : window.api.modApi.enable
+
+  if (!selectedItem.value?.name || !game.value?.mod_root_path) {
+    return
+  }
+
+  const params: ModOpt = {
+    itemData: toRaw(selectedItem.value),
+    modRootPath: game.value.mod_root_path,
+    itemName: selectedItem.value.name,
+    modName: data.name,
+    categoryPathString: [getCategoryName.value]
+  }
+
+  await fuc(params)
+
+  getModList()
+}
+
+async function getModList() {
+  if (!game.value || !game.value?.mod_root_path || !selectedItem.value?.name) {
+    return
+  }
+
+  const params: ListQuery = {
+    modRootPath: game.value.mod_root_path,
+    itemName: selectedItem.value.name,
+    categoryPathString: [getCategoryName.value]
+  }
+
+  const data = await window.api.modApi.list(params)
+  tableData.value = data
 }
 
 onMounted(async () => {
@@ -345,11 +439,34 @@ onBeforeUnmount(() => {})
         </div>
 
         <div class="flex-1 overflow-hidden">
-          <div class="grid min-h-130 h-full gap-4 xl:grid-cols-[280px_1fr_320px]">
-            <section class="border-r border-black/10 pr-4">
-              <v-img v-if="selectedItem.cover" :src="selectedItem.cover" aspect-ratio="1" cover />
-              <div class="mt-3 text-subtitle-1">{{ selectedItem.name_zh_cn }}</div>
-              <div class="text-body-2 opacity-70">{{ selectedItem.name }}</div>
+          <div class="grid min-h-130 h-full gap-4 xl:grid-cols-[320px_1fr_320px]">
+            <section class="border-r border-black/10 pr-4 flex flex-col pb-4">
+              <div class="">
+                <div class="w-74 mx-auto">
+                  <v-img
+                    v-if="selectedItem.cover"
+                    :src="selectedItem.cover"
+                    aspect-ratio="1"
+                    cover
+                  />
+                </div>
+                <v-text-field
+                  v-model="selectedItem.name_zh_cn"
+                  class="mt-2"
+                  label="中文名称"
+                  required
+                ></v-text-field>
+                <v-text-field v-model="selectedItem.name" label="英文名称" required></v-text-field>
+              </div>
+              <div class="shrink-0 text-end">
+                <v-btn
+                  color="primary"
+                  variant="flat"
+                  :loading="saveItemInfoLoading"
+                  @click="saveItemInfo"
+                  >保存</v-btn
+                >
+              </div>
             </section>
 
             <section class="min-w-0 overflow-auto">
@@ -362,17 +479,39 @@ onBeforeUnmount(() => {})
                   </tr>
                 </thead>
                 <tbody>
-                  <!-- <tr v-for="item in desserts" :key="item.name">
-                  <td>{{ item.name }}</td>
-                  <td>{{ item.calories }}</td>
-                </tr> -->
+                  <tr
+                    v-for="item in tableData"
+                    :key="item.name"
+                    :class="[
+                      {
+                        'bg-blue-200': selectTableRow?.name === item.name
+                      }
+                    ]"
+                    @click.stop="handleRowSelect(item)"
+                    @keydown.delete="handleDelete(item)"
+                  >
+                    <td>
+                      <v-checkbox-btn
+                        v-model="item.enabled"
+                        @change.stop="handleModEnabled($event, item)"
+                      ></v-checkbox-btn>
+                    </td>
+                    <td>{{ item.name }}</td>
+                    <td>{{ dayjs(item.modifiedAt).format('YYYY-MM-HH HH:mm:ss') }}</td>
+                  </tr>
                 </tbody>
               </v-table>
             </section>
 
-            <section class="border-l border-black/10 pl-4">
-              <div class="mb-3 text-subtitle-1">配置</div>
-              <div class="mt-3 text-body-2 opacity-70">预览</div>
+            <section class="border-l border-black/10 px-4">
+              <div>
+                <div class="text-body-2 opacity-70">MOD预览</div>
+                <v-img v-if="selectTableRow?.cover" :src="selectTableRow?.cover" />
+                <div v-else>
+                  <v-alert density="compact" text="暂无预览" title="" type="warning"></v-alert>
+                </div>
+              </div>
+              <div></div>
             </section>
           </div>
         </div>
@@ -408,9 +547,7 @@ onBeforeUnmount(() => {})
   </div>
 
   <mod-inspect
-    v-model="dialogVisible"
-    :data="modData"
-    :preview-image-url="previewUrl"
+    ref="dialogRef"
     @cancel="onCancel"
     @install="onInstall"
     @override-install="onOverrideInstall"

@@ -4,9 +4,16 @@ import { access } from 'node:fs/promises'
 import { ModInfo, ModInstallPreview } from '@shared/types/mod'
 import { basename, extname } from 'node:path'
 import { extract, inspectArchive } from '../utils/zip'
-import { ensureOverwrite } from '../utils/file'
+import { ensureOverwrite, exists } from '../utils/file'
+import { existsSync } from 'node:fs'
+import { ItemRepo } from '../db/repo/item.repo'
+import { ItemEntity } from '@shared/entities/item'
 
 export class ModRepository {
+  private getCategoryPath(modRootPath: string, categoryPathString: string[]): string {
+    return join(modRootPath, ...categoryPathString)
+  }
+
   private getItemPath(modRootPath: string, itemName: string): string {
     return join(modRootPath, itemName.trim().toLowerCase())
   }
@@ -77,9 +84,16 @@ export class ModRepository {
     return itemPath
   }
 
-  async install(modRootPath: string, itemName: string, archivePath: string, overwrite = false) {
-    const itemPath = await this.createItemFolder(modRootPath, itemName)
-
+  async install(
+    itemData: ItemEntity,
+    modRootPath: string,
+    itemName: string,
+    archivePath: string,
+    categoryPathString: string[],
+    overwrite = false
+  ) {
+    const categoryPath = this.getCategoryPath(modRootPath, categoryPathString)
+    const itemPath = await this.createItemFolder(categoryPath, itemName)
     const tempDir = await mkdtemp(join(itemPath, '.tmp-'))
 
     try {
@@ -112,6 +126,11 @@ export class ModRepository {
         recursive: true,
         force: true
       }).catch(() => {})
+
+      const item = new ItemRepo()
+      item.update(itemData.id, {
+        mod_count: itemData.mod_count + 1
+      })
     }
   }
 
@@ -124,8 +143,22 @@ export class ModRepository {
     return inspectArchive(archivePath, category, itemName, modsRoot)
   }
 
-  async list(modRootPath: string, itemName: string): Promise<ModInfo[]> {
-    const itemPath = await this.createItemFolder(modRootPath, itemName)
+  async list(
+    modRootPath: string,
+    itemName: string,
+    categoryPathString: string[]
+  ): Promise<ModInfo[]> {
+    const categoryPath = join(modRootPath, ...categoryPathString)
+
+    if (!existsSync(categoryPath)) {
+      return []
+    }
+
+    const itemPath = join(categoryPath, itemName.trim().toLowerCase())
+
+    if (!existsSync(itemPath)) {
+      return []
+    }
 
     const entries = await readdir(itemPath, {
       withFileTypes: true
@@ -139,30 +172,90 @@ export class ModRepository {
 
           return {
             name: e.name.replace(/^DISABLED_/, ''),
-
             enabled: !e.name.startsWith('DISABLED_'),
-
             cover: await this.getPreview(modPath),
-
             configPath: await this.getModIni(modPath),
-
             size: await this.getDirectorySize(modPath),
-
             modifiedAt: await this.getModifiedAt(modPath)
           }
         })
     )
   }
 
-  async enable(modRootPath: string, itemName: string, modName: string): Promise<void> {
-    const itemPath = this.getItemPath(modRootPath, itemName)
+  async enable(
+    itemData: ItemEntity,
+    modRootPath: string,
+    itemName: string,
+    modName: string,
+    categoryPathString: string[]
+  ): Promise<void> {
+    const categoryPath = this.getCategoryPath(modRootPath, categoryPathString)
+    const itemPath = await this.createItemFolder(categoryPath, itemName)
 
     await rename(join(itemPath, `DISABLED_${modName}`), join(itemPath, modName))
+
+    const item = new ItemRepo()
+    item.update(itemData.id, {
+      mod_count_enable: itemData.mod_count_enable + 1
+    })
   }
 
-  async disable(modRootPath: string, itemName: string, modName: string): Promise<void> {
-    const itemPath = this.getItemPath(modRootPath, itemName)
+  async disable(
+    itemData: ItemEntity,
+    modRootPath: string,
+    itemName: string,
+    modName: string,
+    categoryPathString: string[]
+  ): Promise<void> {
+    const categoryPath = this.getCategoryPath(modRootPath, categoryPathString)
+    const itemPath = await this.createItemFolder(categoryPath, itemName)
 
     await rename(join(itemPath, modName), join(itemPath, `DISABLED_${modName}`))
+    const item = new ItemRepo()
+
+    item.update(itemData.id, {
+      mod_count_enable: itemData.mod_count_enable - 1
+    })
+  }
+
+  async uninstall(
+    itemData: ItemEntity,
+    modRootPath: string,
+    itemName: string,
+    modName: string,
+    categoryPathString: string[]
+  ): Promise<void> {
+    const categoryPath = this.getCategoryPath(modRootPath, categoryPathString)
+    const itemPath = this.getItemPath(categoryPath, itemName)
+
+    const enabledPath = join(itemPath, modName)
+
+    const disabledPath = join(itemPath, `DISABLED_${modName}`)
+    const item = new ItemRepo()
+
+    if (await exists(enabledPath)) {
+      await rm(enabledPath, {
+        recursive: true,
+        force: true
+      })
+      item.update(itemData.id, {
+        mod_count: itemData.mod_count_enable - 1
+      })
+      return
+    }
+
+    if (await exists(disabledPath)) {
+      await rm(disabledPath, {
+        recursive: true,
+        force: true
+      })
+
+      item.update(itemData.id, {
+        mod_count: itemData.mod_count_enable - 1
+      })
+      return
+    }
+
+    throw new Error(`Mod不存在: ${modName}`)
   }
 }

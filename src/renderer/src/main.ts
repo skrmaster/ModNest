@@ -4,6 +4,7 @@ import { createApp } from 'vue'
 import App from './App.vue'
 import { setupRouter } from './router'
 import i18n from './i18n'
+import { createPinia } from 'pinia'
 
 // Vuetify
 import 'vuetify/styles'
@@ -54,9 +55,13 @@ async function bootstrap(): Promise<void> {
     }
   })
 
+  const pinia = createPinia()
+
   setupRouter(app)
+
   app.use(vuetify)
   app.use(i18n)
+  app.use(pinia)
   app.mount('#app')
 }
 

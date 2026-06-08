@@ -87,6 +87,10 @@ export class ItemRepo {
       fields.push('mod_count = @mod_count')
       params.mod_count = data.mod_count
     }
+    if (data.mod_count_enable !== undefined) {
+      fields.push('mod_count_enable = @mod_count_enable')
+      params.mod_count_enable = data.mod_count_enable
+    }
     if (data.game_id !== undefined) {
       fields.push('game_id = @game_id')
       params.game_id = data.game_id

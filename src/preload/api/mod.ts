@@ -1,5 +1,5 @@
 import { ipcRenderer } from 'electron'
-import { InspectArchive, ListQuery, ModInstall, ModOpt } from '@shared/types/mod'
+import { InspectArchive, ListQuery, ModInstall, ModOpt, ModUninstall } from '@shared/types/mod'
 
 export const modApi = {
   install(data: ModInstall) {
@@ -20,5 +20,9 @@ export const modApi = {
 
   disable(data: ModOpt) {
     return ipcRenderer.invoke('mod:disable', data)
+  },
+
+  uninstall(data: ModUninstall) {
+    return ipcRenderer.invoke('mod:uninstall', data)
   }
 }
