@@ -10,6 +10,7 @@ export function up(db: Database.Database) {
       "mod_count" integer NOT NULL,
       "mod_count_enable" integer NOT NULL,
       "game_id" integer NOT NULL,
+      "is_custom" interger NOT NULL,
       FOREIGN KEY ("game_id") REFERENCES "t_user_game" ("id") ON DELETE SET NULL ON UPDATE CASCADE
     );
   `)

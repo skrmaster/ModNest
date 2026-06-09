@@ -9,9 +9,9 @@ import type { UpdateItemDto } from '@shared/dto/item'
 import { QueryParams } from '@shared/types/item'
 import { UserGame } from '@shared/entities/game'
 import modInspect from './components/mod-inspect.vue'
-import { ListQuery, ModInfo, ModOpt, ModPreviewData } from '@shared/types/mod.js'
+import { ListQuery, ModInfo, ModOpt, ModPreviewData } from '@shared/types/mod'
 import dayjs from 'dayjs'
-import { useNotify } from '@renderer/composables/useNotify.js'
+import { useNotify } from '@renderer/composables/useNotify'
 import modUninstall from './components/mod-uninstall.vue'
 import comScroll from '@renderer/components/com-scroll.vue'
 import { wrapGrid } from 'animate-css-grid'
@@ -52,8 +52,6 @@ const queryParams = reactive<QueryParams>({
 })
 const selectedItem = ref<ItemEntity>()
 const selectedItemId = ref<string>()
-
-const editingItemId = ref<string>()
 
 const getCategoryName = computed(() => {
   const item = category.value.find((e) => e.id == queryParams.primaryCategoryId)
@@ -98,9 +96,8 @@ function handleDetail(item: ItemEntity) {
 }
 
 const itemFormRef = useTemplateRef('itemFormRef')
-const openItemDialog = (item?: ItemEntity): void => {
-  editingItemId.value = item?.id
-  itemFormRef.value?.openModal()
+const openItemDialog = (): void => {
+  itemFormRef.value?.openModal(game.value?.id)
 }
 
 const notify = useNotify()
@@ -215,6 +212,7 @@ async function handleModInstall(event: DragEvent) {
 
 const backToItems = (): void => {
   selectedItem.value = undefined
+  getItems()
 }
 
 const elementMap = new Map()
@@ -224,7 +222,6 @@ async function handleElementSelect(v?: string) {
   await debouncedGetItems()
 }
 
-// 路由监听
 watch(
   () => route.params.gameId,
   async (newGameId) => {
@@ -386,7 +383,7 @@ onUnmounted(() => {})
               ></genshin-elements>
             </div>
           </div>
-          <div class="w-full max-w-120 mx-auto">
+          <div class="w-full max-w-120 mx-auto flex items-center gap-2">
             <v-text-field
               v-model="searchText"
               label="搜索"
@@ -395,9 +392,9 @@ onUnmounted(() => {})
               clearable
               single-line
               hide-details
-              density="comfortable"
               color="primary"
             ></v-text-field>
+            <v-btn color="primary" prepend-icon="mdi-plus" @click="openItemDialog">添加项目</v-btn>
           </div>
         </div>
 
@@ -407,7 +404,7 @@ onUnmounted(() => {})
               ref="containerRef"
               class="containerRef relative grid gap-4 grid-cols-[repeat(auto-fill,minmax(200px,1fr))]"
             >
-              <div :key="'__add__'" class="h-43.5">
+              <!-- <div :key="'__add__'">
                 <v-tooltip text="添加" location="top">
                   <template #activator>
                     <v-card class="cursor-pointer h-full" variant="tonal" @click="openItemDialog()">
@@ -417,16 +414,11 @@ onUnmounted(() => {})
                     </v-card>
                   </template>
                 </v-tooltip>
-              </div>
-              <div
-                v-for="item in filteredItems"
-                :key="`item-${item.id}`"
-                class="relative card h-43.5"
-                :data-item="item.id"
-              >
+              </div> -->
+              <div v-for="item in filteredItems" :key="item.id">
                 <v-card class="cursor-pointer py-2" variant="tonal" @click="handleDetail(item)">
-                  <div class="w-full relative h-27.5">
-                    <div v-show="item.cover" class="w-50 mx-auto">
+                  <div class="w-full relative h-32">
+                    <div v-show="item.cover" class="w-32 mx-auto">
                       <v-img v-if="item.cover" :src="item.cover" cover />
                     </div>
                     <div
@@ -440,7 +432,9 @@ onUnmounted(() => {})
                   <div class="w-full gap-3">
                     <div class="text-center">
                       <div class="text-subtitle-1 truncate">{{ item.name }}</div>
-                      <div class="text-body-2 opacity-70 truncate">{{ item.name_zh_cn }}</div>
+                      <div class="text-body-2 opacity-70 truncate">
+                        {{ item.name_zh_cn }}
+                      </div>
                     </div>
                   </div>
                 </v-card>

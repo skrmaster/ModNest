@@ -6,4 +6,5 @@ export interface ItemEntity {
   mod_count: number
   mod_count_enable: number
   game_id: string
+  is_custom: number
 }

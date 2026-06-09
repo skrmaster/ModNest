@@ -9,9 +9,10 @@ export function up(db: Database.Database) {
       cover,
       mod_count,
       mod_count_enable,
-      game_id
+      game_id,
+      is_custom
     )
-    VALUES (?, ?, ?, ?, ?, ?)
+    VALUES (?, ?, ?, ?, ?, ?, ?)
   `)
 
   db.exec(`
@@ -43,7 +44,7 @@ export function up(db: Database.Database) {
   `)
 
   for (const character of items) {
-    stmt.run(character.name, character.zhCn, `genshin/characters/${character.image}`, 0, 0, 1)
+    stmt.run(character.name, character.zhCn, `genshin/characters/${character.image}`, 0, 0, 1, 0)
 
     const row = db
       .prepare(

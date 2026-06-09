@@ -1,32 +1,58 @@
 import { ItemEntity } from '@shared/entities/item'
 import { DatabaseManager } from '..'
+import { getAppImageUrl, getUserImageUrl } from '@shared/utils/getPath'
+import { CreateItemDto } from '@shared/dto/item'
+import type Database from 'better-sqlite3'
 
 export class ItemRepo {
   private get db() {
     return DatabaseManager.getDb()
   }
 
-  create(data: ItemEntity) {
+  create(data: CreateItemDto) {
     const stmt = this.db.prepare(`
       INSERT INTO t_game_item (
         name,
         name_zh_cn,
         cover,
         mod_count,
-        category_id,
-        game_id
+        mod_count_enable,
+        game_id,
+        is_custom
       )
       VALUES (
         @name,
         @name_zh_cn,
         @cover,
         @mod_count,
-        @category_id,
-        @game_id
+        @mod_count_enable,
+        @game_id,
+        @is_custom
       )
     `)
 
-    return stmt.run(data)
+    const res = stmt.run(data)
+
+    if (res.changes === 0) {
+      return res
+    }
+
+    const loopData = data.category_ids || []
+    const relativeResList: Database.RunResult[] = []
+    for (let i = 0; i < loopData.length; i++) {
+      const relationStmt = this.db.prepare(`
+        INSERT INTO t_category_records (
+          category_id,
+          item_id
+        )
+        VALUES (?, ?)
+      `)
+
+      const relationRes = relationStmt.run(loopData[i], res.lastInsertRowid)
+      relativeResList.push(relationRes)
+    }
+
+    return relativeResList.every((e) => e.changes !== 0) ? { changes: 1 } : { changes: 0 }
   }
 
   list(gameId: string, primaryCategoryId: string, secondaryCategoryId?: string): ItemEntity[] {
@@ -70,7 +96,7 @@ export class ItemRepo {
 
     return (rows as ItemEntity[]).map((row) => ({
       ...row,
-      cover: row.cover ? `app-image://seed-images/${row.cover}` : null,
+      cover: row.is_custom ? getUserImageUrl(row.cover) : getAppImageUrl(row.cover),
       id: row.id.toString()
     }))
   }
@@ -133,7 +159,7 @@ export class ItemRepo {
 
     return {
       ...row,
-      cover: row.cover ? `app-image://seed-images/${row.cover}` : null,
+      cover: row.is_custom ? getUserImageUrl(row.cover) : getAppImageUrl(row.cover),
       id: row.id.toString()
     }
   }

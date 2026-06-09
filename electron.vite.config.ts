@@ -6,7 +6,13 @@ import ViteFonts from 'unplugin-fonts/vite'
 import VueI18nPlugin from '@intlify/unplugin-vue-i18n/vite'
 
 export default defineConfig(() => ({
-  main: {},
+  main: {
+    resolve: {
+      alias: {
+        '@shared': resolve('src/shared')
+      }
+    }
+  },
   preload: {},
   renderer: {
     define: {

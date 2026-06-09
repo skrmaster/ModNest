@@ -1,10 +1,10 @@
 <template>
-  <v-dialog v-model="itemDialog" max-width="560">
+  <v-dialog v-model="itemDialog" max-width="660">
     <v-card>
-      <v-card-title> 编辑 </v-card-title>
+      <v-card-title> 新增一项 </v-card-title>
       <v-card-text>
-        <div class="grid gap-3">
-          <div>
+        <div class="flex flex-col gap-3">
+          <div class="flex justify-center">
             <v-img
               v-if="showImageCover"
               :src="showImageCover"
@@ -25,7 +25,7 @@
             </v-img>
 
             <div v-else class="text-center pa-4 bg-grey-lighten-2 rounded-md">
-              <v-icon :size="60" class="text-grey-darken-2">mdi-panorama-variant-outline</v-icon>
+              <v-icon :size="80" class="text-grey-darken-2">mdi-panorama-variant-outline</v-icon>
             </div>
           </div>
 
@@ -46,11 +46,11 @@
             />
           </div>
 
-          <div class="flex gap-2">
-            <v-radio-group v-model="imageType" class="d-flex flex-col gap-4 w-full">
-              <div class="d-flex flex-col gap-2">
+          <div class="flex">
+            <v-radio-group v-model="imageType" class="d-flex flex-col w-full">
+              <div class="d-flex flex-col">
                 <v-radio value="one" label="网络图片"></v-radio>
-                <div class="d-flex gap-2 align-start">
+                <div class="d-flex gap-2">
                   <v-text-field
                     v-model="coverUrl"
                     :disabled="imageType !== 'one' || isDownloading"
@@ -62,7 +62,7 @@
                   <v-btn
                     color="primary"
                     :disabled="imageType !== 'one' || !coverUrl || isDownloading"
-                    class="mt-3"
+                    class="mt-1"
                     @click="downloadCover"
                   >
                     <v-progress-circular
@@ -77,7 +77,7 @@
                 </div>
               </div>
 
-              <div class="d-flex flex-col gap-2">
+              <div class="d-flex flex-col">
                 <v-radio value="two" label="本地图片"></v-radio>
                 <v-file-input
                   v-model="localFile"
@@ -93,13 +93,31 @@
             </v-radio-group>
           </div>
 
-          <v-alert
-            v-if="formErrorMessage"
-            type="error"
-            variant="tonal"
-            density="compact"
-            class="mt-2"
-          >
+          <div>
+            <v-sheet class="mx-auto">
+              <v-chip-group
+                v-model="selectedCategoryIds"
+                multiple
+                show-arrows
+                column
+                active-class="primary"
+                class="pa-2"
+              >
+                <v-chip
+                  v-for="n in listCategory"
+                  :key="n.id"
+                  :value="n.id"
+                  class="ma-1"
+                  rounded
+                  color="primary"
+                >
+                  {{ n.name_zh_cn }}
+                </v-chip>
+              </v-chip-group>
+            </v-sheet>
+          </div>
+
+          <v-alert v-if="formErrorMessage" type="error" variant="tonal" density="compact">
             {{ formErrorMessage }}
           </v-alert>
         </div>
@@ -117,8 +135,11 @@
 </template>
 
 <script setup lang="ts">
+import { useNotify } from '@renderer/composables/useNotify'
 import { CreateItemDto } from '@shared/dto/item'
-import { reactive, ref } from 'vue'
+import { getUserImageUrl } from '@shared/utils/getPath'
+import { computed, onMounted, reactive, ref, toRaw } from 'vue'
+import { categoryStore } from '@renderer/stores/category-store'
 
 const itemDialog = ref(false)
 const imageType = ref('one')
@@ -127,12 +148,19 @@ const localFile = ref(null)
 const showImageCover = ref('')
 const isDownloading = ref(false)
 
+const listCategory = computed(() => {
+  return categoryStore.getState().items
+})
+
 const itemForm = reactive<CreateItemDto>({
   name: '',
   name_zh_cn: '',
   cover: null,
   mod_count: 0,
-  game_id: ''
+  game_id: '',
+  is_custom: 0,
+  mod_count_enable: 0,
+  category_ids: []
 })
 
 const formErrorMessage = ref('')
@@ -164,6 +192,8 @@ const resetForm = () => {
   clearErrors()
 }
 
+const selectedCategoryIds = ref<string[]>([])
+
 const closeDialog = () => {
   itemDialog.value = false
   setTimeout(() => {
@@ -180,11 +210,9 @@ const downloadCover = async () => {
 
   try {
     isDownloading.value = true
-    const fileName = await window.api.fileApi.downloadImage(coverUrl.value)
-    const coverPath = `app-image://user-images/${fileName}`
+    itemForm.cover = await window.api.fileApi.downloadImage(coverUrl.value)
 
-    showImageCover.value = coverPath
-    itemForm.cover = coverPath
+    showImageCover.value = itemForm.cover ? getUserImageUrl(itemForm.cover) : ''
   } catch (err) {
     formErrorMessage.value = `图片下载失败：${err}`
   } finally {
@@ -229,19 +257,45 @@ const validateForm = (): boolean => {
   return valid
 }
 
+const notify = useNotify()
 const saveItem = async (): Promise<void> => {
-  if (!validateForm()) return
+  if (!validateForm() || !game_id) return
 
-  itemForm.name_zh_cn = itemForm.name_zh_cn.trim()
-  itemForm.name = itemForm.name.trim()
+  const itemDto: CreateItemDto = {
+    name: itemForm.name.trim(),
+    name_zh_cn: itemForm.name_zh_cn.trim(),
+    cover: itemForm.cover,
+    mod_count: 0,
+    game_id,
+    is_custom: 1,
+    mod_count_enable: 0,
+    category_ids: toRaw(selectedCategoryIds.value)
+  }
 
-  itemDialog.value = false
+  const data: {
+    changes: number
+    lastInsertRowid: number | bigint
+  } = await window.api.itemApi.create(itemDto)
+
+  if (data.changes !== 0) {
+    itemDialog.value = false
+  } else {
+    notify.error('添加失败')
+  }
 }
 
-function openModal() {
+let game_id: string | undefined
+function openModal(gameId?: string) {
+  game_id = gameId
   resetForm()
   itemDialog.value = true
 }
+
+onMounted(async () => {
+  if (!categoryStore.getState().loaded) {
+    await categoryStore.load()
+  }
+})
 
 defineExpose({
   openModal
