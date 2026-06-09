@@ -30,35 +30,43 @@ export class ItemRepo {
   }
 
   list(gameId: string, primaryCategoryId: string, secondaryCategoryId?: string): ItemEntity[] {
-    const rows = secondaryCategoryId
-      ? this.db
-          .prepare(
-            `
-              SELECT gi.*
-              FROM t_game_item gi
-              JOIN t_category_records cr
-                ON cr.item_id = gi.id
-              WHERE gi.game_id = ?
-                AND cr.category_id IN (?, ?)
-              GROUP BY gi.id
-              HAVING COUNT(DISTINCT cr.category_id) = 2
-              ORDER BY gi.id
-            `
-          )
-          .all(gameId, primaryCategoryId, secondaryCategoryId)
-      : this.db
-          .prepare(
-            `
-              SELECT gi.*
-              FROM t_game_item gi
-              JOIN t_category_records cr
-                ON cr.item_id = gi.id
-              WHERE gi.game_id = ?
-                AND cr.category_id = ?
-              ORDER BY gi.id
-            `
-          )
-          .all(gameId, primaryCategoryId)
+    let rows
+
+    if (secondaryCategoryId) {
+      rows = this.db
+        .prepare(
+          `
+      SELECT DISTINCT gi.*
+      FROM t_game_item gi
+      WHERE gi.game_id = ?
+        AND EXISTS (
+          SELECT 1 FROM t_category_records cr
+          WHERE cr.item_id = gi.id AND cr.category_id = ?
+        )
+        AND EXISTS (
+          SELECT 1 FROM t_category_records cr
+          WHERE cr.item_id = gi.id AND cr.category_id = ?
+        )
+      ORDER BY gi.id
+    `
+        )
+        .all(gameId, primaryCategoryId, secondaryCategoryId)
+    } else {
+      rows = this.db
+        .prepare(
+          `
+      SELECT DISTINCT gi.*
+      FROM t_game_item gi
+      WHERE gi.game_id = ?
+        AND EXISTS (
+          SELECT 1 FROM t_category_records cr
+          WHERE cr.item_id = gi.id AND cr.category_id = ?
+        )
+      ORDER BY gi.id
+    `
+        )
+        .all(gameId, primaryCategoryId)
+    }
 
     return (rows as ItemEntity[]).map((row) => ({
       ...row,

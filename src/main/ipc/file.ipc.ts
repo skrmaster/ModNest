@@ -23,6 +23,8 @@ export function register(): void {
           'seed-images',
           decodeURIComponent(url.pathname.replace(/^\//, ''))
         )
+      } else if (url.hostname === 'user-images') {
+        filePath = join(getGameImageDirectory(), decodeURIComponent(url.pathname.slice(1)))
       } else {
         return new Response('not found', {
           status: 404
@@ -91,6 +93,7 @@ export function register(): void {
             ? '.gif'
             : '.jpg'
       const extension = extensionFromUrl || extensionFromType
+      gameName = !gameName ? (+Date.now()).toString() : gameName
       const hash = createHash('sha1').update(`${gameName}:${url}`).digest('hex').slice(0, 12)
       const imageDirectory = getGameImageDirectory()
       const fileName = `${gameName}-${hash}${extension}`
