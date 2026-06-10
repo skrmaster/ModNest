@@ -5,27 +5,29 @@
       <v-card-text>
         <div class="pl-0">
           <div>
-            <div class="mb-2">{{ labels.themeHint }}</div>
-            <v-select
-              v-model="themeMode"
-              :items="themeModeOptions"
-              :label="labels.themeLabel"
-              item-title="label"
-              item-value="value"
-              density="comfortable"
-            />
+            <div class="mb-2">主题颜色</div>
+
+            <v-radio-group v-model="themeMode" inline>
+              <v-radio
+                v-for="(e, index) in themeModeOptions"
+                :key="index"
+                :label="e.label"
+                :value="e.value"
+              ></v-radio>
+            </v-radio-group>
           </div>
 
           <div>
-            <div class="mb-2">{{ labels.languageHint }}</div>
-            <v-select
-              v-model="language"
-              :items="languageOptions"
-              :label="labels.languageLabel"
-              item-title="label"
-              item-value="value"
-              density="comfortable"
-            />
+            <div class="mb-2">语言</div>
+
+            <v-radio-group v-model="language" inline>
+              <v-radio
+                v-for="(e, index) in languageOptions"
+                :key="index"
+                :label="e.label"
+                :value="e.value"
+              ></v-radio>
+            </v-radio-group>
           </div>
         </div>
       </v-card-text>
