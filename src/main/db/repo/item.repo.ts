@@ -1,7 +1,7 @@
 import { ItemEntity } from '@shared/entities/item'
 import { DatabaseManager } from '..'
-import { getAppImageUrl, getUserImageUrl } from '@shared/utils/getPath'
-import { CreateItemDto } from '@shared/dto/item'
+import { getAppImageUrl, getUserImageUrl } from '@shared/utils/url'
+import { CreateItemDto, UpdateItemDto } from '@shared/dto/item'
 import type Database from 'better-sqlite3'
 
 export class ItemRepo {
@@ -101,7 +101,7 @@ export class ItemRepo {
     }))
   }
 
-  update(id: string, data: Partial<ItemEntity>) {
+  update(id: string, data: Partial<UpdateItemDto>) {
     const fields: string[] = []
     const params: Record<string, unknown> = { id }
 
@@ -128,6 +128,33 @@ export class ItemRepo {
     if (data.game_id !== undefined) {
       fields.push('game_id = @game_id')
       params.game_id = data.game_id
+    }
+
+    if (data.category_ids) {
+      const stmt = this.db.prepare('DELETE FROM t_category_records WHERE item_id = ?')
+      const deleteRes = stmt.run(id)
+
+      if (deleteRes.changes <= 0) {
+        return deleteRes
+      }
+
+      const loopData = data.category_ids || []
+      const len = loopData.length
+      const relativeResList: Database.RunResult[] = []
+      for (let i = 0; i < len; i++) {
+        const relationStmt = this.db.prepare(`
+          INSERT INTO t_category_records (
+            category_id,
+            item_id
+          )
+          VALUES (?, ?)
+        `)
+        const relationRes = relationStmt.run(loopData[i], id)
+        relativeResList.push(relationRes)
+      }
+      if (!relativeResList.every((e) => e.changes !== 0)) {
+        return { changes: 0 }
+      }
     }
 
     if (fields.length === 0) return { changes: 0 }

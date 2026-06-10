@@ -68,25 +68,19 @@ export class CategoryRepository {
     return stmt.run(id)
   }
 
-  findById(id: string): Category | null {
-    const row = this.db
+  findCategoriesByItemId(itemId: string): Category[] {
+    const rows = this.db
       .prepare(
         `
-        SELECT *
-        FROM t_game_category
-        WHERE id = ?
-        LIMIT 1
+          SELECT c.*
+          FROM t_game_category c
+          JOIN t_category_records cr
+            ON c.id = cr.category_id
+          WHERE cr.item_id = ?
         `
       )
-      .get(id) as Category | undefined
+      .all(itemId)
 
-    if (!row) {
-      return null
-    }
-
-    return {
-      ...row,
-      id: row.id.toString()
-    }
+    return rows as Category[]
   }
 }

@@ -29,8 +29,8 @@ export function register(): void {
     return result
   })
 
-  ipcMain.handle('category:getInfoById', (_, id: string) => {
-    const result = repo.findById(id)
+  ipcMain.handle('category:findCategoriesByItemId', (_, id: string) => {
+    const result = repo.findCategoriesByItemId(id)
     return result
   })
 }

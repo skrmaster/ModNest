@@ -9,7 +9,8 @@ export default defineConfig(() => ({
   main: {
     resolve: {
       alias: {
-        '@shared': resolve('src/shared')
+        '@shared': resolve('src/shared'),
+        '@constants': resolve('src/constants')
       }
     }
   },

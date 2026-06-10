@@ -3,7 +3,7 @@ import { ipcRenderer, webUtils } from 'electron'
 export const fileApi = {
   selectDirectory: () => ipcRenderer.invoke('select-directory'),
   selectImage: () => ipcRenderer.invoke('select-image'),
-  downloadImage: (url: string, gameName?: string) =>
+  downloadImage: (url: string, gameName?: string): Promise<string> =>
     ipcRenderer.invoke('download-image', { url, gameName }),
 
   getPathForFile(file: File) {

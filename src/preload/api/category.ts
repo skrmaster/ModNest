@@ -1,5 +1,6 @@
 import { ipcRenderer } from 'electron'
 import type { CreateCategoryDto, UpdateCategoryDto } from '@shared/dto/category'
+import { Category } from '@shared/entities/category'
 
 export const categoryApi = {
   create(data: CreateCategoryDto) {
@@ -21,7 +22,7 @@ export const categoryApi = {
     return ipcRenderer.invoke('category:list')
   },
 
-  getById(id: string) {
-    return ipcRenderer.invoke('category:getInfoById', id)
+  findCategoriesByItemId(id: string): Promise<Category[]> {
+    return ipcRenderer.invoke('category:findCategoriesByItemId', id)
   }
 }

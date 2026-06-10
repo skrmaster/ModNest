@@ -1,11 +1,21 @@
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, reactive, ref, toRaw, useTemplateRef, watch } from 'vue'
+import {
+  computed,
+  nextTick,
+  onMounted,
+  onUnmounted,
+  reactive,
+  ref,
+  toRaw,
+  useTemplateRef,
+  watch
+} from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { gameStore } from '@renderer/stores/game-store'
 import { categoryStore } from '@renderer/stores/category-store'
 import GenshinElements from '@renderer/components/genshin-elements.vue'
 import { ItemEntity } from '@shared/entities/item'
-import type { UpdateItemDto } from '@shared/dto/item'
+import type { ItemDto } from '@shared/dto/item'
 import { QueryParams } from '@shared/types/item'
 import { UserGame } from '@shared/entities/game'
 import modInspect from './components/mod-inspect.vue'
@@ -17,6 +27,7 @@ import comScroll from '@renderer/components/com-scroll.vue'
 import { wrapGrid } from 'animate-css-grid'
 import { debounce } from '@renderer/utils/base'
 import ItemForm from './components/item-form.vue'
+import formContent from './components/form-content.vue'
 
 const router = useRouter()
 router.beforeEach(async (to) => {
@@ -58,7 +69,7 @@ const getCategoryName = computed(() => {
   return item ? item.name : ''
 })
 
-const activeItems = ref<ItemEntity[]>()
+const activeItems = ref<ItemDto[]>()
 const searchText = ref<string | undefined>()
 const isGettingItems = ref(false)
 const isGettingModList = ref(false)
@@ -90,41 +101,24 @@ async function getItems() {
 
 const debouncedGetItems = debounce(getItems, 200)
 
-function handleDetail(item: ItemEntity) {
+const formContentRef = useTemplateRef('formContentRef')
+async function handleDetail(item: ItemDto) {
   selectedItem.value = item
+  await nextTick()
+  formContentRef.value?.init(item, game.value?.id)
   getModList()
 }
 
 const itemFormRef = useTemplateRef('itemFormRef')
 const openItemDialog = (): void => {
-  itemFormRef.value?.openModal(game.value?.id)
+  itemFormRef.value?.openModal(undefined, game.value?.id)
+}
+
+function handleEditItem(item: ItemEntity) {
+  itemFormRef.value?.openModal(item as ItemDto, game.value?.id)
 }
 
 const notify = useNotify()
-const saveItemInfoLoading = ref(false)
-let timer: null | ReturnType<typeof setTimeout> = null
-
-async function saveItemInfo() {
-  saveItemInfoLoading.value = true
-  try {
-    if (!selectedItem.value) return
-
-    const updateItem: UpdateItemDto = {
-      name: selectedItem.value.name,
-      name_zh_cn: selectedItem.value.name_zh_cn
-    }
-    await window.api.itemApi.update(toRaw(selectedItem.value.id), updateItem)
-  } catch (error) {
-    console.log(error)
-  } finally {
-    if (timer) clearTimeout(timer)
-    timer = setTimeout(() => {
-      saveItemInfoLoading.value = false
-      notify.success('保存成功')
-    }, 500)
-  }
-}
-
 const dialogRef = useTemplateRef('dialogRef')
 const tableData = ref<ModInfo[]>([])
 const selectTableRow = ref<ModInfo>()
@@ -338,6 +332,32 @@ function initListAnimate() {
   })
 }
 
+const deleteDialog = ref(false)
+const deletingItem = ref<ItemDto>()
+function openDeleteDialog(item: ItemDto) {
+  deletingItem.value = item
+  deleteDialog.value = true
+}
+
+async function confirmDelete() {
+  if (!deletingItem.value) {
+    return
+  }
+
+  try {
+    await window.api.itemApi.remove(deletingItem.value.id)
+
+    notify.success('删除成功')
+
+    deleteDialog.value = false
+    deletingItem.value = undefined
+
+    getItems()
+  } catch (err) {
+    notify.error(`删除失败：${err}`)
+  }
+}
+
 onMounted(async () => {
   if (!categoryStore.getState().loaded) {
     await categoryStore.load()
@@ -399,24 +419,17 @@ onUnmounted(() => {})
         </div>
 
         <div class="flex-1 overflow-hidden">
-          <com-scroll>
+          <com-scroll class="pb-4">
             <div
               ref="containerRef"
               class="containerRef relative grid gap-4 grid-cols-[repeat(auto-fill,minmax(200px,1fr))]"
             >
-              <!-- <div :key="'__add__'">
-                <v-tooltip text="添加" location="top">
-                  <template #activator>
-                    <v-card class="cursor-pointer h-full" variant="tonal" @click="openItemDialog()">
-                      <div class="flex items-center justify-center w-full h-full">
-                        <v-icon :size="40" color="ffffff">mdi-plus</v-icon>
-                      </div>
-                    </v-card>
-                  </template>
-                </v-tooltip>
-              </div> -->
               <div v-for="item in filteredItems" :key="item.id">
-                <v-card class="cursor-pointer py-2" variant="tonal" @click="handleDetail(item)">
+                <v-card
+                  class="cursor-pointer py-2 group"
+                  variant="tonal"
+                  @click="handleDetail(item)"
+                >
                   <div class="w-full relative h-32">
                     <div v-show="item.cover" class="w-32 mx-auto">
                       <v-img v-if="item.cover" :src="item.cover" cover />
@@ -427,6 +440,35 @@ onUnmounted(() => {})
                     >
                       <span>{{ item.mod_count_enable }}/</span>
                       <span>{{ item.mod_count }}</span>
+                    </div>
+
+                    <div v-if="item.is_custom" class="absolute right-0 -top-2">
+                      <v-menu location="end" :offset="[-8, -12]">
+                        <template #activator="{ props }">
+                          <v-btn
+                            v-bind="props"
+                            icon="mdi-dots-vertical"
+                            variant="text"
+                            density="comfortable"
+                            @click.stop
+                          />
+                        </template>
+
+                        <v-list density="compact">
+                          <v-list-item
+                            prepend-icon="mdi-pencil-outline"
+                            title="编辑"
+                            @click.stop="handleEditItem(item)"
+                          />
+
+                          <v-list-item
+                            prepend-icon="mdi-delete-outline"
+                            title="删除"
+                            class="text-error"
+                            @click.stop="openDeleteDialog(item)"
+                          />
+                        </v-list>
+                      </v-menu>
                     </div>
                   </div>
                   <div class="w-full gap-3">
@@ -462,30 +504,7 @@ onUnmounted(() => {})
           <div class="grid min-h-130 h-full gap-4 xl:grid-cols-[320px_1fr_320px]">
             <section class="border-r border-black/10 pr-4 flex flex-col pb-4">
               <div class="">
-                <div class="w-74 mx-auto">
-                  <v-img
-                    v-if="selectedItem.cover"
-                    :src="selectedItem.cover"
-                    aspect-ratio="1"
-                    cover
-                  />
-                </div>
-                <v-text-field
-                  v-model="selectedItem.name_zh_cn"
-                  class="mt-2"
-                  label="中文名称"
-                  required
-                ></v-text-field>
-                <v-text-field v-model="selectedItem.name" label="英文名称" required></v-text-field>
-              </div>
-              <div class="shrink-0 text-end">
-                <v-btn
-                  color="primary"
-                  variant="flat"
-                  :loading="saveItemInfoLoading"
-                  @click="saveItemInfo"
-                  >保存</v-btn
-                >
+                <form-content ref="formContentRef" :use-mode="'inline'"></form-content>
               </div>
             </section>
 
@@ -536,6 +555,28 @@ onUnmounted(() => {})
     </section>
   </div>
 
+  <v-dialog v-model="deleteDialog" max-width="420">
+    <v-card>
+      <v-card-title> 注意 </v-card-title>
+
+      <v-card-text>
+        确定删除
+        <strong>{{ deletingItem?.name_zh_cn }}</strong>
+        吗？
+        <br />
+        此操作会删除改项目下的所有mod。
+      </v-card-text>
+
+      <v-card-actions>
+        <v-spacer />
+
+        <v-btn variant="text" @click="deleteDialog = false"> 取消 </v-btn>
+
+        <v-btn color="error" variant="flat" @click="confirmDelete"> 删除 </v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
+
   <mod-inspect
     ref="dialogRef"
     @cancel="onCancel"
@@ -549,7 +590,7 @@ onUnmounted(() => {})
     @recycle="handleMoveRecycle"
   ></mod-uninstall>
 
-  <item-form ref="itemFormRef"></item-form>
+  <item-form ref="itemFormRef" @update="getItems"></item-form>
 </template>
 
 <style scoped></style>

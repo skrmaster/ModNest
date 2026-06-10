@@ -10,4 +10,6 @@ export interface CreateItemDto {
   category_ids: string[]
 }
 
+export type ItemDto = CreateItemDto & { id: string }
+
 export type UpdateItemDto = Partial<CreateItemDto>
