@@ -32,6 +32,27 @@ const router = createRouter({
   routes
 })
 
+router.beforeEach(async (to) => {
+  if (to.name !== 'DefaultSetup') {
+    return true
+  }
+
+  const gameId = to.params.gameId as string
+  if (!gameId) {
+    return true
+  }
+
+  const game = await window.api.gameApi.getById(gameId)
+  if (game?.mod_root_path) {
+    return {
+      name: 'GameManager',
+      params: { gameId }
+    }
+  }
+
+  return true
+})
+
 export function setupRouter(app: App): void {
   app.use(router)
 }
