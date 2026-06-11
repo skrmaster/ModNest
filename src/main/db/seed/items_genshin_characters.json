@@ -22,7 +22,7 @@
   },
   {
     "image": "linea.png",
-    "element": "hydro",
+    "element": "geo",
     "name": "Linea",
     "zhCn": "莉奈娅",
     "rarity": 5
@@ -39,18 +39,18 @@
     "element": "geo",
     "name": "Zibai",
     "zhCn": "兹白",
-    "rarity": 4
+    "rarity": 5
   },
   {
     "image": "yeloia.png",
-    "element": "cryo",
+    "element": "geo",
     "name": "Yeloia",
     "zhCn": "叶洛亚",
     "rarity": 4
   },
   {
     "image": "columbina.png",
-    "element": "cryo",
+    "element": "hydro",
     "name": "Columbina",
     "zhCn": "哥伦比娅",
     "rarity": 5
@@ -60,25 +60,25 @@
     "element": "pyro",
     "name": "Durin",
     "zhCn": "杜林",
-    "rarity": 4
+    "rarity": 5
   },
   {
     "image": "jahoda.png",
-    "element": "hydro",
+    "element": "anemo",
     "name": "Jahoda",
     "zhCn": "雅珂达",
     "rarity": 4
   },
   {
     "image": "naveria.png",
-    "element": "hydro",
+    "element": "dendro",
     "name": "Naveria",
     "zhCn": "奈芙尔",
-    "rarity": 4
+    "rarity": 5
   },
   {
     "image": "enno.png",
-    "element": "electro",
+    "element": "hydro",
     "name": "Enno",
     "zhCn": "爱诺",
     "rarity": 4
@@ -88,7 +88,7 @@
     "element": "electro",
     "name": "Filins",
     "zhCn": "菲林斯",
-    "rarity": 4
+    "rarity": 5
   },
   {
     "image": "lauma.png",
@@ -99,7 +99,7 @@
   },
   {
     "image": "inev.png",
-    "element": "dendro",
+    "element": "electro",
     "name": "Inev",
     "zhCn": "伊涅芙",
     "rarity": 5
@@ -130,7 +130,7 @@
     "element": "cryo",
     "name": "Ecofi",
     "zhCn": "爱可菲",
-    "rarity": 4
+    "rarity": 5
   },
   {
     "image": "ianshan.png",
@@ -151,11 +151,11 @@
     "element": "anemo",
     "name": "Yumegetsu Mizuki",
     "zhCn": "梦见月瑞希",
-    "rarity": 4
+    "rarity": 5
   },
   {
     "image": "lanyan.png",
-    "element": "geo",
+    "element": "anemo",
     "name": "Lanyan",
     "zhCn": "蓝砚",
     "rarity": 4
@@ -193,14 +193,14 @@
     "element": "geo",
     "name": "Shinon",
     "zhCn": "希诺宁",
-    "rarity": 4
+    "rarity": 5
   },
   {
     "image": "kinichi.png",
     "element": "dendro",
     "name": "Kinichi",
     "zhCn": "基尼奇",
-    "rarity": 4
+    "rarity": 5
   },
   {
     "image": "kacina.png",
@@ -214,7 +214,7 @@
     "element": "hydro",
     "name": "Malani",
     "zhCn": "玛拉妮",
-    "rarity": 4
+    "rarity": 5
   },
   {
     "image": "emerie.png",
@@ -228,7 +228,7 @@
     "element": "hydro",
     "name": "Sigewinne",
     "zhCn": "希格雯",
-    "rarity": 4
+    "rarity": 5
   },
   {
     "image": "sesios.png",
@@ -256,7 +256,7 @@
     "element": "geo",
     "name": "Chiori",
     "zhCn": "千织",
-    "rarity": 4
+    "rarity": 5
   },
   {
     "image": "gaming.png",
