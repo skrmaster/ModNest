@@ -86,5 +86,71 @@
     "name_zh_cn": "岩元素",
     "level": 1,
     "cover": "genshin/elements/geo.svg"
+  },
+
+  {
+    "id": 12,
+    "name": "rarity5",
+    "icon": "",
+    "name_zh_cn": "5星",
+    "level": 1,
+    "cover": "genshin/elements/geo.svg"
+  },
+  {
+    "id": 13,
+    "name": "rarity4",
+    "icon": "",
+    "name_zh_cn": "4星",
+    "level": 1,
+    "cover": "genshin/elements/geo.svg"
+  },
+  {
+    "id": 14,
+    "name": "rarity3",
+    "icon": "",
+    "name_zh_cn": "3星",
+    "level": 1,
+    "cover": "genshin/elements/geo.svg"
+  },
+
+  {
+    "id": 15,
+    "name": "physical",
+    "icon": "",
+    "name_zh_cn": "物理",
+    "level": 2,
+    "cover": "zzz/elements/Physical.svg"
+  },
+  {
+    "id": 16,
+    "name": "ice",
+    "icon": "",
+    "name_zh_cn": "冰",
+    "level": 2,
+    "cover": "zzz/elements/Ice.svg"
+  },
+  {
+    "id": 17,
+    "name": "fire",
+    "icon": "",
+    "name_zh_cn": "火",
+    "level": 2,
+    "cover": "zzz/elements/Fire.svg"
+  },
+  {
+    "id": 18,
+    "name": "ether",
+    "icon": "",
+    "name_zh_cn": "以太",
+    "level": 2,
+    "cover": "zzz/elements/Ether.svg"
+  },
+  {
+    "id": 19,
+    "name": "electric",
+    "icon": "",
+    "name_zh_cn": "电",
+    "level": 2,
+    "cover": "zzz/elements/Electric.svg"
   }
 ]

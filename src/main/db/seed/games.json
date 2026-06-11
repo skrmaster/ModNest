@@ -3,14 +3,14 @@
     "id": 1,
     "name": "Genshin Impact",
     "name_zh_cn": "原神",
-    "cover": "genshin/genshin-impact.jpg",
+    "cover": "Genshin Impact/genshin-impact.jpg",
     "mod_root_path": ""
   },
   {
     "id": 2,
     "name": "Zenless Zone Zero",
     "name_zh_cn": "绝区零",
-    "cover": "zzz/zenless-zone-zero.png",
+    "cover": "Zenless Zone Zero/zenless-zone-zero.png",
     "mod_root_path": ""
   }
 ]

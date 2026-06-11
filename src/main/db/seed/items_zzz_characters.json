@@ -1,0 +1,345 @@
+[
+  {
+    "image": "Belle.webp",
+    "element": "character",
+    "name": "Belle",
+    "zhCn": "贝拉",
+    "rarity": 0
+  },
+  {
+    "image": "Wise.webp",
+    "element": "character",
+    "name": "Wise",
+    "zhCn": "怀斯",
+    "rarity": 0
+  },
+  {
+    "image": "Rina.webp",
+    "element": "electric",
+    "name": "Rina",
+    "zhCn": "丽娜",
+    "rarity": 5
+  },
+  {
+    "image": "Ellen.webp",
+    "element": "ice",
+    "name": "Ellen",
+    "zhCn": "艾莲",
+    "rarity": 5
+  },
+  {
+    "image": "Grace.webp",
+    "element": "electric",
+    "name": "Grace",
+    "zhCn": "格蕾丝",
+    "rarity": 5
+  },
+  {
+    "image": "Koleda.webp",
+    "element": "fire",
+    "name": "Koleda",
+    "zhCn": "可琳妲",
+    "rarity": 5
+  },
+  {
+    "image": "Nekomata.webp",
+    "element": "physical",
+    "name": "Nekomata",
+    "zhCn": "猫又",
+    "rarity": 5
+  },
+  {
+    "image": "Soldier11.webp",
+    "element": "fire",
+    "name": "Soldier 11",
+    "zhCn": "11号",
+    "rarity": 5
+  },
+  {
+    "image": "Lycaon.webp",
+    "element": "ice",
+    "name": "Lycaon",
+    "zhCn": "莱卡恩",
+    "rarity": 5
+  },
+  {
+    "image": "ZhuYuan.webp",
+    "element": "ether",
+    "name": "Zhu Yuan",
+    "zhCn": "朱鸢",
+    "rarity": 5
+  },
+  {
+    "image": "Anby.webp",
+    "element": "electric",
+    "name": "Anby",
+    "zhCn": "安比",
+    "rarity": 4
+  },
+  {
+    "image": "Anton.webp",
+    "element": "electric",
+    "name": "Anton",
+    "zhCn": "安东",
+    "rarity": 4
+  },
+  {
+    "image": "Ben.webp",
+    "element": "fire",
+    "name": "Ben",
+    "zhCn": "本",
+    "rarity": 4
+  },
+  {
+    "image": "Billy.webp",
+    "element": "physical",
+    "name": "Billy",
+    "zhCn": "比利",
+    "rarity": 4
+  },
+  {
+    "image": "Corin.webp",
+    "element": "physical",
+    "name": "Corin",
+    "zhCn": "可琳",
+    "rarity": 4
+  },
+  {
+    "image": "Lucy.webp",
+    "element": "fire",
+    "name": "Lucy",
+    "zhCn": "露西",
+    "rarity": 4
+  },
+  {
+    "image": "Nicole.webp",
+    "element": "ether",
+    "name": "Nicole",
+    "zhCn": "妮可",
+    "rarity": 4
+  },
+  {
+    "image": "Piper.webp",
+    "element": "physical",
+    "name": "Piper",
+    "zhCn": "派珀",
+    "rarity": 4
+  },
+  {
+    "image": "Soukaku.webp",
+    "element": "ice",
+    "name": "Soukaku",
+    "zhCn": "苍角",
+    "rarity": 4
+  },
+  {
+    "image": "Miyabi.webp",
+    "element": "ice",
+    "name": "Miyabi",
+    "zhCn": "雅",
+    "rarity": 5
+  },
+  {
+    "image": "Jane.webp",
+    "element": "physical",
+    "name": "Jane",
+    "zhCn": "简",
+    "rarity": 5
+  },
+  {
+    "image": "Qingyi.webp",
+    "element": "electric",
+    "name": "Qingyi",
+    "zhCn": "青衣",
+    "rarity": 5
+  },
+  {
+    "image": "Seth.webp",
+    "element": "electric",
+    "name": "Seth",
+    "zhCn": "赛斯",
+    "rarity": 4
+  },
+  {
+    "image": "Caesar.webp",
+    "element": "physical",
+    "name": "Caesar",
+    "zhCn": "凯撒",
+    "rarity": 5
+  },
+  {
+    "image": "Burnice.webp",
+    "element": "fire",
+    "name": "Burnice",
+    "zhCn": "柏妮思",
+    "rarity": 5
+  },
+  {
+    "image": "Yanagi.webp",
+    "element": "electric",
+    "name": "Yanagi",
+    "zhCn": "柳",
+    "rarity": 5
+  },
+  {
+    "image": "Harumasa.webp",
+    "element": "electric",
+    "name": "Harumasa",
+    "zhCn": "晴正",
+    "rarity": 5
+  },
+  {
+    "image": "Astra.webp",
+    "element": "ether",
+    "name": "Astra",
+    "zhCn": "艾丝翠",
+    "rarity": 5
+  },
+  {
+    "image": "Evelyn.webp",
+    "element": "fire",
+    "name": "Evelyn",
+    "zhCn": "伊芙琳",
+    "rarity": 5
+  },
+  {
+    "image": "Lighter.webp",
+    "element": "fire",
+    "name": "Lighter",
+    "zhCn": "莱特",
+    "rarity": 5
+  },
+  {
+    "image": "Pulchra.webp",
+    "element": "physical",
+    "name": "Pulchra",
+    "zhCn": "普尔拉",
+    "rarity": 5
+  },
+  {
+    "image": "SSAnby.webp",
+    "element": "electric",
+    "name": "Silver Soldier - Anby",
+    "zhCn": "银装安比",
+    "rarity": 5
+  },
+  {
+    "image": "Trigger.webp",
+    "element": "electric",
+    "name": "Trigger",
+    "zhCn": "崔格",
+    "rarity": 5
+  },
+  {
+    "image": "Vivian.webp",
+    "element": "ether",
+    "name": "Vivian",
+    "zhCn": "薇薇安",
+    "rarity": 5
+  },
+  {
+    "image": "Hugo.png",
+    "element": "ice",
+    "name": "Hugo",
+    "zhCn": "雨果",
+    "rarity": 5
+  },
+  {
+    "image": "Yixuan.png",
+    "element": "ether",
+    "name": "Yixuan",
+    "zhCn": "易玄",
+    "rarity": 5
+  },
+  {
+    "image": "PanYinhu.png",
+    "element": "physical",
+    "name": "Pan Yinhu",
+    "zhCn": "潘寅虎",
+    "rarity": 4
+  },
+  {
+    "image": "JuFufu.png",
+    "element": "fire",
+    "name": "Ju Fufu",
+    "zhCn": "鞠芙芙",
+    "rarity": 5
+  },
+  {
+    "image": "UkinamiYuzuha.png",
+    "element": "physical",
+    "name": "Yuzuha",
+    "zhCn": "柚叶",
+    "rarity": 5
+  },
+  {
+    "image": "AliceThymefield.png",
+    "element": "physical",
+    "name": "Alice",
+    "zhCn": "艾莉丝",
+    "rarity": 5
+  },
+  {
+    "image": "OrphieMagnusson.png",
+    "element": "fire",
+    "name": "Orphie",
+    "zhCn": "奥菲",
+    "rarity": 5
+  },
+  {
+    "image": "Seed.png",
+    "element": "electric",
+    "name": "Seed",
+    "zhCn": "希德",
+    "rarity": 5
+  },
+  {
+    "image": "Manato.png",
+    "element": "fire",
+    "name": "Manato",
+    "zhCn": "真人",
+    "rarity": 4
+  },
+  {
+    "image": "Lucia.png",
+    "element": "ether",
+    "name": "Lucia",
+    "zhCn": "露琪亚",
+    "rarity": 5
+  },
+  {
+    "image": "Yidhari.png",
+    "element": "ice",
+    "name": "Yidhari",
+    "zhCn": "伊达里",
+    "rarity": 5
+  },
+  {
+    "image": "Dialyn.webp",
+    "element": "physical",
+    "name": "Dialyn",
+    "zhCn": "黛琳",
+    "rarity": 5
+  },
+  {
+    "image": "Banyue.webp",
+    "element": "fire",
+    "name": "Banyue",
+    "zhCn": "半月",
+    "rarity": 5
+  },
+  {
+    "image": "YeShunguang.webp",
+    "element": "physical",
+    "name": "Ye Shunguang",
+    "zhCn": "叶瞬光",
+    "rarity": 5
+  },
+  {
+    "image": "Zhao.webp",
+    "element": "ice",
+    "name": "Zhao",
+    "zhCn": "赵",
+    "rarity": 5
+  }
+]

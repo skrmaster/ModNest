@@ -1,536 +1,822 @@
 [
   {
-    "image": "albedo.png",
-    "element": "geo",
-    "name": "Albedo",
-    "zhCn": "阿贝多"
+    "image": "lohen.png",
+    "element": "cryo",
+    "name": "Lohen",
+    "zhCn": "洛恩",
+    "rarity": 5
   },
   {
-    "image": "alhaitham.png",
+    "image": "nicole.png",
+    "element": "pyro",
+    "name": "Nicole",
+    "zhCn": "尼可",
+    "rarity": 5
+  },
+  {
+    "image": "prune.png",
+    "element": "anemo",
+    "name": "Prune",
+    "zhCn": "布伦妮",
+    "rarity": 4
+  },
+  {
+    "image": "linea.png",
+    "element": "hydro",
+    "name": "Linea",
+    "zhCn": "莉奈娅",
+    "rarity": 5
+  },
+  {
+    "image": "varka.png",
+    "element": "anemo",
+    "name": "Varka",
+    "zhCn": "法尔伽",
+    "rarity": 5
+  },
+  {
+    "image": "zibai.png",
+    "element": "geo",
+    "name": "Zibai",
+    "zhCn": "兹白",
+    "rarity": 4
+  },
+  {
+    "image": "yeloia.png",
+    "element": "cryo",
+    "name": "Yeloia",
+    "zhCn": "叶洛亚",
+    "rarity": 4
+  },
+  {
+    "image": "columbina.png",
+    "element": "cryo",
+    "name": "Columbina",
+    "zhCn": "哥伦比娅",
+    "rarity": 5
+  },
+  {
+    "image": "durin.png",
+    "element": "pyro",
+    "name": "Durin",
+    "zhCn": "杜林",
+    "rarity": 4
+  },
+  {
+    "image": "jahoda.png",
+    "element": "hydro",
+    "name": "Jahoda",
+    "zhCn": "雅珂达",
+    "rarity": 4
+  },
+  {
+    "image": "naveria.png",
+    "element": "hydro",
+    "name": "Naveria",
+    "zhCn": "奈芙尔",
+    "rarity": 4
+  },
+  {
+    "image": "enno.png",
+    "element": "electro",
+    "name": "Enno",
+    "zhCn": "爱诺",
+    "rarity": 4
+  },
+  {
+    "image": "filins.png",
+    "element": "electro",
+    "name": "Filins",
+    "zhCn": "菲林斯",
+    "rarity": 4
+  },
+  {
+    "image": "lauma.png",
     "element": "dendro",
-    "name": "Alhaitham",
-    "zhCn": "艾尔海森"
+    "name": "Lauma",
+    "zhCn": "菈乌玛",
+    "rarity": 5
   },
   {
-    "image": "aloy.png",
-    "element": "cryo",
-    "name": "Aloy",
-    "zhCn": "埃洛伊"
-  },
-  {
-    "image": "amber.png",
-    "element": "pyro",
-    "name": "Amber",
-    "zhCn": "安柏"
-  },
-  {
-    "image": "arataki_Itto.png",
-    "element": "geo",
-    "name": "Arataki Itto",
-    "zhCn": "荒泷一斗"
-  },
-  {
-    "image": "baizhu.png",
+    "image": "inev.png",
     "element": "dendro",
-    "name": "Baizhu",
-    "zhCn": "白术"
+    "name": "Inev",
+    "zhCn": "伊涅芙",
+    "rarity": 5
   },
   {
-    "image": "barbara.png",
+    "image": "talia.png",
     "element": "hydro",
-    "name": "Barbara",
-    "zhCn": "芭芭拉"
+    "name": "Talia",
+    "zhCn": "塔利雅",
+    "rarity": 4
   },
   {
-    "image": "beidou.png",
+    "image": "skirk.png",
+    "element": "cryo",
+    "name": "Skirk",
+    "zhCn": "丝柯克",
+    "rarity": 5
+  },
+  {
+    "image": "ifa.png",
+    "element": "anemo",
+    "name": "Ifa",
+    "zhCn": "伊法",
+    "rarity": 4
+  },
+  {
+    "image": "ecofi.png",
+    "element": "cryo",
+    "name": "Ecofi",
+    "zhCn": "爱可菲",
+    "rarity": 4
+  },
+  {
+    "image": "ianshan.png",
     "element": "electro",
-    "name": "Beidou",
-    "zhCn": "北斗"
+    "name": "Ianshan",
+    "zhCn": "伊安珊",
+    "rarity": 4
   },
   {
-    "image": "bennett.png",
+    "image": "vanessa.png",
+    "element": "electro",
+    "name": "Vanessa",
+    "zhCn": "瓦雷莎",
+    "rarity": 5
+  },
+  {
+    "image": "yumegetsu mizuki.png",
+    "element": "anemo",
+    "name": "Yumegetsu Mizuki",
+    "zhCn": "梦见月瑞希",
+    "rarity": 4
+  },
+  {
+    "image": "lanyan.png",
+    "element": "geo",
+    "name": "Lanyan",
+    "zhCn": "蓝砚",
+    "rarity": 4
+  },
+  {
+    "image": "citralie.png",
+    "element": "cryo",
+    "name": "Citralie",
+    "zhCn": "茜特菈莉",
+    "rarity": 5
+  },
+  {
+    "image": "mavika.png",
     "element": "pyro",
-    "name": "Bennett",
-    "zhCn": "班尼特"
+    "name": "Mavika",
+    "zhCn": "玛薇卡",
+    "rarity": 5
   },
   {
-    "image": "candace.png",
-    "element": "hydro",
-    "name": "Candace",
-    "zhCn": "坎蒂丝"
+    "image": "olorun.png",
+    "element": "electro",
+    "name": "Olorun",
+    "zhCn": "欧洛伦",
+    "rarity": 4
   },
   {
-    "image": "charlotte.png",
-    "element": "cryo",
-    "name": "Charlotte",
-    "zhCn": "夏洛蒂"
+    "image": "chasca.png",
+    "element": "anemo",
+    "name": "Chasca",
+    "zhCn": "恰斯卡",
+    "rarity": 5
   },
   {
-    "image": "chongyun.png",
-    "element": "cryo",
-    "name": "Chongyun",
-    "zhCn": "重云"
+    "image": "shinon.png",
+    "element": "geo",
+    "name": "Shinon",
+    "zhCn": "希诺宁",
+    "rarity": 4
   },
   {
-    "image": "collei.png",
+    "image": "kinichi.png",
     "element": "dendro",
-    "name": "Collei",
-    "zhCn": "柯莱"
+    "name": "Kinichi",
+    "zhCn": "基尼奇",
+    "rarity": 4
   },
   {
-    "image": "cyno.png",
-    "element": "electro",
-    "name": "Cyno",
-    "zhCn": "赛诺"
-  },
-  {
-    "image": "dehya.png",
-    "element": "pyro",
-    "name": "Dehya",
-    "zhCn": "迪希雅"
-  },
-  {
-    "image": "diluc.png",
-    "element": "pyro",
-    "name": "Diluc",
-    "zhCn": "迪卢克"
-  },
-  {
-    "image": "diona.png",
-    "element": "cryo",
-    "name": "Diona",
-    "zhCn": "迪奥娜"
-  },
-  {
-    "image": "dori.png",
-    "element": "electro",
-    "name": "Dori",
-    "zhCn": "多莉"
-  },
-  {
-    "image": "eula.png",
-    "element": "cryo",
-    "name": "Eula",
-    "zhCn": "优菈"
-  },
-  {
-    "image": "faruzan.png",
-    "element": "anemo",
-    "name": "Faruzan",
-    "zhCn": "珐露珊"
-  },
-  {
-    "image": "fischl.png",
-    "element": "electro",
-    "name": "Fischl",
-    "zhCn": "菲谢尔"
-  },
-  {
-    "image": "freminet.png",
-    "element": "cryo",
-    "name": "Freminet",
-    "zhCn": "菲米尼"
-  },
-  {
-    "image": "furina.png",
-    "element": "hydro",
-    "name": "Furina",
-    "zhCn": "芙宁娜"
-  },
-  {
-    "image": "ganyu.png",
-    "element": "cryo",
-    "name": "Ganyu",
-    "zhCn": "甘雨"
-  },
-  {
-    "image": "gorou.png",
+    "image": "kacina.png",
     "element": "geo",
-    "name": "Gorou",
-    "zhCn": "五郎"
+    "name": "Kacina",
+    "zhCn": "卡齐娜",
+    "rarity": 4
   },
   {
-    "image": "hu_Tao.png",
-    "element": "pyro",
-    "name": "Hu Tao",
-    "zhCn": "胡桃"
-  },
-  {
-    "image": "jean.png",
-    "element": "anemo",
-    "name": "Jean",
-    "zhCn": "琴"
-  },
-  {
-    "image": "kaedehara_Kazuha.png",
-    "element": "anemo",
-    "name": "Kaedehara Kazuha",
-    "zhCn": "枫原万叶"
-  },
-  {
-    "image": "kaeya.png",
-    "element": "cryo",
-    "name": "Kaeya",
-    "zhCn": "凯亚"
-  },
-  {
-    "image": "kamisato_Ayaka.png",
-    "element": "cryo",
-    "name": "Kamisato Ayaka",
-    "zhCn": "神里绫华"
-  },
-  {
-    "image": "kamisato_Ayato.png",
+    "image": "malani.png",
     "element": "hydro",
-    "name": "Kamisato Ayato",
-    "zhCn": "神里绫人"
+    "name": "Malani",
+    "zhCn": "玛拉妮",
+    "rarity": 4
   },
   {
-    "image": "kaveh.png",
+    "image": "emerie.png",
     "element": "dendro",
-    "name": "Kaveh",
-    "zhCn": "卡维"
-  },
-  {
-    "image": "keqing.png",
-    "element": "electro",
-    "name": "Keqing",
-    "zhCn": "刻晴"
-  },
-  {
-    "image": "kirara.png",
-    "element": "dendro",
-    "name": "Kirara",
-    "zhCn": "绮良良"
-  },
-  {
-    "image": "klee.png",
-    "element": "pyro",
-    "name": "Klee",
-    "zhCn": "可莉"
-  },
-  {
-    "image": "kujou_Sara.png",
-    "element": "electro",
-    "name": "Kujou Sara",
-    "zhCn": "九条裟罗"
-  },
-  {
-    "image": "kuki_Shinobu.png",
-    "element": "electro",
-    "name": "Kuki Shinobu",
-    "zhCn": "久岐忍"
-  },
-  {
-    "image": "layla.png",
-    "element": "cryo",
-    "name": "Layla",
-    "zhCn": "莱依拉"
-  },
-  {
-    "image": "lisa.png",
-    "element": "electro",
-    "name": "Lisa",
-    "zhCn": "丽莎"
-  },
-  {
-    "image": "lynette.png",
-    "element": "anemo",
-    "name": "Lynette",
-    "zhCn": "琳妮特"
-  },
-  {
-    "image": "lyney.png",
-    "element": "pyro",
-    "name": "Lyney",
-    "zhCn": "林尼"
-  },
-  {
-    "image": "mika.png",
-    "element": "cryo",
-    "name": "Mika",
-    "zhCn": "米卡"
-  },
-  {
-    "image": "mona.png",
-    "element": "hydro",
-    "name": "Mona",
-    "zhCn": "莫娜"
-  },
-  {
-    "image": "nahida.png",
-    "element": "dendro",
-    "name": "Nahida",
-    "zhCn": "纳西妲"
-  },
-  {
-    "image": "navia.png",
-    "element": "geo",
-    "name": "Navia",
-    "zhCn": "娜维娅"
-  },
-  {
-    "image": "neuvillette.png",
-    "element": "hydro",
-    "name": "Neuvillette",
-    "zhCn": "那维莱特"
-  },
-  {
-    "image": "nilou.png",
-    "element": "hydro",
-    "name": "Nilou",
-    "zhCn": "妮露"
-  },
-  {
-    "image": "ningguang.png",
-    "element": "geo",
-    "name": "Ningguang",
-    "zhCn": "凝光"
-  },
-  {
-    "image": "noelle.png",
-    "element": "geo",
-    "name": "Noelle",
-    "zhCn": "诺艾尔"
-  },
-  {
-    "image": "paimon.png",
-    "element": "character",
-    "name": "Paimon",
-    "zhCn": "派蒙"
-  },
-  {
-    "image": "qiqi.png",
-    "element": "cryo",
-    "name": "Qiqi",
-    "zhCn": "七七"
-  },
-  {
-    "image": "raiden_Shogun.png",
-    "element": "electro",
-    "name": "Raiden Shogun",
-    "zhCn": "雷电将军"
-  },
-  {
-    "image": "razor.png",
-    "element": "electro",
-    "name": "Razor",
-    "zhCn": "雷泽"
-  },
-  {
-    "image": "rosaria.png",
-    "element": "cryo",
-    "name": "Rosaria",
-    "zhCn": "罗莎莉亚"
-  },
-  {
-    "image": "sangonomiya_Kokomi.png",
-    "element": "hydro",
-    "name": "Sangonomiya Kokomi",
-    "zhCn": "珊瑚宫心海"
-  },
-  {
-    "image": "sayu.png",
-    "element": "anemo",
-    "name": "Sayu",
-    "zhCn": "早柚"
-  },
-  {
-    "image": "shenhe.png",
-    "element": "cryo",
-    "name": "Shenhe",
-    "zhCn": "申鹤"
-  },
-  {
-    "image": "shikanoin_Heizou.png",
-    "element": "anemo",
-    "name": "Shikanoin Heizou",
-    "zhCn": "鹿野院平藏"
-  },
-  {
-    "image": "sucrose.png",
-    "element": "anemo",
-    "name": "Sucrose",
-    "zhCn": "砂糖"
-  },
-  {
-    "image": "tartaglia.png",
-    "element": "hydro",
-    "name": "Tartaglia",
-    "zhCn": "达达利亚"
-  },
-  {
-    "image": "thoma.png",
-    "element": "pyro",
-    "name": "Thoma",
-    "zhCn": "托马"
-  },
-  {
-    "image": "tighnari.png",
-    "element": "dendro",
-    "name": "Tighnari",
-    "zhCn": "提纳里"
-  },
-  {
-    "image": "traveler_(Female).png",
-    "element": "anemo",
-    "name": "Lumine",
-    "zhCn": "荧"
-  },
-  {
-    "image": "traveler_(Male).png",
-    "element": "anemo",
-    "name": "Aether",
-    "zhCn": "空"
-  },
-  {
-    "image": "venti.png",
-    "element": "anemo",
-    "name": "Venti",
-    "zhCn": "温迪"
-  },
-  {
-    "image": "wanderer.png",
-    "element": "anemo",
-    "name": "Wanderer",
-    "zhCn": "流浪者"
-  },
-  {
-    "image": "xiangling.png",
-    "element": "pyro",
-    "name": "Xiangling",
-    "zhCn": "香菱"
-  },
-  {
-    "image": "xiao.png",
-    "element": "anemo",
-    "name": "Xiao",
-    "zhCn": "魈"
-  },
-  {
-    "image": "xingqiu.png",
-    "element": "hydro",
-    "name": "Xingqiu",
-    "zhCn": "行秋"
-  },
-  {
-    "image": "xinyan.png",
-    "element": "pyro",
-    "name": "Xinyan",
-    "zhCn": "辛焱"
-  },
-  {
-    "image": "yae_Miko.png",
-    "element": "electro",
-    "name": "Yae Miko",
-    "zhCn": "八重神子"
-  },
-  {
-    "image": "yanfei.png",
-    "element": "pyro",
-    "name": "Yanfei",
-    "zhCn": "烟绯"
-  },
-  {
-    "image": "yaoyao.png",
-    "element": "dendro",
-    "name": "Yaoyao",
-    "zhCn": "瑶瑶"
-  },
-  {
-    "image": "yelan.png",
-    "element": "hydro",
-    "name": "Yelan",
-    "zhCn": "夜兰"
-  },
-  {
-    "image": "yoimiya.png",
-    "element": "pyro",
-    "name": "Yoimiya",
-    "zhCn": "宵宫"
-  },
-  {
-    "image": "yun_Jin.png",
-    "element": "geo",
-    "name": "Yun Jin",
-    "zhCn": "云堇"
-  },
-  {
-    "image": "zhongli.png",
-    "element": "geo",
-    "name": "Zhongli",
-    "zhCn": "钟离"
-  },
-  {
-    "image": "wriothesley.png",
-    "element": "cryo",
-    "name": "Wriothesley",
-    "zhCn": "莱欧斯利"
-  },
-  {
-    "image": "chevreuse.png",
-    "element": "pyro",
-    "name": "Chevreuse",
-    "zhCn": "夏沃蕾"
-  },
-  {
-    "image": "xianyun.png",
-    "element": "anemo",
-    "name": "Xianyun",
-    "zhCn": "闲云"
-  },
-  {
-    "image": "gaming.png",
-    "element": "pyro",
-    "name": "Gaming",
-    "zhCn": "嘉明"
-  },
-  {
-    "image": "chiori.png",
-    "element": "geo",
-    "name": "Chiori",
-    "zhCn": "千织"
-  },
-  {
-    "image": "arlecchino.png",
-    "element": "pyro",
-    "name": "Arlecchino",
-    "zhCn": "阿蕾奇诺"
-  },
-  {
-    "image": "clorinde.png",
-    "element": "electro",
-    "name": "Clorinde",
-    "zhCn": "克洛琳德"
+    "name": "Emerie",
+    "zhCn": "艾梅莉埃",
+    "rarity": 5
   },
   {
     "image": "sigewinne.png",
     "element": "hydro",
     "name": "Sigewinne",
-    "zhCn": "希格雯"
+    "zhCn": "希格雯",
+    "rarity": 4
   },
   {
-    "image": "sethos.png",
+    "image": "sesios.png",
     "element": "electro",
-    "name": "Sethos",
-    "zhCn": "赛索斯"
+    "name": "Sesios",
+    "zhCn": "赛索斯",
+    "rarity": 4
   },
   {
-    "image": "emilie.png",
-    "element": "dendro",
-    "name": "Emilie",
-    "zhCn": "爱可菲"
+    "image": "clorinde.png",
+    "element": "electro",
+    "name": "Clorinde",
+    "zhCn": "克洛琳德",
+    "rarity": 5
   },
   {
-    "image": "mualani.png",
+    "image": "arlecchino.png",
+    "element": "pyro",
+    "name": "Arlecchino",
+    "zhCn": "阿蕾奇诺",
+    "rarity": 5
+  },
+  {
+    "image": "chiori.png",
+    "element": "geo",
+    "name": "Chiori",
+    "zhCn": "千织",
+    "rarity": 4
+  },
+  {
+    "image": "gaming.png",
+    "element": "pyro",
+    "name": "Gamin",
+    "zhCn": "嘉明",
+    "rarity": 4
+  },
+  {
+    "image": "xianyun.png",
+    "element": "anemo",
+    "name": "Xianyun",
+    "zhCn": "闲云",
+    "rarity": 5
+  },
+  {
+    "image": "chevreuse.png",
+    "element": "pyro",
+    "name": "Chevreuse",
+    "zhCn": "夏沃蕾",
+    "rarity": 4
+  },
+  {
+    "image": "navia.png",
+    "element": "geo",
+    "name": "Navia",
+    "zhCn": "娜维娅",
+    "rarity": 5
+  },
+  {
+    "image": "charlotte.png",
+    "element": "cryo",
+    "name": "Charlotte",
+    "zhCn": "夏洛蒂",
+    "rarity": 4
+  },
+  {
+    "image": "furina.png",
     "element": "hydro",
-    "name": "Mualani",
-    "zhCn": "玛拉妮"
+    "name": "Furina",
+    "zhCn": "芙宁娜",
+    "rarity": 5
   },
   {
-    "image": "kinich.png",
+    "image": "wriothesley.png",
+    "element": "cryo",
+    "name": "Wriothesley",
+    "zhCn": "莱欧斯利",
+    "rarity": 5
+  },
+  {
+    "image": "neuvillette.png",
+    "element": "hydro",
+    "name": "Neuvillette",
+    "zhCn": "那维莱特",
+    "rarity": 5
+  },
+  {
+    "image": "freminet.png",
+    "element": "cryo",
+    "name": "Freminet",
+    "zhCn": "菲米尼",
+    "rarity": 4
+  },
+  {
+    "image": "lynette.png",
+    "element": "anemo",
+    "name": "Lynette",
+    "zhCn": "琳妮特",
+    "rarity": 4
+  },
+  {
+    "image": "lyney.png",
+    "element": "pyro",
+    "name": "Lyney",
+    "zhCn": "林尼",
+    "rarity": 5
+  },
+  {
+    "image": "kirara.png",
     "element": "dendro",
-    "name": "Kinich",
-    "zhCn": "基尼奇"
+    "name": "Kirara",
+    "zhCn": "绮良良",
+    "rarity": 4
+  },
+  {
+    "image": "kaveh.png",
+    "element": "dendro",
+    "name": "Kaveh",
+    "zhCn": "卡维",
+    "rarity": 4
+  },
+  {
+    "image": "baizhu.png",
+    "element": "dendro",
+    "name": "Baizhu",
+    "zhCn": "白术",
+    "rarity": 5
+  },
+  {
+    "image": "mika.png",
+    "element": "cryo",
+    "name": "Mika",
+    "zhCn": "米卡",
+    "rarity": 4
+  },
+  {
+    "image": "dehya.png",
+    "element": "pyro",
+    "name": "Dehya",
+    "zhCn": "迪希雅",
+    "rarity": 5
+  },
+  {
+    "image": "yaoyao.png",
+    "element": "dendro",
+    "name": "Yaoyao",
+    "zhCn": "瑶瑶",
+    "rarity": 4
+  },
+  {
+    "image": "alhaitham.png",
+    "element": "dendro",
+    "name": "Alhaitham",
+    "zhCn": "艾尔海森",
+    "rarity": 5
+  },
+  {
+    "image": "wanderer.png",
+    "element": "anemo",
+    "name": "Wanderer",
+    "zhCn": "流浪者",
+    "rarity": 5
+  },
+  {
+    "image": "faruzan.png",
+    "element": "anemo",
+    "name": "Faruzan",
+    "zhCn": "珐露珊",
+    "rarity": 4
+  },
+  {
+    "image": "layla.png",
+    "element": "cryo",
+    "name": "Layla",
+    "zhCn": "莱依拉",
+    "rarity": 4
+  },
+  {
+    "image": "nahida.png",
+    "element": "dendro",
+    "name": "Nahida",
+    "zhCn": "纳西妲",
+    "rarity": 5
+  },
+  {
+    "image": "nilou.png",
+    "element": "hydro",
+    "name": "Nilou",
+    "zhCn": "妮露",
+    "rarity": 5
+  },
+  {
+    "image": "cyno.png",
+    "element": "electro",
+    "name": "Cyno",
+    "zhCn": "赛诺",
+    "rarity": 5
+  },
+  {
+    "image": "candace.png",
+    "element": "hydro",
+    "name": "Candace",
+    "zhCn": "坎蒂丝",
+    "rarity": 4
+  },
+  {
+    "image": "collei.png",
+    "element": "dendro",
+    "name": "Collei",
+    "zhCn": "柯莱",
+    "rarity": 4
+  },
+  {
+    "image": "tighnari.png",
+    "element": "dendro",
+    "name": "Tighnari",
+    "zhCn": "提纳里",
+    "rarity": 5
+  },
+  {
+    "image": "shikanoin heizou.png",
+    "element": "anemo",
+    "name": "Shikanoin Heizou",
+    "zhCn": "鹿野院平藏",
+    "rarity": 4
+  },
+  {
+    "image": "kuki shinobu.png",
+    "element": "electro",
+    "name": "Kuki Shinobu",
+    "zhCn": "久岐忍",
+    "rarity": 4
+  },
+  {
+    "image": "yelan.png",
+    "element": "hydro",
+    "name": "Yelan",
+    "zhCn": "夜兰",
+    "rarity": 5
+  },
+  {
+    "image": "kamisato ayato.png",
+    "element": "hydro",
+    "name": "Kamisato Ayato",
+    "zhCn": "神里绫人",
+    "rarity": 5
+  },
+  {
+    "image": "yae miko.png",
+    "element": "electro",
+    "name": "Yae Miko",
+    "zhCn": "八重神子",
+    "rarity": 5
+  },
+  {
+    "image": "shenhe.png",
+    "element": "cryo",
+    "name": "Shenhe",
+    "zhCn": "申鹤",
+    "rarity": 5
+  },
+  {
+    "image": "yun jin.png",
+    "element": "geo",
+    "name": "Yun Jin",
+    "zhCn": "云堇",
+    "rarity": 4
+  },
+  {
+    "image": "gorou.png",
+    "element": "geo",
+    "name": "Gorou",
+    "zhCn": "五郎",
+    "rarity": 4
+  },
+  {
+    "image": "arataki itto.png",
+    "element": "geo",
+    "name": "Arataki Itto",
+    "zhCn": "荒泷一斗",
+    "rarity": 5
+  },
+  {
+    "image": "thoma.png",
+    "element": "pyro",
+    "name": "Thoma",
+    "zhCn": "托马",
+    "rarity": 4
+  },
+  {
+    "image": "sangonomiya kokomi.png",
+    "element": "hydro",
+    "name": "Sangonomiya Kokomi",
+    "zhCn": "珊瑚宫心海",
+    "rarity": 5
+  },
+  {
+    "image": "raiden shogun.png",
+    "element": "electro",
+    "name": "Raiden Shogun",
+    "zhCn": "雷电将军",
+    "rarity": 5
+  },
+  {
+    "image": "kujou sara.png",
+    "element": "electro",
+    "name": "Kujou Sara",
+    "zhCn": "九条裟罗",
+    "rarity": 4
+  },
+  {
+    "image": "aloy.png",
+    "element": "cryo",
+    "name": "Aloy",
+    "zhCn": "埃洛伊",
+    "rarity": 5
+  },
+  {
+    "image": "yoimiya.png",
+    "element": "pyro",
+    "name": "Yoimiya",
+    "zhCn": "宵宫",
+    "rarity": 5
+  },
+  {
+    "image": "sayu.png",
+    "element": "anemo",
+    "name": "Sayu",
+    "zhCn": "早柚",
+    "rarity": 4
+  },
+  {
+    "image": "kamisato ayaka.png",
+    "element": "cryo",
+    "name": "Kamisato Ayaka",
+    "zhCn": "神里绫华",
+    "rarity": 5
+  },
+  {
+    "image": "kaedehara kazuha.png",
+    "element": "anemo",
+    "name": "Kaedehara Kazuha",
+    "zhCn": "枫原万叶",
+    "rarity": 5
+  },
+  {
+    "image": "eula.png",
+    "element": "cryo",
+    "name": "Eula",
+    "zhCn": "优菈",
+    "rarity": 5
+  },
+  {
+    "image": "yanfei.png",
+    "element": "pyro",
+    "name": "Yanfei",
+    "zhCn": "烟绯",
+    "rarity": 4
+  },
+  {
+    "image": "rosaria.png",
+    "element": "cryo",
+    "name": "Rosaria",
+    "zhCn": "罗莎莉亚",
+    "rarity": 4
+  },
+  {
+    "image": "hu tao.png",
+    "element": "pyro",
+    "name": "Hu Tao",
+    "zhCn": "胡桃",
+    "rarity": 5
+  },
+  {
+    "image": "xiao.png",
+    "element": "anemo",
+    "name": "Xiao",
+    "zhCn": "魈",
+    "rarity": 5
+  },
+  {
+    "image": "ganyu.png",
+    "element": "cryo",
+    "name": "Ganyu",
+    "zhCn": "甘雨",
+    "rarity": 5
+  },
+  {
+    "image": "albedo.png",
+    "element": "geo",
+    "name": "Albedo",
+    "zhCn": "阿贝多",
+    "rarity": 5
+  },
+  {
+    "image": "zhongli.png",
+    "element": "geo",
+    "name": "Zhongli",
+    "zhCn": "钟离",
+    "rarity": 5
+  },
+  {
+    "image": "xinyan.png",
+    "element": "pyro",
+    "name": "Xinyan",
+    "zhCn": "辛焱",
+    "rarity": 4
+  },
+  {
+    "image": "tartaglia.png",
+    "element": "hydro",
+    "name": "Tartaglia",
+    "zhCn": "达达利亚",
+    "rarity": 5
+  },
+  {
+    "image": "diona.png",
+    "element": "cryo",
+    "name": "Diona",
+    "zhCn": "迪奥娜",
+    "rarity": 4
+  },
+  {
+    "image": "klee.png",
+    "element": "pyro",
+    "name": "Klee",
+    "zhCn": "可莉",
+    "rarity": 5
+  },
+  {
+    "image": "venti.png",
+    "element": "anemo",
+    "name": "Venti",
+    "zhCn": "温迪",
+    "rarity": 5
+  },
+  {
+    "image": "keqing.png",
+    "element": "electro",
+    "name": "Keqing",
+    "zhCn": "刻晴",
+    "rarity": 5
+  },
+  {
+    "image": "mona.png",
+    "element": "hydro",
+    "name": "Mona",
+    "zhCn": "莫娜",
+    "rarity": 5
+  },
+  {
+    "image": "qiqi.png",
+    "element": "cryo",
+    "name": "Qiqi",
+    "zhCn": "七七",
+    "rarity": 5
+  },
+  {
+    "image": "diluc.png",
+    "element": "pyro",
+    "name": "Diluc",
+    "zhCn": "迪卢克",
+    "rarity": 5
+  },
+  {
+    "image": "jean.png",
+    "element": "anemo",
+    "name": "Jean",
+    "zhCn": "琴",
+    "rarity": 5
+  },
+  {
+    "image": "sucrose.png",
+    "element": "anemo",
+    "name": "Sucrose",
+    "zhCn": "砂糖",
+    "rarity": 4
+  },
+  {
+    "image": "chongyun.png",
+    "element": "cryo",
+    "name": "Chongyun",
+    "zhCn": "重云",
+    "rarity": 4
+  },
+  {
+    "image": "noelle.png",
+    "element": "geo",
+    "name": "Noelle",
+    "zhCn": "诺艾尔",
+    "rarity": 4
+  },
+  {
+    "image": "bennett.png",
+    "element": "pyro",
+    "name": "Bennett",
+    "zhCn": "班尼特",
+    "rarity": 4
+  },
+  {
+    "image": "fischl.png",
+    "element": "electro",
+    "name": "Fischl",
+    "zhCn": "菲谢尔",
+    "rarity": 4
+  },
+  {
+    "image": "ningguang.png",
+    "element": "geo",
+    "name": "Ningguang",
+    "zhCn": "凝光",
+    "rarity": 4
+  },
+  {
+    "image": "xingqiu.png",
+    "element": "hydro",
+    "name": "Xingqiu",
+    "zhCn": "行秋",
+    "rarity": 4
+  },
+  {
+    "image": "beidou.png",
+    "element": "electro",
+    "name": "Beidou",
+    "zhCn": "北斗",
+    "rarity": 4
+  },
+  {
+    "image": "xiangling.png",
+    "element": "pyro",
+    "name": "Xiangling",
+    "zhCn": "香菱",
+    "rarity": 4
+  },
+  {
+    "image": "razor.png",
+    "element": "electro",
+    "name": "Razor",
+    "zhCn": "雷泽",
+    "rarity": 4
+  },
+  {
+    "image": "barbara.png",
+    "element": "hydro",
+    "name": "Barbara",
+    "zhCn": "芭芭拉",
+    "rarity": 4
+  },
+  {
+    "image": "lisa.png",
+    "element": "electro",
+    "name": "Lisa",
+    "zhCn": "丽莎",
+    "rarity": 4
+  },
+  {
+    "image": "kaeya.png",
+    "element": "cryo",
+    "name": "Kaeya",
+    "zhCn": "凯亚",
+    "rarity": 4
+  },
+  {
+    "image": "amber.png",
+    "element": "pyro",
+    "name": "Amber",
+    "zhCn": "安柏",
+    "rarity": 4
+  },
+
+  {
+    "image": "paimon.png",
+    "element": "character",
+    "name": "Paimon",
+    "zhCn": "派蒙",
+    "rarity": 3
+  },
+  {
+    "image": "traveler_(Female).png",
+    "element": "character",
+    "name": "Lumine",
+    "zhCn": "荧",
+    "rarity": 5
+  },
+  {
+    "image": "traveler_(Male).png",
+    "element": "character",
+    "name": "Aether",
+    "zhCn": "空",
+    "rarity": 5
   }
 ]
