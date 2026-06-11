@@ -3,6 +3,10 @@ import { DatabaseManager } from '..'
 import { getAppImageUrl, getUserImageUrl } from '@shared/utils/url'
 import { CreateItemDto, UpdateItemDto } from '@shared/dto/item'
 import type Database from 'better-sqlite3'
+import { UserGame } from '@shared/entities/game'
+import { readdir } from 'fs/promises'
+import path from 'path'
+import { isDirExists } from '../../utils/file'
 
 export class ItemRepo {
   private get db() {
@@ -161,6 +165,59 @@ export class ItemRepo {
 
     const stmt = this.db.prepare(`UPDATE t_game_item SET ${fields.join(', ')} WHERE id = @id`)
     return stmt.run(params)
+  }
+
+  async checkMod(gameId: string) {
+    const row = this.db
+      .prepare(
+        `SELECT *
+            FROM t_user_game
+            WHERE id = ?
+            LIMIT 1`
+      )
+      .get(gameId) as UserGame | undefined
+
+    if (!row || !row.mod_root_path) {
+      return
+    }
+
+    const items = this.db
+      .prepare(
+        `
+        SELECT *
+        FROM t_game_item
+        WHERE game_id = ?
+      `
+      )
+      .all(gameId) as ItemEntity[]
+
+    for (let i = 0; i < items.length; i++) {
+      const e = items[i]
+      let enabledCount = 0
+      let modCount = 0
+
+      const targetPath = path.join(row.mod_root_path, 'character', e.name.toLocaleLowerCase())
+
+      const res = await isDirExists(targetPath)
+
+      if (!res) {
+        continue
+      }
+
+      const entries = await readdir(targetPath, {
+        withFileTypes: true
+      })
+
+      for (const entry of entries) {
+        if (!entry.isDirectory()) continue
+        if (!entry.name.startsWith('DISABLED_')) {
+          enabledCount++
+          this.update(e.id, { mod_count_enable: enabledCount })
+        }
+        modCount++
+        this.update(e.id, { mod_count: modCount })
+      }
+    }
   }
 
   remove(id: string) {

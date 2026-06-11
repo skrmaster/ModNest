@@ -13,7 +13,7 @@ import {
 import { useRoute, useRouter } from 'vue-router'
 import { gameStore } from '@renderer/stores/game-store'
 import { categoryStore } from '@renderer/stores/category-store'
-import GenshinElements from '@renderer/components/genshin-elements.vue'
+import GenshinElements from '@renderer/components/elements-genshin.vue'
 import { ItemEntity } from '@shared/entities/item'
 import type { ItemDto } from '@shared/dto/item'
 import { QueryParams } from '@shared/types/item'
@@ -24,7 +24,7 @@ import dayjs from 'dayjs'
 import { useNotify } from '@renderer/composables/useNotify'
 import modUninstall from './components/mod-uninstall.vue'
 import comScroll from '@renderer/components/com-scroll.vue'
-import { wrapGrid } from 'animate-css-grid'
+// import { wrapGrid } from 'animate-css-grid'
 import { debounce } from '@renderer/utils/base'
 import ItemForm from './components/item-form.vue'
 import formContent from './components/form-content.vue'
@@ -50,14 +50,18 @@ router.beforeEach(async (to) => {
 const route = useRoute()
 
 const activeSection = ref<string>('1')
-const { gameId } = route.params
+const gameId = computed(() => {
+  return route.params.gameId as string
+})
 const game = ref<UserGame | undefined>()
 
 const category = computed(() => categoryStore.getState().items)
 const level0Filter = computed(() => category.value.filter((e) => e.level === 0))
 
 const queryParams = reactive<QueryParams>({
-  gameId: gameId as string,
+  get gameId() {
+    return gameId.value
+  },
   primaryCategoryId: '1',
   secondaryCategoryId: undefined
 })
@@ -225,10 +229,17 @@ watch(
     if (!gameStore.getState().loaded) {
       await gameStore.load()
     }
+    if (!categoryStore.getState().loaded) {
+      await categoryStore.load()
+    }
+    category.value.forEach((e) => {
+      elementMap.set(e.name, e.id)
+    })
     game.value = gameStore.getById(newGameId as string)
     await debouncedGetItems()
+    initListAnimate()
   },
-  { immediate: true, flush: 'post' }
+  { immediate: true }
 )
 
 watch(
@@ -238,7 +249,7 @@ watch(
     queryParams.primaryCategoryId = v
     await debouncedGetItems()
   },
-  { immediate: false, flush: 'post' }
+  { immediate: false }
 )
 
 function handleDragEnter(e: DragEvent) {
@@ -325,11 +336,11 @@ function initListAnimate() {
     return
   }
 
-  wrapGrid(containerRef.value, {
-    stagger: 0,
-    duration: 600,
-    easing: 'easeInOut'
-  })
+  // wrapGrid(containerRef.value, {
+  //   stagger: 0,
+  //   duration: 600,
+  //   easing: 'easeInOut'
+  // })
 }
 
 const deleteDialog = ref(false)
@@ -358,21 +369,7 @@ async function confirmDelete() {
   }
 }
 
-onMounted(async () => {
-  if (!categoryStore.getState().loaded) {
-    await categoryStore.load()
-  }
-  category.value.forEach((e) => {
-    elementMap.set(e.name, e.id)
-  })
-
-  if (!gameStore.getState().loaded) {
-    await gameStore.load()
-  }
-  game.value = gameStore.getById(gameId as string)
-
-  initListAnimate()
-})
+onMounted(() => {})
 
 onUnmounted(() => {})
 </script>
@@ -398,7 +395,7 @@ onUnmounted(() => {})
           <div class="flex-1 flex justify-center-safe">
             <div class="mx-auto">
               <genshin-elements
-                v-if="activeSection == '1'"
+                v-if="activeSection == '1' && gameId === '1'"
                 @select="handleElementSelect"
               ></genshin-elements>
             </div>
@@ -431,7 +428,7 @@ onUnmounted(() => {})
                   @click="handleDetail(item)"
                 >
                   <div class="w-full relative h-32">
-                    <div v-show="item.cover" class="w-32 mx-auto">
+                    <div v-show="item.cover" class="w-32 h-32 mx-auto overflow-hidden">
                       <v-img v-if="item.cover" :src="item.cover" cover />
                     </div>
                     <div

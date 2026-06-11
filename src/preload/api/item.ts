@@ -22,6 +22,10 @@ export const itemApi = {
     return ipcRenderer.invoke('item:list', data)
   },
 
+  checkMod(gameId: string) {
+    return ipcRenderer.invoke('item:checkMod', gameId)
+  },
+
   getById(id: string) {
     return ipcRenderer.invoke('item:getInfoById', id)
   }

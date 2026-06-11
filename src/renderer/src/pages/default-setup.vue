@@ -7,6 +7,27 @@ import { gameStore } from '@renderer/stores/game-store'
 const route = useRoute()
 const router = useRouter()
 
+router.beforeEach(async (to) => {
+  const gameId = to.params.gameId as string
+  console.log(to.name, gameId)
+
+  if (!gameId) {
+    return true
+  }
+
+  if (to.name !== 'DefaultSetup') {
+    return true
+  }
+
+  const game = await window.api.gameApi.getById(gameId)
+  console.log(game)
+
+  if (game?.mod_root_path) {
+    return { name: 'GameManager', params: { gameId } }
+  }
+  return true
+})
+
 const game = ref<UserGame | undefined>()
 const modPath = ref('')
 const saving = ref(false)
@@ -16,15 +37,15 @@ async function loadGame(gameIdParam: unknown): Promise<void> {
   const gameId = gameIdParam
   game.value = gameStore.getById(gameId as string)
 
-  if (game.value?.mod_root_path) {
-    router.push({
-      name: 'GameManager',
-      params: {
-        gameId: gameIdParam as string
-      }
-    })
-    return
-  }
+  // if (game.value?.mod_root_path) {
+  //   router.push({
+  //     name: 'GameManager',
+  //     params: {
+  //       gameId: gameIdParam as string
+  //     }
+  //   })
+  //   return
+  // }
 
   if (!game.value) {
     router.push('/')
@@ -69,6 +90,7 @@ async function save(): Promise<void> {
     }
 
     await window.api.gameApi.update(game.value.id, { mod_root_path: nextPath })
+    await window.api.itemApi.checkMod(game.value.id)
     gameStore.refresh()
     router.push({ name: 'GameManager', params: { gameId: game.value.id } })
   } catch (err: unknown) {

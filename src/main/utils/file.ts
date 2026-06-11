@@ -1,9 +1,20 @@
 import { cp, rename, access, rm } from 'node:fs/promises'
+import fs from 'fs/promises'
 
 export async function exists(path: string): Promise<boolean> {
   try {
     await access(path)
     return true
+  } catch {
+    return false
+  }
+}
+
+export async function isDirExists(dirPath: string): Promise<boolean> {
+  try {
+    await fs.access(dirPath)
+    const stat = await fs.stat(dirPath)
+    return stat.isDirectory()
   } catch {
     return false
   }

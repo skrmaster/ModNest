@@ -9,9 +9,7 @@ export function register(): void {
   ipcMain.handle('item:create', (_, payload) => {
     const result = repo.create(payload)
 
-    return {
-      id: result.lastInsertRowid
-    }
+    return result
   })
 
   ipcMain.handle('item:list', (_, payload: QueryParams) => {
@@ -26,6 +24,11 @@ export function register(): void {
 
   ipcMain.handle('item:remove', (_, id: string) => {
     const result = repo.remove(id)
+    return result
+  })
+
+  ipcMain.handle('item:checkMod', (_, gameId: string) => {
+    const result = repo.checkMod(gameId)
     return result
   })
 

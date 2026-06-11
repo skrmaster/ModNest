@@ -143,7 +143,9 @@ const showImageCover = ref('')
 const isDownloading = ref(false)
 
 const listCategory = computed(() => {
-  return categoryStore.getState().items
+  return categoryStore
+    .getState()
+    .items.filter((e) => [game_id.value, '0'].includes(e.level.toString()))
 })
 
 const itemForm = reactive<CreateItemDto | ItemDto>({
@@ -265,7 +267,7 @@ const saveItemInfoLoading = ref(false)
 let timer: null | ReturnType<typeof setTimeout> = null
 
 const saveItem = async (): Promise<void> => {
-  if (!validateForm() || !game_id) return
+  if (!validateForm() || !game_id.value) return
 
   if (isDownloading.value) {
     formErrorMessage.value = '正在保存图片请稍后再试'
@@ -306,7 +308,7 @@ const saveItem = async (): Promise<void> => {
     name_zh_cn: itemForm.name_zh_cn.trim(),
     cover: itemForm.cover,
     mod_count: 0,
-    game_id,
+    game_id: game_id.value,
     is_custom: 1,
     mod_count_enable: 0,
     category_ids: toRaw(selectedCategoryIds.value)
@@ -334,10 +336,10 @@ const saveItem = async (): Promise<void> => {
   }
 }
 
-let game_id: string | undefined
+const game_id = ref<string | undefined>()
 let editData: undefined | ItemDto
 async function init(itemData?: ItemDto, gameId?: string) {
-  game_id = gameId
+  game_id.value = gameId
   resetForm()
   if (itemData) {
     Object.assign(itemForm, itemData)
