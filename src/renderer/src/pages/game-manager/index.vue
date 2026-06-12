@@ -78,17 +78,41 @@ const searchText = ref<string | undefined>()
 const isGettingItems = ref(false)
 const isGettingModList = ref(false)
 
+const options = ref([
+  { label: '默认排序', value: 'default' },
+  { label: 'Mod数量', value: 'ModCount' }
+])
+const selectedText = ref('默认排序')
+const sortType = ref<string>('default')
+function handleSortList(val: (typeof options.value)[0]) {
+  sortType.value = val.value
+  selectedText.value = val.label
+}
 const filteredItems = computed(() => {
   if (!activeItems.value) return []
+
   const keyword = searchText.value?.trim().toLowerCase()
-  if (!keyword) {
-    return [...activeItems.value]
+  let result = activeItems.value
+
+  if (keyword) {
+    result = result.filter((item) => {
+      const name = (item.name ?? '').toLowerCase()
+      const nameZhCn = (item.name_zh_cn ?? '').toLowerCase()
+      return name.includes(keyword) || nameZhCn.includes(keyword)
+    })
   }
-  return activeItems.value.filter((item) => {
-    const name = (item.name ?? '').toLowerCase()
-    const nameZhCn = (item.name_zh_cn ?? '').toLowerCase()
-    return name.includes(keyword) || nameZhCn.includes(keyword)
-  })
+
+  if (sortType.value === 'ModCount') {
+    result = [...result].sort((a, b) => {
+      const countA = a.mod_count ?? 0
+      const countB = b.mod_count ?? 0
+      return countB - countA
+    })
+  } else {
+    result = [...result]
+  }
+
+  return result
 })
 
 async function getItems() {
@@ -379,6 +403,20 @@ onUnmounted(() => {})
     <section class="h-full w-full">
       <div v-if="!selectedItem" class="flex flex-col h-full w-full">
         <div class="flex items-center gap-4 justify-between py-4 pr-3 flex-wrap">
+          <v-menu>
+            <template #activator="{ props }">
+              <v-btn v-bind="props" variant="flat" class="d-flex align-items-center">
+                {{ selectedText }}
+                <v-icon icon="mdi-chevron-down" class="ml-2" />
+              </v-btn>
+            </template>
+
+            <v-list density="compact">
+              <v-list-item v-for="item in options" :key="item.value" @click="handleSortList(item)">
+                <v-list-item-title>{{ item.label }}</v-list-item-title>
+              </v-list-item>
+            </v-list>
+          </v-menu>
           <div class="shrink-0 flex gap-3 justify-center">
             <v-chip-group v-model="activeSection" filter mandatory>
               <v-chip
@@ -400,19 +438,21 @@ onUnmounted(() => {})
               ></genshin-elements>
             </div>
           </div>
-          <div class="w-full max-w-120 mx-auto flex items-center gap-2">
+          <div class="w-full max-w-60 flex items-center gap-2">
             <v-text-field
               v-model="searchText"
-              label="搜索"
+              label="请输入搜索内容"
               placeholder="请输入搜索内容"
-              prepend-icon="mdi-magnify"
+              append-inner-icon="mdi-magnify"
               clearable
               single-line
               hide-details
+              density="compact"
               color="primary"
+              variant="outlined"
             ></v-text-field>
-            <v-btn color="primary" prepend-icon="mdi-plus" @click="openItemDialog">添加项目</v-btn>
           </div>
+          <v-btn color="primary" prepend-icon="mdi-plus" @click="openItemDialog">添加项目</v-btn>
         </div>
 
         <div class="flex-1 overflow-hidden">
@@ -590,4 +630,9 @@ onUnmounted(() => {})
   <item-form ref="itemFormRef" @update="getItems"></item-form>
 </template>
 
-<style scoped></style>
+<style scoped>
+.menu-move-transition {
+  transition: 0.2s ease-out;
+  transition-property: left, top;
+}
+</style>
