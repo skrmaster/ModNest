@@ -120,7 +120,7 @@
 
 <script setup lang="ts">
 import { useNotify } from '@renderer/composables/useNotify'
-import { CreateItemDto, ItemDto, UpdateItemDto } from '@shared/dto/item'
+import { CreateItemDto, GameItemRow, ItemDto, UpdateItemDto } from '@shared/dto/item'
 import { extractImageFileName, getUserImageUrl } from '@shared/utils/url'
 import { computed, onMounted, reactive, ref, toRaw, toRef } from 'vue'
 import { categoryStore } from '@renderer/stores/category-store'
@@ -337,8 +337,8 @@ const saveItem = async (): Promise<void> => {
 }
 
 const game_id = ref<string | undefined>()
-let editData: undefined | ItemDto
-async function init(itemData?: ItemDto, gameId?: string) {
+let editData: undefined | GameItemRow
+async function init(itemData?: GameItemRow, gameId?: string) {
   game_id.value = gameId
   resetForm()
   if (itemData) {

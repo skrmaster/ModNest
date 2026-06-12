@@ -1,12 +1,16 @@
 import { ItemEntity } from '@shared/entities/item'
 import { DatabaseManager } from '..'
 import { getAppImageUrl, getUserImageUrl } from '@shared/utils/url'
-import { CreateItemDto, UpdateItemDto } from '@shared/dto/item'
+import { CreateItemDto, GameItemList, UpdateItemDto } from '@shared/dto/item'
 import type Database from 'better-sqlite3'
 import { UserGame } from '@shared/entities/game'
 import { readdir } from 'fs/promises'
 import path from 'path'
 import { isDirExists } from '../../utils/file'
+import { Category } from '@shared/entities/category'
+import { splitBatch } from '@shared/utils/split'
+
+type List = Array<ItemEntity & { categoryDtos?: Category[] }>
 
 export class ItemRepo {
   private get db() {
@@ -59,50 +63,116 @@ export class ItemRepo {
     return relativeResList.every((e) => e.changes !== 0) ? { changes: 1 } : { changes: 0 }
   }
 
-  list(gameId: string, primaryCategoryId: string, secondaryCategoryId?: string): ItemEntity[] {
-    let rows
+  list(gameId: string, primaryCategoryId: string, secondaryCategoryId?: string): GameItemList {
+    let rows: List | undefined
 
     if (secondaryCategoryId) {
       rows = this.db
         .prepare(
           `
-      SELECT DISTINCT gi.*
-      FROM t_game_item gi
-      WHERE gi.game_id = ?
-        AND EXISTS (
-          SELECT 1 FROM t_category_records cr
-          WHERE cr.item_id = gi.id AND cr.category_id = ?
+            SELECT DISTINCT gi.*
+            FROM t_game_item gi
+            WHERE gi.game_id = ?
+              AND EXISTS (
+                SELECT 1 FROM t_category_records cr
+                WHERE cr.item_id = gi.id AND cr.category_id = ?
+              )
+              AND EXISTS (
+                SELECT 1 FROM t_category_records cr
+                WHERE cr.item_id = gi.id AND cr.category_id = ?
+              )
+            ORDER BY gi.id
+          `
         )
-        AND EXISTS (
-          SELECT 1 FROM t_category_records cr
-          WHERE cr.item_id = gi.id AND cr.category_id = ?
-        )
-      ORDER BY gi.id
-    `
-        )
-        .all(gameId, primaryCategoryId, secondaryCategoryId)
+        .all(gameId, primaryCategoryId, secondaryCategoryId) as List
     } else {
       rows = this.db
         .prepare(
           `
-      SELECT DISTINCT gi.*
-      FROM t_game_item gi
-      WHERE gi.game_id = ?
-        AND EXISTS (
-          SELECT 1 FROM t_category_records cr
-          WHERE cr.item_id = gi.id AND cr.category_id = ?
+            SELECT DISTINCT gi.*
+            FROM t_game_item gi
+            WHERE gi.game_id = ?
+              AND EXISTS (
+                SELECT 1 FROM t_category_records cr
+                WHERE cr.item_id = gi.id AND cr.category_id = ?
+              )
+            ORDER BY gi.id
+          `
         )
-      ORDER BY gi.id
-    `
-        )
-        .all(gameId, primaryCategoryId)
+        .all(gameId, primaryCategoryId) as List
     }
 
-    return (rows as ItemEntity[]).map((row) => ({
+    const res = rows.map((row) => ({
       ...row,
       cover: row.is_custom ? getUserImageUrl(row.cover) : getAppImageUrl(row.cover),
       id: row.id.toString()
     }))
+
+    const rawItemIds = res.map((item) => item.id)
+    if (rawItemIds.length === 0) {
+      res.forEach((item) => (item.categoryDtos = []))
+      return []
+    }
+
+    // 2. 分批（每批400个，避开SQLite参数限制）
+    const idBatches = splitBatch(rawItemIds, 400)
+    const allRecords: Array<{ item_id: number; category_id: number }> = []
+
+    // 3. 逐批查询关联表
+    for (const batchIds of idBatches) {
+      const ph = batchIds.map(() => '?').join(',')
+      const sql = `SELECT item_id, category_id FROM t_category_records WHERE item_id IN (${ph})`
+
+      const rows = this.db.prepare(sql).all(batchIds) as Array<{
+        item_id: number
+        category_id: number
+      }>
+      allRecords.push(...rows)
+    }
+
+    // 无关联数据直接返回
+    if (allRecords.length === 0) {
+      res.forEach((item) => (item.categoryDtos = []))
+      return res
+    }
+
+    // 4. 提取所有分类ID，同样分批查询
+    const catIds = [...new Set(allRecords.map((r) => r.category_id))]
+    const catBatches = splitBatch(catIds, 400)
+    const allCategories: Category[] = []
+
+    for (const batchCatIds of catBatches) {
+      const ph = batchCatIds.map(() => '?').join(',')
+      const sql = `SELECT * FROM t_game_category WHERE id IN (${ph})`
+      const rows = this.db.prepare(sql).all(batchCatIds) as Category[]
+      allCategories.push(...rows)
+    }
+
+    // 5. 构建Map映射
+    const categoryMap = new Map<string, Category>()
+    allCategories.forEach((cat) => categoryMap.set(cat.id.toString(), cat))
+
+    const itemCatMap = new Map<string, Category[]>()
+    allRecords.forEach((rec) => {
+      const itemId = rec.item_id.toString()
+      const catId = rec.category_id.toString()
+
+      const cat = categoryMap.get(catId)
+      if (!cat) return
+
+      if (!itemCatMap.has(itemId)) {
+        itemCatMap.set(itemId, [])
+      }
+      itemCatMap.get(itemId)!.push(cat)
+    })
+
+    // 6. 回填数据
+    res.forEach((item) => {
+      const key = String(item.id)
+      item.categoryDtos = itemCatMap.get(key) || []
+    })
+
+    return res
   }
 
   update(id: string, data: Partial<UpdateItemDto>) {

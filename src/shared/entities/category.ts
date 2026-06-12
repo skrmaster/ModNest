@@ -8,4 +8,6 @@ export interface Category {
   icon: string
 
   level: number
+
+  cover: string
 }

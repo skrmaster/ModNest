@@ -15,7 +15,7 @@ import { gameStore } from '@renderer/stores/game-store'
 import { categoryStore } from '@renderer/stores/category-store'
 import GenshinElements from '@renderer/components/elements-genshin.vue'
 import { ItemEntity } from '@shared/entities/item'
-import type { ItemDto } from '@shared/dto/item'
+import type { ItemDto, GameItemRow } from '@shared/dto/item'
 import { QueryParams } from '@shared/types/item'
 import { UserGame } from '@shared/entities/game'
 import modInspect from './components/mod-inspect.vue'
@@ -28,6 +28,10 @@ import comScroll from '@renderer/components/com-scroll.vue'
 import { debounce } from '@renderer/utils/base'
 import ItemForm from './components/item-form.vue'
 import formContent from './components/form-content.vue'
+import type { GameElement } from '#types/element'
+import { getAppImageUrl } from '@shared/utils/url.js'
+
+type List = Array<GameItemRow & { element?: string }>
 
 const router = useRouter()
 router.beforeEach(async (to) => {
@@ -73,7 +77,7 @@ const getCategoryName = computed(() => {
   return item ? item.name : ''
 })
 
-const activeItems = ref<ItemDto[]>()
+const activeItems = ref<List>()
 const searchText = ref<string | undefined>()
 const isGettingItems = ref(false)
 const isGettingModList = ref(false)
@@ -115,11 +119,36 @@ const filteredItems = computed(() => {
   return result
 })
 
+const gameElementList: GameElement[] = [
+  'anemo',
+  'cryo',
+  'dendro',
+  'electro',
+  'geo',
+  'hydro',
+  'pyro'
+]
+
 async function getItems() {
   if (isGettingItems.value) return
   isGettingItems.value = true
   try {
-    activeItems.value = await window.api.itemApi.list(toRaw(queryParams))
+    const tmp = (await window.api.itemApi.list(toRaw(queryParams))) as List
+    activeItems.value = tmp.map((e) => {
+      const arr =
+        e.categoryDtos?.flatMap((e) => {
+          if (gameElementList.includes(e.name as GameElement)) {
+            return getAppImageUrl(e.cover)
+          } else {
+            return []
+          }
+        }) || []
+      let element = arr[0]
+      return {
+        ...e,
+        element
+      }
+    })
   } catch (error) {
     console.error('获取物品列表失败：', error)
   } finally {
@@ -130,7 +159,7 @@ async function getItems() {
 const debouncedGetItems = debounce(getItems, 200)
 
 const formContentRef = useTemplateRef('formContentRef')
-async function handleDetail(item: ItemDto) {
+async function handleDetail(item: GameItemRow) {
   selectedItem.value = item
   await nextTick()
   formContentRef.value?.init(item, game.value?.id)
@@ -142,7 +171,7 @@ const openItemDialog = (): void => {
   itemFormRef.value?.openModal(undefined, game.value?.id)
 }
 
-function handleEditItem(item: ItemEntity) {
+function handleEditItem(item: GameItemRow) {
   itemFormRef.value?.openModal(item as ItemDto, game.value?.id)
 }
 
@@ -368,8 +397,8 @@ function initListAnimate() {
 }
 
 const deleteDialog = ref(false)
-const deletingItem = ref<ItemDto>()
-function openDeleteDialog(item: ItemDto) {
+const deletingItem = ref<GameItemRow>()
+function openDeleteDialog(item: GameItemRow) {
   deletingItem.value = item
   deleteDialog.value = true
 }
@@ -468,6 +497,11 @@ onUnmounted(() => {})
                   @click="handleDetail(item)"
                 >
                   <div class="w-full relative h-32">
+                    <div v-if="item.element" class="absolute -top-1 left-2">
+                      <div class="w-10 h-10">
+                        <v-img :src="item.element" cover />
+                      </div>
+                    </div>
                     <div v-show="item.cover" class="w-32 h-32 mx-auto overflow-hidden">
                       <v-img v-if="item.cover" :src="item.cover" cover />
                     </div>

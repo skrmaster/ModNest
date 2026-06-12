@@ -2,6 +2,7 @@ import { UpdateCategoryDto } from '@shared/dto/category'
 import { ipcMain } from 'electron'
 import { ItemRepo } from '../db/repo/item.repo'
 import { QueryParams } from '@shared/types/item'
+import { GameItemList } from '@shared/dto/item'
 
 export function register(): void {
   const repo = new ItemRepo()
@@ -12,7 +13,7 @@ export function register(): void {
     return result
   })
 
-  ipcMain.handle('item:list', (_, payload: QueryParams) => {
+  ipcMain.handle('item:list', (_, payload: QueryParams): GameItemList => {
     const result = repo.list(payload.gameId, payload.primaryCategoryId, payload.secondaryCategoryId)
     return result
   })
