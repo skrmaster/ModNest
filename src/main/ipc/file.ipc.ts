@@ -1,7 +1,7 @@
 import { pathToFileURL } from 'url'
 import { ipcMain, protocol, net } from 'electron'
 import { join } from 'path'
-import { IMAGE_PROTOCOL } from '@constants/index'
+import { IMAGE_PROTOCOL, MOD_IMAGE_PROTOCOL } from '@constants/index'
 import { FileService } from '../services/file/file.service'
 
 export function register(): void {
@@ -34,6 +34,24 @@ export function register(): void {
 
       return new Response(String(e), {
         status: 500
+      })
+    }
+  })
+
+  protocol.handle(MOD_IMAGE_PROTOCOL, async (request) => {
+    try {
+      const encodedPath = request.url.replace(`${MOD_IMAGE_PROTOCOL}:///`, '')
+
+      const filePath = decodeURIComponent(encodedPath)
+
+      console.log(pathToFileURL(filePath).toString())
+
+      return net.fetch(pathToFileURL(filePath).toString())
+    } catch (error) {
+      console.error('[mod-preview] load failed:', error)
+
+      return new Response('Not Found', {
+        status: 404
       })
     }
   })

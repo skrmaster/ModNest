@@ -169,7 +169,7 @@ export class ItemRepo {
     return res
   }
 
-  update(id: string, data: Partial<UpdateItemDto>) {
+  update(id: string, data: UpdateItemDto) {
     const fields: string[] = []
     const params: Record<string, unknown> = { id }
 

@@ -54,7 +54,7 @@ function createCsp(): void {
           script-src 'self';
           style-src 'self' 'unsafe-inline';
           connect-src 'self' ws://localhost:5173 http://localhost:5173;
-          img-src 'self' data: blob: https: app-image:;
+          img-src 'self' data: blob: https: app-image: mod-preview:;
           font-src 'self' data:;
           object-src 'none';
           base-uri 'self';
@@ -65,7 +65,7 @@ function createCsp(): void {
           script-src 'self';
           style-src 'self' 'unsafe-inline';
           connect-src 'self';
-          img-src 'self' data: https: app-image:;
+          img-src 'self' data: https: app-image: mod-preview:;
           font-src 'self' data:;
           object-src 'none';
           base-uri 'self';

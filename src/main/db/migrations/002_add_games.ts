@@ -9,6 +9,7 @@ export function up(db: Database.Database) {
       "name_zh_cn" text,
       "cover" text,
       "mod_root_path" text,
+      "is_custom" integer,
       UNIQUE ("name")
     );
   `)
@@ -26,13 +27,17 @@ export function up(db: Database.Database) {
       @name,
       @name_zh_cn,
       @cover,
-      @mod_root_path
+      @mod_root_path,
+      @is_custom
     )
   `)
 
   const transaction = db.transaction(() => {
     for (const item of items) {
-      stmt.run(item)
+      stmt.run({
+        ...item,
+        is_custom: 0
+      })
     }
   })
 

@@ -8,4 +8,6 @@ export interface UserGame {
   cover: string | null
 
   mod_root_path: string | null
+
+  is_custom: number
 }

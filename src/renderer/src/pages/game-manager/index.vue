@@ -142,14 +142,14 @@ const gameElementList = computed(() => {
     return []
   }
 
-  return gameImageMap[game.value.id].elementList
+  return gameImageMap[game.value.id]?.elementList || []
 })
 const rarityList = computed(() => {
   if (!game.value?.id) {
     return []
   }
 
-  return gameImageMap[game.value.id].rarityList
+  return gameImageMap[game.value.id]?.rarityList || []
 })
 
 async function getItems() {
@@ -651,8 +651,10 @@ onUnmounted(() => {})
             <Pane :size="20">
               <section>
                 <div>
-                  <div class="text-body-2 opacity-70">MOD预览</div>
-                  <v-img v-if="selectTableRow?.cover" :src="selectTableRow?.cover" />
+                  <div class="text-body-2 opacity-70">预览图</div>
+                  <div v-if="selectTableRow?.cover" class="px-4">
+                    <v-img :src="selectTableRow?.cover" cover />
+                  </div>
                   <div v-else>
                     <v-alert density="compact" text="暂无预览" title="" type="warning"></v-alert>
                   </div>

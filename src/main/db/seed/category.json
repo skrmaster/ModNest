@@ -8,22 +8,6 @@
     "cover": ""
   },
   {
-    "id": 2,
-    "name": "weapon",
-    "icon": "",
-    "name_zh_cn": "武器",
-    "level": 0,
-    "cover": ""
-  },
-  {
-    "id": 3,
-    "name": "npc",
-    "icon": "",
-    "name_zh_cn": "NPC",
-    "level": 0,
-    "cover": ""
-  },
-  {
     "id": 4,
     "name": "item",
     "icon": "",

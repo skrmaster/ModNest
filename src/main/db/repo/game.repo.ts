@@ -1,5 +1,6 @@
 import type { UserGame } from '@shared/entities/game'
 import { DatabaseManager } from '..'
+import { getAppImageUrl, getUserImageUrl } from '@shared/utils/url'
 
 export class GameRepository {
   private get db() {
@@ -38,7 +39,7 @@ export class GameRepository {
 
     return rows.map((row) => ({
       ...row,
-      cover: row.cover ? `app-image://seed-images/${row.cover}` : null,
+      cover: row.is_custom ? getUserImageUrl(row.cover) : getAppImageUrl(row.cover),
       id: row.id.toString()
     }))
   }

@@ -9,6 +9,7 @@ import { existsSync } from 'node:fs'
 import { ItemRepo } from '../db/repo/item.repo'
 import { ItemEntity } from '@shared/entities/item'
 import trash from 'trash'
+import { MOD_IMAGE_PROTOCOL } from '@constants/index'
 
 export class ModRepository {
   private getCategoryPath(modRootPath: string, categoryPathString: string[]): string {
@@ -66,7 +67,7 @@ export class ModRepository {
       try {
         await access(fullPath)
 
-        return fullPath
+        return `${MOD_IMAGE_PROTOCOL}:///` + encodeURI(fullPath.replaceAll('\\', '/'))
       } catch (e) {
         console.log('get preview png failure. ' + e)
       }
@@ -93,6 +94,8 @@ export class ModRepository {
     categoryPathString: string[],
     overwrite = false
   ) {
+    console.log('install')
+
     const categoryPath = this.getCategoryPath(modRootPath, categoryPathString)
     const itemPath = await this.createItemFolder(categoryPath, itemName)
     const tempDir = await mkdtemp(join(itemPath, '.tmp-'))
@@ -129,8 +132,10 @@ export class ModRepository {
       }).catch(() => {})
 
       const item = new ItemRepo()
+
       item.update(itemData.id, {
-        mod_count: itemData.mod_count + 1
+        mod_count: itemData.mod_count + 1,
+        mod_count_enable: itemData.mod_count_enable + 1
       })
     }
   }
