@@ -1,10 +1,9 @@
-import { apiGetGameList } from '@renderer/api/game'
 import { BaseStore } from './base-store'
 import type { UserGame } from '@shared/entities/game'
 
 export class GameStore extends BaseStore<UserGame> {
   protected fetchData() {
-    return apiGetGameList()
+    return window.api.gameApi.list()
   }
 }
 

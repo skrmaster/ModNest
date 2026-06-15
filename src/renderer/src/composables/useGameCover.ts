@@ -1,5 +1,3 @@
-import { downloadGameCover } from '@renderer/api/file'
-
 export function useGameCover() {
   const selectCover = async () => {
     const path = await window.api.fileApi.selectImage()
@@ -8,7 +6,7 @@ export function useGameCover() {
   }
 
   const downloadCover = (imageUrl: string, gameName?: string) => {
-    return downloadGameCover(imageUrl, gameName)
+    return window.api.fileApi.downloadImage(imageUrl, gameName)
   }
 
   return {
