@@ -11,4 +11,7 @@ export function register(): void {
   ipcMain.handle('settings:set', (_, key, value) => {
     settings.set(key, value)
   })
+
+  ipcMain.handle('settings:getSystemTheme', () => SettingsService.getSystemTheme())
+  ipcMain.handle('settings:getSystemLanguage', () => SettingsService.getSystemLanguage())
 }

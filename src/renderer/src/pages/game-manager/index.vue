@@ -24,14 +24,15 @@ import dayjs from 'dayjs'
 import { useNotify } from '@renderer/composables/useNotify'
 import modUninstall from './components/mod-uninstall.vue'
 import comScroll from '@renderer/components/com-scroll.vue'
-// import { wrapGrid } from 'animate-css-grid'
 import { debounce } from '@renderer/utils/base'
 import ItemForm from './components/item-form.vue'
 import formContent from './components/form-content.vue'
-import type { GameElement } from '#types/element'
+import type { GameGenshinElement } from '#types/element'
 import { getAppImageUrl } from '@shared/utils/url.js'
+import ElementsZzz from '@renderer/components/elements-zzz.vue'
+// import { wrapGrid } from 'animate-css-grid'
 
-type List = Array<GameItemRow & { element?: string }>
+type List = Array<GameItemRow & { element?: string; rarityBg?: string }>
 
 const router = useRouter()
 router.beforeEach(async (to) => {
@@ -119,34 +120,61 @@ const filteredItems = computed(() => {
   return result
 })
 
-const gameElementList: GameElement[] = [
-  'anemo',
-  'cryo',
-  'dendro',
-  'electro',
-  'geo',
-  'hydro',
-  'pyro'
-]
+const gameImageMap: Record<
+  string,
+  {
+    elementList: string[]
+    rarityList: string[]
+  }
+> = {
+  1: {
+    elementList: ['anemo', 'cryo', 'dendro', 'electro', 'geo', 'hydro', 'pyro'],
+    rarityList: ['rarity3', 'rarity4', 'rarity5']
+  },
+  2: {
+    elementList: ['physical', 'ice', 'fire', 'ether', 'electric'],
+    rarityList: ['rarity3', 'rarity4', 'rarity5']
+  }
+}
+const gameElementList = computed(() => {
+  if (!game.value?.id) {
+    return []
+  }
+
+  return gameImageMap[game.value.id].elementList
+})
+const rarityList = computed(() => {
+  if (!game.value?.id) {
+    return []
+  }
+
+  return gameImageMap[game.value.id].rarityList
+})
 
 async function getItems() {
   if (isGettingItems.value) return
   isGettingItems.value = true
   try {
     const tmp = (await window.api.itemApi.list(toRaw(queryParams))) as List
+
     activeItems.value = tmp.map((e) => {
-      const arr =
-        e.categoryDtos?.flatMap((e) => {
-          if (gameElementList.includes(e.name as GameElement)) {
-            return getAppImageUrl(e.cover)
-          } else {
-            return []
-          }
-        }) || []
-      let element = arr[0]
+      let element: string | undefined, rarityBg: string | undefined
+      for (const item of e.categoryDtos || []) {
+        if (gameElementList.value.includes(item.name as GameGenshinElement)) {
+          element = getAppImageUrl(item.cover)
+          continue
+        }
+        if (rarityList.value.includes(item.name)) {
+          rarityBg = getAppImageUrl(item.cover)
+
+          continue
+        }
+      }
+
       return {
         ...e,
-        element
+        element,
+        rarityBg
       }
     })
   } catch (error) {
@@ -462,9 +490,10 @@ onUnmounted(() => {})
           <div class="flex-1 flex justify-center-safe">
             <div class="mx-auto">
               <genshin-elements
-                v-if="activeSection == '1' && gameId === '1'"
+                v-if="gameId === '1'"
                 @select="handleElementSelect"
               ></genshin-elements>
+              <elements-zzz v-else-if="gameId === '2'" @select="handleElementSelect"></elements-zzz>
             </div>
           </div>
           <div class="w-full max-w-60 flex items-center gap-2">
@@ -488,7 +517,7 @@ onUnmounted(() => {})
           <com-scroll class="pb-4">
             <div
               ref="containerRef"
-              class="containerRef relative grid gap-4 grid-cols-[repeat(auto-fill,minmax(200px,1fr))]"
+              class="containerRef relative grid gap-2 grid-cols-[repeat(auto-fill,minmax(200px,1fr))]"
             >
               <div v-for="item in filteredItems" :key="item.id">
                 <v-card
@@ -664,9 +693,4 @@ onUnmounted(() => {})
   <item-form ref="itemFormRef" @update="getItems"></item-form>
 </template>
 
-<style scoped>
-.menu-move-transition {
-  transition: 0.2s ease-out;
-  transition-property: left, top;
-}
-</style>
+<style scoped></style>

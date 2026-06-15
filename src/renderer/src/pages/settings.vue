@@ -44,9 +44,9 @@ const { t } = useI18n()
 const { themeMode, language } = useAppSettings()
 
 const themeModeOptions = computed(() => [
+  { label: t('theme.system'), value: 'system' },
   { label: t('theme.light'), value: 'light' },
-  { label: t('theme.dark'), value: 'dark' },
-  { label: t('theme.system'), value: 'system' }
+  { label: t('theme.dark'), value: 'dark' }
 ])
 
 const languageOptions = computed(() => [

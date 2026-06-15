@@ -26,11 +26,11 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
 import { useAppSettings } from '@renderer/composables/useAppSettings'
-import { GameElement } from '#types/element'
+import { GameGenshinElement } from '#types/element'
 import { categoryStore } from '@renderer/stores/category-store'
 import { getAppImageUrl } from '@shared/utils/url'
 
-const gameElementList: GameElement[] = [
+const gameElementList: GameGenshinElement[] = [
   'anemo',
   'cryo',
   'dendro',
@@ -44,7 +44,7 @@ const setting = useAppSettings()
 
 const elementList = computed(() => {
   const tmp = category.value.flatMap((e) => {
-    if (gameElementList.includes(e.name as GameElement)) {
+    if (gameElementList.includes(e.name as GameGenshinElement)) {
       return {
         ...e,
         cover: getAppImageUrl(e.cover)

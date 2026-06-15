@@ -94,7 +94,7 @@
     "icon": "",
     "name_zh_cn": "5星",
     "level": 1,
-    "cover": "Genshin Impact/elements/geo.svg"
+    "cover": "Genshin Impact/rarity/rarity5.svg"
   },
   {
     "id": 13,
@@ -102,7 +102,7 @@
     "icon": "",
     "name_zh_cn": "4星",
     "level": 1,
-    "cover": "Genshin Impact/elements/geo.svg"
+    "cover": "Genshin Impact/rarity/rarity4.svg"
   },
   {
     "id": 14,
@@ -110,7 +110,7 @@
     "icon": "",
     "name_zh_cn": "3星",
     "level": 1,
-    "cover": "Genshin Impact/elements/geo.svg"
+    "cover": "Genshin Impact/rarity/rarity3.svg"
   },
 
   {

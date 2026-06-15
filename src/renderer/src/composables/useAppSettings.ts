@@ -10,8 +10,7 @@ const lang = (await window.api.settingsApi.get('language')) as Language
 const themeMode = ref<ThemeMode>(theme)
 const language = ref<Language>(lang)
 
-const getSystemTheme = (): ThemeMode =>
-  window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+const getSystemTheme = async (): Promise<ThemeMode> => await window.api.settingsApi.getSystemTheme()
 
 export function useAppSettings(): {
   themeMode: Ref<ThemeMode>
@@ -33,18 +32,18 @@ export function useAppSettings(): {
 } {
   const theme = useTheme()
 
-  const applyTheme = (): void => {
+  const applyTheme = async (): Promise<void> => {
     if (themeMode.value === 'system') {
-      theme.change(getSystemTheme())
+      theme.change(await getSystemTheme())
     } else {
       theme.change(themeMode.value)
     }
   }
 
   const initialize = async (): Promise<void> => {
-    const savedTheme = await window.api.settingsApi.get('themeMode')
+    const savedTheme = await window.api.settingsApi.getSystemTheme()
 
-    const savedLanguage = await window.api.settingsApi.get('language')
+    const savedLanguage = await window.api.settingsApi.getSystemLanguage()
 
     if (savedTheme) {
       themeMode.value = savedTheme as ThemeMode

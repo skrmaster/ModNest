@@ -98,6 +98,13 @@
     "rarity": 5
   },
   {
+    "image": "Manekin.png",
+    "element": "none",
+    "name": "Manekin",
+    "zhCn": "奇偶",
+    "rarity": 3
+  },
+  {
     "image": "inev.png",
     "element": "electro",
     "name": "Inev",

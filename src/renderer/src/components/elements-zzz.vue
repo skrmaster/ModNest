@@ -7,15 +7,15 @@
     class="w-100 h-12!"
   >
     <v-tooltip
-      v-for="value in elementList"
+      v-for="(value, index) in elementList"
       :key="value.id"
       location="top"
       :text="getValueText(value)"
     >
       <template #activator="{ props }">
-        <v-btn v-bind="props" class="px-0!" @click="handleSelect(value)">
+        <v-btn v-bind="props" class="px-0!" @click="handleSelect(value, index)">
           <div class="w-10 h-10">
-            <img :src="value.img" />
+            <img :src="value.cover" />
           </div>
         </v-btn>
       </template>
@@ -24,29 +24,29 @@
 </template>
 
 <script setup lang="ts">
-import elements from '@renderer/assets/games/genshin/elements.json'
-import { computed, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useAppSettings } from '@renderer/composables/useAppSettings'
+import { GameZZZElement } from '#types/element'
+import { categoryStore } from '@renderer/stores/category-store'
+import { getAppImageUrl } from '@shared/utils/url'
+
+const gameElementList: GameZZZElement[] = ['physical', 'ice', 'fire', 'ether', 'electric']
 
 const setting = useAppSettings()
-const svgMap: Record<string, string> = {}
-const svgList = import.meta.glob(`@renderer/assets/games/genshin/images/elements/*.svg`, {
-  eager: true,
-  import: 'default'
-}) as Record<string, string>
-
-for (let svgPath in svgList) {
-  const name = svgPath.split('/').pop()?.split('.').shift() || ''
-
-  svgMap[name] = svgList[svgPath]
-}
 
 const elementList = computed(() => {
-  return elements.map((e, i) => ({
-    ...e,
-    id: i,
-    img: svgMap[e.displayName]
-  }))
+  const tmp = category.value.flatMap((e) => {
+    if (gameElementList.includes(e.name as GameZZZElement)) {
+      return {
+        ...e,
+        cover: getAppImageUrl(e.cover)
+      }
+    } else {
+      return []
+    }
+  })
+
+  return tmp
 })
 
 const selected = ref<unknown | undefined>()
@@ -57,23 +57,30 @@ const emits = defineEmits<{
 
 function getValueText(value: (typeof elementList.value)[0]): string {
   if (setting.language.value === 'en-US') {
-    return value.internalName
+    return value.name
   } else if (setting.language.value === 'zh-CN') {
-    return value.zhCN
+    return value.name_zh_cn
   } else {
     return ''
   }
 }
 
-function handleSelect(value: (typeof elementList.value)[0]): void {
-  selected.value = selected.value === value.id ? undefined : value.id
+function handleSelect(value: (typeof elementList.value)[0], index: number): void {
+  selected.value = selected.value === index ? undefined : index
   if (selected.value?.toString()) {
-    const name = value.internalName
+    const name = value.name
     emits('select', name)
   } else {
     emits('select', undefined)
   }
 }
+const category = computed(() => categoryStore.getState().items)
+
+onMounted(async () => {
+  if (!categoryStore.getState().loaded) {
+    await categoryStore.load()
+  }
+})
 </script>
 
 <style scoped></style>

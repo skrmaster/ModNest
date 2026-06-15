@@ -80,6 +80,12 @@ function setCharacterSeedData(
 
       relationStmt.run(categoryId, itemId)
     }
+
+    if (character.rarity) {
+      const categoryId = categoryMap.get(`rarity${character.rarity}`)
+
+      relationStmt.run(categoryId, itemId)
+    }
   }
 }
 

@@ -114,11 +114,9 @@ export class ItemRepo {
       return []
     }
 
-    // 2. 分批（每批400个，避开SQLite参数限制）
     const idBatches = splitBatch(rawItemIds, 400)
     const allRecords: Array<{ item_id: number; category_id: number }> = []
 
-    // 3. 逐批查询关联表
     for (const batchIds of idBatches) {
       const ph = batchIds.map(() => '?').join(',')
       const sql = `SELECT item_id, category_id FROM t_category_records WHERE item_id IN (${ph})`
@@ -130,13 +128,11 @@ export class ItemRepo {
       allRecords.push(...rows)
     }
 
-    // 无关联数据直接返回
     if (allRecords.length === 0) {
       res.forEach((item) => (item.categoryDtos = []))
       return res
     }
 
-    // 4. 提取所有分类ID，同样分批查询
     const catIds = [...new Set(allRecords.map((r) => r.category_id))]
     const catBatches = splitBatch(catIds, 400)
     const allCategories: Category[] = []
@@ -148,7 +144,6 @@ export class ItemRepo {
       allCategories.push(...rows)
     }
 
-    // 5. 构建Map映射
     const categoryMap = new Map<string, Category>()
     allCategories.forEach((cat) => categoryMap.set(cat.id.toString(), cat))
 
@@ -166,7 +161,6 @@ export class ItemRepo {
       itemCatMap.get(itemId)!.push(cat)
     })
 
-    // 6. 回填数据
     res.forEach((item) => {
       const key = String(item.id)
       item.categoryDtos = itemCatMap.get(key) || []
