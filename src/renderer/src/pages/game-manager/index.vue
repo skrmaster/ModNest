@@ -582,6 +582,9 @@ onUnmounted(() => {})
                 </v-card>
               </div>
             </div>
+            <div v-if="filteredItems.length === 0">
+              <v-empty-state title="暂无数据"></v-empty-state>
+            </div>
           </com-scroll>
         </div>
       </div>
