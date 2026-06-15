@@ -15,10 +15,7 @@ export const getAppImageUrl = (name: string | null): string => {
 export function extractImageFileName(url?: string | null): string {
   if (!url) return ''
 
-  if (url.includes('app-image:')) {
-    const parts = url.split('/')
-    return parts[parts.length - 1] || ''
-  }
+  const prefix = 'app-image://seed-images/'
 
-  return url
+  return url.startsWith(prefix) ? url.slice(prefix.length) : url
 }

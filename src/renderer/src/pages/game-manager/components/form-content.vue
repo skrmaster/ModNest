@@ -97,6 +97,11 @@
         </v-sheet>
       </div>
 
+      <com-scroll>
+        <elements-genshin v-if="gameId == '1'" @select="handleCategoryAdd"></elements-genshin>
+        <elements-ZZZ v-else-if="gameId == '2'" @select="handleCategoryAdd"></elements-ZZZ>
+      </com-scroll>
+
       <v-alert v-if="formErrorMessage" type="error" variant="tonal" density="compact">
         {{ formErrorMessage }}
       </v-alert>
@@ -125,9 +130,13 @@ import { extractImageFileName, getUserImageUrl } from '@shared/utils/url'
 import { computed, onMounted, reactive, ref, toRaw, toRef } from 'vue'
 import { categoryStore } from '@renderer/stores/category-store'
 import { UseMode } from '@shared/types/formContent'
+import ElementsGenshin from '@renderer/components/elements-genshin.vue'
+import ElementsZZZ from '@renderer/components/elements-zzz.vue'
+import comScroll from '@renderer/components/com-scroll.vue'
 
 type Prop = {
   useMode?: UseMode
+  gameId: string
 }
 
 const props = withDefaults(defineProps<Prop>(), {
@@ -143,9 +152,7 @@ const showImageCover = ref('')
 const isDownloading = ref(false)
 
 const listCategory = computed(() => {
-  return categoryStore
-    .getState()
-    .items.filter((e) => [game_id.value, '0'].includes(e.level.toString()))
+  return categoryStore.getState().items.filter((e) => e.level === 0)
 })
 
 const itemForm = reactive<CreateItemDto | ItemDto>({
@@ -199,6 +206,13 @@ const selectedCategoryIds = ref<string[]>([])
 
 const closeDialog = () => {
   emits('close')
+}
+
+function handleCategoryAdd(v?: string) {
+  if (!v) {
+    return
+  }
+  selectedCategoryIds.value = [...new Set(selectedCategoryIds.value.concat([v]))]
 }
 
 const downloadCover = async () => {

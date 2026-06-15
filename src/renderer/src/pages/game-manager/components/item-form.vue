@@ -2,19 +2,33 @@
   <v-dialog v-model="itemDialog" max-width="660">
     <v-card>
       <v-card-title> {{ itemForm.id ? '编辑' : '添加' }} </v-card-title>
-      <form-content ref="contentRef" @close="closeDialog" @update="emits('update')"></form-content>
+      <form-content
+        ref="contentRef"
+        :game-id="gameId"
+        @close="closeDialog"
+        @update="emits('update')"
+      ></form-content>
     </v-card>
   </v-dialog>
 </template>
 
 <script setup lang="ts">
 import { CreateItemDto, ItemDto } from '@shared/dto/item'
-import { reactive, ref, useTemplateRef, nextTick } from 'vue'
+import { reactive, ref, useTemplateRef, nextTick, computed } from 'vue'
 import FormContent from './form-content.vue'
+
+type Prop = {
+  gameId: string
+}
+
+const props = withDefaults(defineProps<Prop>(), {})
 
 const itemDialog = ref(false)
 
 const contentRef = useTemplateRef('contentRef')
+const gameId = computed(() => {
+  return props.gameId
+})
 
 const itemForm = reactive<CreateItemDto | ItemDto>({
   name: '',

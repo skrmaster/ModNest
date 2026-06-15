@@ -1,10 +1,12 @@
 <template>
   <v-btn-toggle
+    ref="toggleRef"
     :model-value="selected"
     mandatory
     density="comfortable"
     variant="outlined"
-    class="w-100 h-12!"
+    class="w-100"
+    :class="hasHorizontalScroll ? 'h-18!' : 'h-12!'"
   >
     <v-tooltip
       v-for="(value, index) in elementList"
@@ -24,7 +26,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
+import { computed, nextTick, onMounted, ref, watch } from 'vue'
 import { useAppSettings } from '@renderer/composables/useAppSettings'
 import { GameGenshinElement } from '#types/element'
 import { categoryStore } from '@renderer/stores/category-store'
@@ -75,20 +77,46 @@ function getValueText(value: (typeof elementList.value)[0]): string {
 
 function handleSelect(value: (typeof elementList.value)[0], index: number): void {
   selected.value = selected.value === index ? undefined : index
-  if (selected.value?.toString()) {
-    const name = value.name
-    emits('select', name)
+
+  const categoryItem = category.value.find((e) => e.name === value.name)
+  if (selected.value?.toString() && categoryItem) {
+    emits('select', categoryItem.id)
   } else {
     emits('select', undefined)
   }
 }
 const category = computed(() => categoryStore.getState().items)
 
+const toggleRef = ref()
+const hasHorizontalScroll = ref(false)
+
+function checkScroll() {
+  const el = toggleRef.value.$el as HTMLElement
+  if (!el) return
+
+  hasHorizontalScroll.value = el.scrollWidth > el.clientWidth
+}
+
+watch(
+  () => elementList,
+  async () => {
+    await nextTick()
+    checkScroll()
+  },
+  { deep: true }
+)
+
 onMounted(async () => {
   if (!categoryStore.getState().loaded) {
     await categoryStore.load()
   }
+  nextTick(checkScroll)
 })
 </script>
 
-<style scoped></style>
+<style scoped>
+.v-btn-toggle {
+  overflow-x: auto;
+  flex-wrap: nowrap;
+}
+</style>

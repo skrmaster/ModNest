@@ -220,10 +220,7 @@ onUnmounted(() => {
             <v-icon icon="mdi-menu" />
           </v-btn>
         </template>
-
-        <transition name="fade" :duration="config.transitionDuration">
-          <v-list-item-title v-if="isExpanded" key="title"> 主页 </v-list-item-title>
-        </transition>
+        <v-list-item-title v-if="isExpanded" key="title"> 主页 </v-list-item-title>
       </v-list-item>
 
       <v-divider class="pt-3" />
@@ -387,12 +384,10 @@ onUnmounted(() => {
   display: none;
 }
 
-/* 减少图标模式下的间距，居中图标 */
 .icon-only .menu-item > * {
   justify-content: center !important;
 }
 
-/* 减少过渡时长，降低卡顿感 */
 .v-list-item-title,
 .v-list-item-subtitle {
   transition: opacity 120ms linear;

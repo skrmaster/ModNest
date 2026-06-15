@@ -24,12 +24,13 @@ import dayjs from 'dayjs'
 import { useNotify } from '@renderer/composables/useNotify'
 import modUninstall from './components/mod-uninstall.vue'
 import comScroll from '@renderer/components/com-scroll.vue'
-import { debounce } from '@renderer/utils/base'
 import ItemForm from './components/item-form.vue'
 import formContent from './components/form-content.vue'
 import type { GameGenshinElement } from '#types/element'
 import { getAppImageUrl } from '@shared/utils/url.js'
 import ElementsZzz from '@renderer/components/elements-zzz.vue'
+import { Splitpanes, Pane } from 'splitpanes'
+import 'splitpanes/dist/splitpanes.css'
 // import { wrapGrid } from 'animate-css-grid'
 
 type List = Array<GameItemRow & { element?: string; rarityBg?: string }>
@@ -184,8 +185,6 @@ async function getItems() {
   }
 }
 
-const debouncedGetItems = debounce(getItems, 200)
-
 const formContentRef = useTemplateRef('formContentRef')
 async function handleDetail(item: GameItemRow) {
   selectedItem.value = item
@@ -296,9 +295,8 @@ const backToItems = (): void => {
 
 const elementMap = new Map()
 async function handleElementSelect(v?: string) {
-  const categoryItem = category.value.find((e) => e.name === v)
-  queryParams.secondaryCategoryId = categoryItem?.id
-  await debouncedGetItems()
+  queryParams.secondaryCategoryId = v
+  await getItems()
 }
 
 watch(
@@ -317,7 +315,7 @@ watch(
       elementMap.set(e.name, e.id)
     })
     game.value = gameStore.getById(newGameId as string)
-    await debouncedGetItems()
+    await getItems()
     initListAnimate()
   },
   { immediate: true }
@@ -328,7 +326,7 @@ watch(
   async (v) => {
     selectedItemId.value = undefined
     queryParams.primaryCategoryId = v
-    await debouncedGetItems()
+    await getItems()
   },
   { immediate: false }
 )
@@ -514,7 +512,7 @@ onUnmounted(() => {})
         </div>
 
         <div class="flex-1 overflow-hidden">
-          <com-scroll class="pb-4">
+          <com-scroll class="pb-4 pr-4">
             <div
               ref="containerRef"
               class="containerRef relative grid gap-2 grid-cols-[repeat(auto-fill,minmax(200px,1fr))]"
@@ -604,55 +602,65 @@ onUnmounted(() => {})
         </div>
 
         <div class="flex-1 overflow-hidden">
-          <div class="grid min-h-130 h-full gap-4 xl:grid-cols-[320px_1fr_320px]">
-            <section class="border-r border-black/10 pr-4 flex flex-col pb-4">
-              <div class="">
-                <form-content ref="formContentRef" :use-mode="'inline'"></form-content>
-              </div>
-            </section>
-
-            <section class="min-w-0 overflow-auto">
-              <v-table>
-                <thead>
-                  <tr>
-                    <th class="text-left">启用</th>
-                    <th class="text-left">mod名称</th>
-                    <th class="text-left">添加时间</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr
-                    v-for="item in tableData"
-                    :key="item.name"
-                    :class="[{ 'bg-blue-200': selectTableRow?.name === item.name }]"
-                    tabindex="0"
-                    @click.stop="handleRowSelect(item)"
-                    @keydown.delete="handleDelete(item)"
-                  >
-                    <td>
-                      <v-checkbox-btn
-                        v-model="item.enabled"
-                        @change.stop="handleModEnabled($event, item)"
-                      ></v-checkbox-btn>
-                    </td>
-                    <td>{{ item.name }}</td>
-                    <td>{{ dayjs(item.modifiedAt).format('YYYY-MM-DD HH:mm:ss') }}</td>
-                  </tr>
-                </tbody>
-              </v-table>
-            </section>
-
-            <section class="border-l border-black/10 px-4">
-              <div>
-                <div class="text-body-2 opacity-70">MOD预览</div>
-                <v-img v-if="selectTableRow?.cover" :src="selectTableRow?.cover" />
-                <div v-else>
-                  <v-alert density="compact" text="暂无预览" title="" type="warning"></v-alert>
+          <Splitpanes>
+            <Pane :size="20">
+              <section>
+                <div class="">
+                  <form-content
+                    ref="formContentRef"
+                    :use-mode="'inline'"
+                    :game-id="gameId"
+                  ></form-content>
                 </div>
-              </div>
-              <div></div>
-            </section>
-          </div>
+              </section>
+            </Pane>
+
+            <Pane :size="60">
+              <section class="min-w-0 h-full overflow-auto border-x border-black/10">
+                <v-table>
+                  <thead>
+                    <tr>
+                      <th class="text-left">启用</th>
+                      <th class="text-left">mod名称</th>
+                      <th class="text-left">添加时间</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr
+                      v-for="item in tableData"
+                      :key="item.name"
+                      :class="[{ 'bg-blue-200': selectTableRow?.name === item.name }]"
+                      tabindex="0"
+                      @click.stop="handleRowSelect(item)"
+                      @keydown.delete="handleDelete(item)"
+                    >
+                      <td>
+                        <v-checkbox-btn
+                          v-model="item.enabled"
+                          @change.stop="handleModEnabled($event, item)"
+                        ></v-checkbox-btn>
+                      </td>
+                      <td>{{ item.name }}</td>
+                      <td>{{ dayjs(item.modifiedAt).format('YYYY-MM-DD HH:mm:ss') }}</td>
+                    </tr>
+                  </tbody>
+                </v-table>
+              </section>
+            </Pane>
+
+            <Pane :size="20">
+              <section>
+                <div>
+                  <div class="text-body-2 opacity-70">MOD预览</div>
+                  <v-img v-if="selectTableRow?.cover" :src="selectTableRow?.cover" />
+                  <div v-else>
+                    <v-alert density="compact" text="暂无预览" title="" type="warning"></v-alert>
+                  </div>
+                </div>
+                <div></div>
+              </section>
+            </Pane>
+          </Splitpanes>
         </div>
       </div>
     </section>
@@ -693,7 +701,27 @@ onUnmounted(() => {})
     @recycle="handleMoveRecycle"
   ></mod-uninstall>
 
-  <item-form ref="itemFormRef" @update="getItems"></item-form>
+  <item-form ref="itemFormRef" :game-id="gameId" @update="getItems"></item-form>
 </template>
 
-<style scoped></style>
+<style scoped>
+:deep(.splitpanes .splitpanes__splitter) {
+  width: 10px;
+  position: relative;
+}
+
+:deep(.splitpanes .splitpanes__splitter::after) {
+  content: '⋮';
+
+  position: absolute;
+
+  left: 50%;
+  top: 50%;
+
+  transform: translate(-50%, -50%);
+
+  opacity: 0.5;
+
+  font-size: 14px;
+}
+</style>
