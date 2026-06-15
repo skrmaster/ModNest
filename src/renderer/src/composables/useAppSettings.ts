@@ -4,8 +4,8 @@ import i18n from '@renderer/i18n'
 import type { ComputedRef, Ref } from 'vue'
 import type { ThemeMode, Language } from '@shared/types/settings'
 
-const theme = (await window.api.settingsApi.get('theme')) as ThemeMode
-const lang = (await window.api.settingsApi.get('language')) as Language
+const theme = (await window.api.settingsApi.getSystemTheme()) as ThemeMode
+const lang = (await window.api.settingsApi.getSystemLanguage()) as Language
 
 const themeMode = ref<ThemeMode>(theme)
 const language = ref<Language>(lang)
@@ -31,6 +31,8 @@ export function useAppSettings(): {
   initialize: () => Promise<void>
 } {
   const theme = useTheme()
+
+  window.api.settingsApi.onSystemThemeChanged(() => applyTheme())
 
   const applyTheme = async (): Promise<void> => {
     if (themeMode.value === 'system') {
@@ -59,7 +61,7 @@ export function useAppSettings(): {
   }
 
   watch(themeMode, async (value) => {
-    await window.api.settingsApi.set('themeMode', value)
+    await window.api.settingsApi.set('theme', value)
 
     applyTheme()
   })
@@ -71,14 +73,8 @@ export function useAppSettings(): {
   })
 
   onMounted(() => {
-    if ('matchMedia' in window) {
-      const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
-
-      mediaQuery.addEventListener('change', () => {
-        if (themeMode.value === 'system') {
-          applyTheme()
-        }
-      })
+    if (themeMode.value === 'system') {
+      applyTheme()
     }
   })
 

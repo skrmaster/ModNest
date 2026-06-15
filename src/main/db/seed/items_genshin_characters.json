@@ -84,9 +84,9 @@
     "rarity": 4
   },
   {
-    "image": "filins.png",
+    "image": "flins.png",
     "element": "electro",
-    "name": "Filins",
+    "name": "Flins",
     "zhCn": "菲林斯",
     "rarity": 5
   },
@@ -99,15 +99,15 @@
   },
   {
     "image": "Manekin.png",
-    "element": "none",
+    "element": "character",
     "name": "Manekin",
     "zhCn": "奇偶",
     "rarity": 3
   },
   {
-    "image": "inev.png",
+    "image": "ineffa.png",
     "element": "electro",
-    "name": "Inev",
+    "name": "Ineffa",
     "zhCn": "伊涅芙",
     "rarity": 5
   },
@@ -140,16 +140,16 @@
     "rarity": 5
   },
   {
-    "image": "ianshan.png",
+    "image": "iansan.png",
     "element": "electro",
-    "name": "Ianshan",
+    "name": "Iansan",
     "zhCn": "伊安珊",
     "rarity": 4
   },
   {
-    "image": "vanessa.png",
+    "image": "varesa.png",
     "element": "electro",
-    "name": "Vanessa",
+    "name": "varesa",
     "zhCn": "瓦雷莎",
     "rarity": 5
   },
@@ -168,23 +168,23 @@
     "rarity": 4
   },
   {
-    "image": "citralie.png",
+    "image": "citlali.png",
     "element": "cryo",
-    "name": "Citralie",
+    "name": "Citlali",
     "zhCn": "茜特菈莉",
     "rarity": 5
   },
   {
-    "image": "mavika.png",
+    "image": "mavuika.png",
     "element": "pyro",
-    "name": "Mavika",
+    "name": "Mavuika",
     "zhCn": "玛薇卡",
     "rarity": 5
   },
   {
-    "image": "olorun.png",
+    "image": "ororon.png",
     "element": "electro",
-    "name": "Olorun",
+    "name": "Ororon",
     "zhCn": "欧洛伦",
     "rarity": 4
   },
@@ -238,9 +238,9 @@
     "rarity": 5
   },
   {
-    "image": "sesios.png",
+    "image": "sethos.png",
     "element": "electro",
-    "name": "Sesios",
+    "name": "Sethos",
     "zhCn": "赛索斯",
     "rarity": 4
   },

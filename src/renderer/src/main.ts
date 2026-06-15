@@ -15,7 +15,7 @@ import { ThemeMode } from '@shared/types/settings'
 
 async function bootstrap(): Promise<void> {
   const app = createApp(App)
-  const theme = (await window.api.settingsApi.get('theme')) as ThemeMode
+  const theme = (await window.api.settingsApi.getSystemTheme()) as ThemeMode
 
   const vuetify = createVuetify({
     components,
