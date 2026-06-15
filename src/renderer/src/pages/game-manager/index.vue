@@ -499,8 +499,8 @@ onUnmounted(() => {})
           <div class="w-full max-w-60 flex items-center gap-2">
             <v-text-field
               v-model="searchText"
-              label="请输入搜索内容"
-              placeholder="请输入搜索内容"
+              label="请输入搜索名称"
+              placeholder="请输入搜索名称"
               append-inner-icon="mdi-magnify"
               clearable
               single-line

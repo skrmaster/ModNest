@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, reactive, ref } from 'vue'
+import { computed, onMounted, onUnmounted, reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import { useGameCover } from '@renderer/composables/useGameCover'
@@ -27,6 +27,7 @@ const props = withDefaults(
 const config = computed(() => ({
   expandedWidth: 240,
   collapsedWidth: 64,
+  collapseBreakpoint: 800,
   showHeader: true,
   transitionDuration: 300,
   ...props.config
@@ -37,6 +38,7 @@ type ListItem = UserGame
 const { locale, t } = useI18n()
 const router = useRouter()
 const isExpanded = ref(true)
+const userToggled = ref(false)
 const drawer = ref(true)
 const gameDialog = ref(false)
 const games = computed(() => gameStore.getState().items)
@@ -59,6 +61,24 @@ const currentWidth = computed(() =>
 
 const toggleMenu = (): void => {
   isExpanded.value = !isExpanded.value
+  userToggled.value = true
+}
+
+let _resizeTimer: ReturnType<typeof setTimeout> | null = null
+
+const handleResizeEvent = (): void => {
+  if (_resizeTimer) clearTimeout(_resizeTimer)
+
+  _resizeTimer = setTimeout(() => {
+    if (userToggled.value) return
+
+    const shouldCollapse = window.innerWidth <= config.value.collapseBreakpoint
+    if (shouldCollapse === !isExpanded.value) {
+      return
+    }
+
+    isExpanded.value = !shouldCollapse
+  }, 120)
 }
 
 const getGameName = (game: ListItem): string => {
@@ -171,13 +191,30 @@ onMounted(async () => {
   if (!gameStore.getState().loaded) {
     await gameStore.load()
   }
+  handleResizeEvent()
+  window.addEventListener('resize', handleResizeEvent)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('resize', handleResizeEvent)
+  if (_resizeTimer) {
+    clearTimeout(_resizeTimer)
+    _resizeTimer = null
+  }
 })
 </script>
 
 <template>
-  <v-navigation-drawer v-model="drawer" :width="currentWidth">
+  <v-navigation-drawer
+    v-model="drawer"
+    :width="currentWidth"
+    :mini-variant="!isExpanded"
+    :mini-variant-width="config.collapsedWidth"
+    :permanent="true"
+    :class="{ 'icon-only': !isExpanded }"
+  >
     <v-list nav class="h-full flex flex-col">
-      <v-list-item v-if="config.showHeader" class="py-5 flex items-center gap-3 min-h-14">
+      <v-list-item v-if="config.showHeader" class="pb-3 flex items-center gap-3 min-h-14">
         <template #prepend>
           <v-btn icon size="small" @click="toggleMenu">
             <v-icon icon="mdi-menu" />
@@ -185,11 +222,11 @@ onMounted(async () => {
         </template>
 
         <transition name="fade" :duration="config.transitionDuration">
-          <v-list-item-title v-if="isExpanded" key="title"> 导航 </v-list-item-title>
+          <v-list-item-title v-if="isExpanded" key="title"> 主页 </v-list-item-title>
         </transition>
       </v-list-item>
 
-      <v-divider />
+      <v-divider class="pt-3" />
 
       <div class="flex flex-col gap-2">
         <v-list-item
@@ -339,4 +376,25 @@ onMounted(async () => {
   </v-navigation-drawer>
 </template>
 
-<style scoped></style>
+<style scoped>
+.icon-only .v-list-item-title,
+.icon-only .v-list-item-subtitle {
+  opacity: 0;
+  width: 0 !important;
+  max-width: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  display: none;
+}
+
+/* 减少图标模式下的间距，居中图标 */
+.icon-only .menu-item > * {
+  justify-content: center !important;
+}
+
+/* 减少过渡时长，降低卡顿感 */
+.v-list-item-title,
+.v-list-item-subtitle {
+  transition: opacity 120ms linear;
+}
+</style>
