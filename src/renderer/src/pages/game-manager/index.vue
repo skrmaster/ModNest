@@ -584,7 +584,7 @@ onUnmounted(() => {})
                   @click="handleDetail(item)"
                 >
                   <div class="w-full relative h-32">
-                    <div v-if="item.element" class="absolute -top-1 left-2">
+                    <div v-if="item.element" class="absolute -top-1 left-2 z-999">
                       <div class="w-10 h-10">
                         <v-img :src="item.element" cover />
                       </div>

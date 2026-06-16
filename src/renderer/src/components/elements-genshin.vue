@@ -8,16 +8,11 @@
     class="w-100"
     :class="hasHorizontalScroll ? 'h-18!' : 'h-12!'"
   >
-    <v-tooltip
-      v-for="(value, index) in elementList"
-      :key="value.id"
-      location="top"
-      :text="getValueText(value)"
-    >
+    <v-tooltip v-for="(e, index) in elementList" :key="e.id" location="top" :text="getValueText(e)">
       <template #activator="{ props }">
-        <v-btn v-bind="props" class="px-0!" @click="handleSelect(value, index)">
+        <v-btn v-bind="props" class="px-0!" @click="handleSelect(e, index)">
           <div class="w-10 h-10">
-            <img :src="value.cover" />
+            <img :src="e.cover" />
           </div>
         </v-btn>
       </template>
@@ -28,19 +23,27 @@
 <script setup lang="ts">
 import { computed, nextTick, onMounted, ref, watch } from 'vue'
 import { useAppSettings } from '@renderer/composables/useAppSettings'
-import { GameGenshinElement } from '#types/element'
 import { categoryStore } from '@renderer/stores/category-store'
 import { getAppImageUrl } from '@shared/utils/url'
+import { GameGenshinElement } from '@shared/types/item'
+import { gameGenshinElementList } from '@shared/enums'
 
-const gameElementList: GameGenshinElement[] = [
-  'anemo',
-  'cryo',
-  'dendro',
-  'electro',
-  'geo',
-  'hydro',
-  'pyro'
-]
+type Prop = {
+  value?: string[]
+}
+
+const propss = withDefaults(defineProps<Prop>(), {
+  value: undefined
+})
+
+watch(
+  () => propss.value,
+  () => {
+    selected.value = propss.value
+  }
+)
+
+const gameElementList: GameGenshinElement[] = gameGenshinElementList
 
 const setting = useAppSettings()
 

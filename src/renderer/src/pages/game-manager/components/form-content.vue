@@ -98,8 +98,16 @@
       </div>
 
       <com-scroll>
-        <elements-genshin v-if="gameId == '1'" @select="handleCategoryAdd"></elements-genshin>
-        <elements-ZZZ v-else-if="gameId == '2'" @select="handleCategoryAdd"></elements-ZZZ>
+        <elements-genshin
+          v-if="gameId == '1'"
+          :value="selectedCategoryIds"
+          @select="handleCategoryAdd"
+        ></elements-genshin>
+        <elements-ZZZ
+          v-else-if="gameId == '2'"
+          :value="selectedCategoryIds"
+          @select="handleCategoryAdd"
+        ></elements-ZZZ>
       </com-scroll>
 
       <v-alert v-if="formErrorMessage" type="error" variant="tonal" density="compact">
@@ -212,7 +220,13 @@ function handleCategoryAdd(v?: string) {
   if (!v) {
     return
   }
-  selectedCategoryIds.value = [...new Set(selectedCategoryIds.value.concat([v]))]
+  const tmp = [...new Set(selectedCategoryIds.value.concat([v]))]
+  if (tmp.length !== selectedCategoryIds.value.length) {
+    selectedCategoryIds.value.pop()
+    selectedCategoryIds.value.push(v)
+  } else {
+    selectedCategoryIds.value = tmp
+  }
 }
 
 const downloadCover = async () => {
@@ -263,10 +277,10 @@ const validateForm = (): boolean => {
   }
   formErrorMessage.value = ''
 
-  if (!showImageCover.value) {
-    formErrorMessage.value += '请完善图片'
-    valid = false
-  }
+  // if (!showImageCover.value) {
+  //   formErrorMessage.value += '请完善图片'
+  //   valid = false
+  // }
 
   if (selectedCategoryIds.value.length <= 0) {
     formErrorMessage.value += ',请选择分类'
@@ -282,6 +296,10 @@ let timer: null | ReturnType<typeof setTimeout> = null
 
 const saveItem = async (): Promise<void> => {
   if (!validateForm() || !game_id.value) return
+
+  if (!showImageCover.value) {
+    await downloadCover()
+  }
 
   if (isDownloading.value) {
     formErrorMessage.value = '正在保存图片请稍后再试'
