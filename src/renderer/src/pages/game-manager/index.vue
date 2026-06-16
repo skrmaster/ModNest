@@ -16,7 +16,7 @@ import { categoryStore } from '@renderer/stores/category-store'
 import GenshinElements from '@renderer/components/elements-genshin.vue'
 import { ItemEntity } from '@shared/entities/item'
 import type { ItemDto, GameItemRow } from '@shared/dto/item'
-import { QueryParams } from '@shared/types/item'
+import { GameGenshinElement, QueryParams } from '@shared/types/item'
 import { UserGame } from '@shared/entities/game'
 import modInspect from './components/mod-inspect.vue'
 import { ListQuery, ModInfo, ModOpt, ModPreviewData } from '@shared/types/mod'
@@ -26,12 +26,12 @@ import modUninstall from './components/mod-uninstall.vue'
 import comScroll from '@renderer/components/com-scroll.vue'
 import ItemForm from './components/item-form.vue'
 import formContent from './components/form-content.vue'
-import type { GameGenshinElement } from '#types/element'
-import { getAppImageUrl } from '@shared/utils/url.js'
+import { getAppImageUrl } from '@shared/utils/url'
 import ElementsZzz from '@renderer/components/elements-zzz.vue'
 import { Splitpanes, Pane } from 'splitpanes'
 import 'splitpanes/dist/splitpanes.css'
 import { useAppSettings } from '@renderer/composables/useAppSettings'
+import { gameGenshinElementList, gameZZZElementList } from '@shared/enums/index'
 // import { wrapGrid } from 'animate-css-grid'
 
 type List = Array<GameItemRow & { element?: string; rarityBg?: string }>
@@ -135,11 +135,11 @@ const gameImageMap: Record<
   }
 > = {
   1: {
-    elementList: ['anemo', 'cryo', 'dendro', 'electro', 'geo', 'hydro', 'pyro'],
+    elementList: gameGenshinElementList,
     rarityList: ['rarity3', 'rarity4', 'rarity5']
   },
   2: {
-    elementList: ['physical', 'ice', 'fire', 'ether', 'electric'],
+    elementList: gameZZZElementList,
     rarityList: ['rarity3', 'rarity4', 'rarity5']
   }
 }

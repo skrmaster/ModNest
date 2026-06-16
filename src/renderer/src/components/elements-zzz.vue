@@ -28,11 +28,12 @@
 <script setup lang="ts">
 import { computed, nextTick, onMounted, ref, watch } from 'vue'
 import { useAppSettings } from '@renderer/composables/useAppSettings'
-import { GameZZZElement } from '#types/element'
 import { categoryStore } from '@renderer/stores/category-store'
 import { getAppImageUrl } from '@shared/utils/url'
+import { gameZZZElementList } from '@shared/enums'
+import { GameZZZElement } from '@shared/types/item'
 
-const gameElementList: GameZZZElement[] = ['physical', 'ice', 'fire', 'ether', 'electric']
+const gameElementList: GameZZZElement[] = gameZZZElementList
 
 const setting = useAppSettings()
 

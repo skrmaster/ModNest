@@ -9,7 +9,7 @@ import { existsSync } from 'node:fs'
 import { ItemRepo } from '../db/repo/item.repo'
 import { ItemEntity } from '@shared/entities/item'
 import trash from 'trash'
-import { MOD_IMAGE_PROTOCOL } from '@constants/index'
+import { MOD_IMAGE_PROTOCOL } from '@shared/constants/index'
 
 export class ModRepository {
   private getCategoryPath(modRootPath: string, categoryPathString: string[]): string {

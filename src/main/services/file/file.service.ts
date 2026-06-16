@@ -1,4 +1,4 @@
-import { USER_IMAGE_NAME } from '@constants/index'
+import { USER_IMAGE_NAME } from '@shared/constants/index'
 import { createHash } from 'crypto'
 import { app, dialog } from 'electron'
 import { join, extname, resolve, dirname, basename } from 'path'

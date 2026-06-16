@@ -1,7 +1,7 @@
 import { pathToFileURL } from 'url'
 import { ipcMain, protocol, net } from 'electron'
 import { join } from 'path'
-import { IMAGE_PROTOCOL, MOD_IMAGE_PROTOCOL } from '@constants/index'
+import { IMAGE_PROTOCOL, MOD_IMAGE_PROTOCOL } from '@shared/constants/index'
 import { FileService } from '../services/file/file.service'
 
 export function register(): void {
