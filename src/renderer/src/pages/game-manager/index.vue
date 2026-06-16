@@ -109,12 +109,32 @@ const options = computed(() => [
   { label: t('gameManager.sort.default'), value: 'default' },
   { label: t('gameManager.sort.modCount'), value: 'ModCount' }
 ])
-const selectedText = ref(t('gameManager.sort.default'))
+
+const SORT_TYPE_KEY_PREFIX = 'game-manager-sort-type-'
+
 const sortType = ref<string>('default')
+
+const selectedText = computed(() => {
+  const item = options.value.find((item) => item.value === sortType.value)
+  return item?.label || t('gameManager.sort.default')
+})
+
+function getSortTypeStorageKey(id: string): string {
+  return `${SORT_TYPE_KEY_PREFIX}${id}`
+}
+
+function loadSortTypeFromStorage(id: string): string {
+  const saved = localStorage.getItem(getSortTypeStorageKey(id))
+  return saved === 'ModCount' ? 'ModCount' : 'default'
+}
+
 function handleSortList(val: (typeof options.value)[0]) {
   sortType.value = val.value
-  selectedText.value = val.label
+  if (gameId.value) {
+    localStorage.setItem(getSortTypeStorageKey(gameId.value), val.value)
+  }
 }
+
 const filteredItems = computed(() => {
   if (!activeItems.value) return []
 
@@ -390,6 +410,7 @@ watch(
       elementMap.set(e.name, e.id)
     })
     game.value = gameStore.getById(newGameId as string)
+    sortType.value = loadSortTypeFromStorage(newGameId as string)
     await getItems()
     initListAnimate()
   },
