@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { onMounted, ref, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 import type { UserGame } from '@shared/entities/game'
 import { gameStore } from '@renderer/stores/game-store'
 
 const route = useRoute()
 const router = useRouter()
+const { t } = useI18n()
 
 const game = ref<UserGame | undefined>()
 const modPath = ref('')
@@ -54,7 +56,7 @@ async function save(): Promise<void> {
     const nextPath = modPath.value.trim()
 
     if (!nextPath) {
-      error.value = '请先配置 Mod 路径'
+      error.value = t('homeSetting.enterPath')
       return
     }
 
@@ -74,8 +76,8 @@ async function save(): Promise<void> {
   <div class="h-full p-6">
     <div class="mx-auto grid max-w-xl gap-5">
       <div>
-        <h2 class="text-2xl font-medium">配置</h2>
-        <p class="mt-1 text-body-2 opacity-70">默认游戏只需要配置 Mod 路径</p>
+        <h2 class="text-2xl font-medium">{{ t('defaultSetup.title') }}</h2>
+        <p class="mt-1 text-body-2 opacity-70">{{ t('defaultSetup.hint') }}</p>
       </div>
 
       <v-card v-if="game" variant="outlined">
@@ -90,7 +92,7 @@ async function save(): Promise<void> {
             </div>
           </div>
 
-          <v-text-field v-model="modPath" label="Mod 路径" density="compact">
+          <v-text-field v-model="modPath" :label="t('homeSetting.folderLabel')" density="compact">
             <template #append-inner>
               <v-btn
                 icon="mdi-folder-open-outline"
@@ -108,11 +110,13 @@ async function save(): Promise<void> {
 
         <v-card-actions>
           <v-spacer />
-          <v-btn color="primary" :loading="saving" @click="save">保存并进入管理页</v-btn>
+          <v-btn color="primary" :loading="saving" @click="save">{{
+            t('defaultSetup.saveAndEnter')
+          }}</v-btn>
         </v-card-actions>
       </v-card>
 
-      <div v-else class="text-body-2 opacity-70">正在加载...</div>
+      <div v-else class="text-body-2 opacity-70">{{ t('defaultSetup.loading') }}</div>
     </div>
   </div>
 </template>

@@ -26,23 +26,32 @@
   },
   "games": {
     "addGame": "添加游戏",
+    "nameZh": "中文名",
+    "nameEn": "英文名",
+    "imageUrl": "图片链接",
+    "enterImageUrl": "请输入图片链接",
+    "imageDownloadFailed": "图片下载失败：{err}",
     "configuredCount": "已配置 {count} 个",
+    "nameZhRequired": "中文名不能为空",
+    "nameEnRequired": "英文名不能为空",
+    "selectCategory": "请选择分类",
+    "savingImageWait": "正在保存图片请稍后再试",
     "configured": "已配置",
     "notConfigured": "待配置",
     "dialogTitle": "游戏列表",
     "defaultGame": "默认",
     "customGame": "自定义游戏",
-    "nameZh": "游戏名称中文",
-    "nameEn": "游戏名称英文",
     "modPath": "目标 Mod 路径",
     "image": "游戏图片",
-    "imageUrl": "图片 URL",
     "localImage": "本地图片",
     "save": "保存",
+    "import": "导入",
     "addCustom": "添加自定义游戏",
     "close": "关闭",
+    "configureGame": "配置游戏信息",
     "requiredError": "请填写游戏中文名、英文名和目标 Mod 路径。",
-    "imageDownloadFailed": "图片下载失败。"
+    "deleteConfirm": "确定要删除游戏",
+    "deleteWarning": "该操作只会移除数据库记录，不会删除磁盘中的 mod 目录。"
   },
   "gameManager": {
     "unknownGame": "未知游戏",
@@ -52,22 +61,64 @@
     "addedAt": "添加时间",
     "modName": "Mod 名称",
     "author": "作者",
+    "nameZh": "中文名",
+    "nameEn": "英文名",
+    "imageUrl": "图片链接",
+    "import": "导入",
     "version": "版本",
     "emptyMods": "暂无 Mod",
     "modConfig": "Mod 配置",
     "previewHint": "当前只展示 preview 图片，后续可扩展更多配置项。",
     "comingSoon": "该分类暂未接入内容。",
-    "addItem": "添加",
+    "addItem": "添加项目",
+    "itemForm": {
+      "add": "添加项目",
+      "edit": "编辑项目"
+    },
+    "sort": {
+      "default": "默认排序",
+      "modCount": "Mod数量"
+    },
+    "searchPlaceholder": "请输入搜索名称",
+    "preview": "预览图",
+    "noPreview": "暂无预览",
+    "modifyModDir": "修改 Mod 目录",
+    "modifyModDirTitle": "修改 Mod 根目录",
+    "modRootLabel": "Mod 根目录",
+    "selectModRootFirst": "请先选择 Mod 根目录",
+    "itemDeleteConfirm": "确定删除 {name} 吗？",
+    "itemDeleteWarning": "MOD会保留在磁盘上。",
     "sections": {
       "characters": "人物",
       "weapons": "武器",
       "custom": "自定义类"
     },
     "categories": {
+      "modInspect": {
+        "existsTitle": "Mod 已存在 - 覆盖安装",
+        "previewTitle": "Mod 安装预览",
+        "previewAlt": "Mod 预览图",
+        "modNameLabel": "Mod 名称",
+        "modNamePlaceholder": "请输入 Mod 名称",
+        "createdAtLabel": "创建时间",
+        "createdAtPlaceholder": "创建时间",
+        "existsWarning": "该 Mod 已存在，覆盖安装会替换原有文件！",
+        "install": "安装",
+        "overrideInstall": "覆盖安装"
+      },
       "all": "全部",
       "attack": "输出",
       "support": "辅助",
       "defense": "防护"
+    },
+    "uninstall": {
+      "title": "卸载 {name}",
+      "recycle": "移入回收站",
+      "recycleDesc": "文件将被移入系统回收站，可以随时恢复",
+      "delete": "彻底删除",
+      "deleteWarning": "此操作无法撤销！",
+      "uninstalling": "卸载中...",
+      "confirm": "确认卸载"
     }
   },
   "homeSetting": {
@@ -82,5 +133,24 @@
     "selectDirFail": "选择目录失败",
     "submitFail": "表单提交失败",
     "enterPath": "请输入或选择解压mod地址"
+  },
+  "defaultSetup": {
+    "title": "配置",
+    "hint": "默认游戏只需要配置 Mod 路径",
+    "saveAndEnter": "保存并进入管理页",
+    "loading": "正在加载..."
+  },
+  "common": {
+    "cancel": "取消",
+    "delete": "删除",
+    "warning": "注意",
+    "edit": "编辑",
+    "noData": "暂无数据",
+    "close": "关闭",
+    "save": "保存",
+    "deleteSuccess": "删除成功",
+    "deleteFailed": "删除失败：{err}",
+    "updateSuccess": "更新成功",
+    "addFailed": "添加失败"
   }
 }

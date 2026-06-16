@@ -286,7 +286,7 @@ onUnmounted(() => {
             <v-icon icon="mdi-menu" />
           </v-btn>
         </template>
-        <v-list-item-title v-if="isExpanded" key="title"> 主页 </v-list-item-title>
+        <v-list-item-title v-if="isExpanded" key="title">{{ t('nav.home') }}</v-list-item-title>
       </v-list-item>
 
       <v-divider class="pt-3" />
@@ -316,7 +316,7 @@ onUnmounted(() => {
                   <div v-if="isExpanded" key="game-item" class="min-w-0">
                     <v-list-item-title class="truncate">{{ getGameName(game) }}</v-list-item-title>
                     <v-list-item-subtitle class="truncate">
-                      {{ game.mod_root_path ? '已配置' : '未配置' }}
+                      {{ game.mod_root_path ? t('games.configured') : t('games.notConfigured') }}
                     </v-list-item-subtitle>
                   </div>
                 </transition>
@@ -346,7 +346,9 @@ onUnmounted(() => {
               <v-icon size="large">mdi-plus-circle-outline</v-icon>
 
               <transition name="fade" :duration="config.transitionDuration">
-                <v-list-item-title v-if="isExpanded" key="add-game">添加游戏</v-list-item-title>
+                <v-list-item-title v-if="isExpanded" key="add-game">{{
+                  t('games.addGame')
+                }}</v-list-item-title>
               </transition>
             </div>
           </template>
@@ -356,7 +358,7 @@ onUnmounted(() => {
       <v-dialog v-model="gameDialog" max-width="680">
         <v-card>
           <v-card-title class="flex items-center gap-2">
-            {{ !gameForm.id ? '添加游戏' : '配置游戏信息' }}
+            {{ !gameForm.id ? t('games.addGame') : t('games.configureGame') }}
           </v-card-title>
 
           <v-card-text>
@@ -397,12 +399,12 @@ onUnmounted(() => {
                 <div class="grid gap-3 md:grid-cols-2">
                   <v-text-field
                     v-model="gameForm.name_zh_cn"
-                    :label="'游戏名称-中文'"
+                    :label="t('games.nameZh')"
                     density="compact"
                   />
                   <v-text-field
                     v-model="gameForm.name"
-                    :label="'游戏名称-英文'"
+                    :label="t('games.nameEn')"
                     density="compact"
                   />
                 </div>
@@ -410,7 +412,7 @@ onUnmounted(() => {
                 <div class="flex gap-2">
                   <v-text-field
                     v-model="gameCoverUrl"
-                    label="图片链接"
+                    :label="t('games.imageUrl')"
                     density="compact"
                     class="flex-1"
                     append-icon="mdi-paperclip"
@@ -424,14 +426,14 @@ onUnmounted(() => {
                       color="white"
                       class="mr-1"
                     />
-                    导入
+                    {{ t('games.import') }}
                   </v-btn>
                 </div>
               </div>
 
               <v-text-field
                 v-model="gameForm.mod_root_path"
-                :label="'mod存放目录'"
+                :label="t('games.modPath')"
                 density="compact"
                 required
               >
@@ -453,25 +455,27 @@ onUnmounted(() => {
 
           <v-card-actions>
             <v-spacer />
-            <v-btn variant="text" @click="gameDialog = false"> 取消 </v-btn>
-            <v-btn color="primary" :loading="isSaving" @click="saveGame"> 保存 </v-btn>
+            <v-btn variant="text" @click="gameDialog = false">{{ t('common.cancel') }}</v-btn>
+            <v-btn color="primary" :loading="isSaving" @click="saveGame">{{
+              t('games.save')
+            }}</v-btn>
           </v-card-actions>
         </v-card>
       </v-dialog>
 
       <v-dialog v-model="deleteDialog" max-width="420">
         <v-card>
-          <v-card-title>注意</v-card-title>
+          <v-card-title>{{ t('common.warning') }}</v-card-title>
 
           <v-card-text>
             <div class="flex gap-2 items-center">
-              <div>确定要删除游戏</div>
+              <div>{{ t('games.deleteConfirm') }}</div>
               <div class="font-medium my-2">
                 {{ deleteTarget?.name_zh_cn || deleteTarget?.name }}
               </div>
             </div>
             <div class="text-[16px] opacity-70">
-              该操作只会移除数据库记录，不会删除磁盘中的 mod 目录。
+              {{ t('games.deleteWarning') }}
             </div>
             <v-alert v-if="deleteError" type="error" variant="tonal" density="compact">
               {{ deleteError }}
@@ -480,8 +484,10 @@ onUnmounted(() => {
 
           <v-card-actions>
             <v-spacer />
-            <v-btn variant="text" @click="deleteDialog = false">取消</v-btn>
-            <v-btn color="error" :loading="deleteLoading" @click="confirmDeleteGame">删除</v-btn>
+            <v-btn variant="text" @click="deleteDialog = false">{{ t('common.cancel') }}</v-btn>
+            <v-btn color="error" :loading="deleteLoading" @click="confirmDeleteGame">{{
+              t('common.delete')
+            }}</v-btn>
           </v-card-actions>
         </v-card>
       </v-dialog>
@@ -495,7 +501,9 @@ onUnmounted(() => {
         </template>
 
         <transition name="fade" :duration="config.transitionDuration">
-          <v-list-item-title v-if="isExpanded" key="settings"> 设置 </v-list-item-title>
+          <v-list-item-title v-if="isExpanded" key="settings">{{
+            t('nav.settings')
+          }}</v-list-item-title>
         </transition>
       </v-list-item>
     </v-list>

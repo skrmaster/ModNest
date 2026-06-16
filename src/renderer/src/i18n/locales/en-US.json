@@ -39,34 +39,82 @@
     "imageUrl": "Image URL",
     "localImage": "Local image",
     "save": "Save",
+    "import": "Import",
     "addCustom": "Add custom game",
     "close": "Close",
+    "configureGame": "Configure game info",
     "requiredError": "Chinese name, English name, and target mod path are required.",
-    "imageDownloadFailed": "Failed to download image."
+    "imageDownloadFailed": "Failed to download image.",
+    "deleteConfirm": "Are you sure you want to delete this game?",
+    "deleteWarning": "This will only remove the database record and will not delete the mod directory on disk."
   },
   "gameManager": {
     "unknownGame": "Unknown game",
     "characterHint": "Choose a character to review available mods and configuration.",
     "modCount": "{count} mods",
     "enabled": "Enabled",
+    "nameZh": "Chinese name",
+    "nameEn": "English name",
+    "imageUrl": "Image URL",
+    "import": "Import",
     "addedAt": "Added",
     "modName": "Mod name",
+
     "author": "Author",
     "version": "Version",
     "emptyMods": "No mods yet",
     "modConfig": "Mod config",
     "previewHint": "Only the preview image is shown for now. More config fields can be added later.",
     "comingSoon": "This category is not connected yet.",
-    "sections": {
-      "characters": "Characters",
-      "weapons": "Weapons",
-      "custom": "Custom"
+    "addItem": "Add item",
+    "itemForm": {
+      "add": "Add item",
+      "edit": "Edit item"
     },
+    "sort": {
+      "default": "Default",
+      "modCount": "Mod count"
+    },
+    "searchPlaceholder": "Enter name to search",
+    "preview": "Preview",
+    "noPreview": "No preview",
+    "modifyModDir": "Modify Mod directory",
+    "modifyModDirTitle": "Modify Mod root directory",
+    "modRootLabel": "Mod root",
+    "selectModRootFirst": "Please select a Mod root directory first",
+    "itemDeleteConfirm": "Are you sure to delete {name}?",
+    "itemDeleteWarning": "The MOD will remain on disk.",
     "categories": {
+      "modInspect": {
+        "existsTitle": "Mod exists - overwrite install",
+        "previewTitle": "Mod install preview",
+        "previewAlt": "Mod preview image",
+        "modNameLabel": "Mod name",
+        "modNamePlaceholder": "Enter Mod name",
+        "createdAtLabel": "Created At",
+        "createdAtPlaceholder": "Created At",
+        "existsWarning": "This Mod already exists. Overwriting will replace existing files!",
+        "install": "Install",
+        "overrideInstall": "Overwrite Install"
+      },
       "all": "All",
       "attack": "Attack",
       "support": "Support",
       "defense": "Defense"
+    },
+    "uninstall": {
+      "title": "Uninstall {name}",
+      "recycle": "Move to Recycle Bin",
+      "recycleDesc": "Files will be moved to system recycle bin and can be restored.",
+      "delete": "Delete permanently",
+      "deleteWarning": "This operation cannot be undone!",
+      "uninstalling": "Uninstalling...",
+      "confirm": "Confirm uninstall"
+    },
+    "sections": {
+      "characters": "Characters",
+      "weapons": "Weapons",
+      "custom": "Custom"
     }
   },
   "homeSetting": {
@@ -81,5 +129,22 @@
     "selectDirFail": "Failed to select directory",
     "submitFail": "Form submission failed",
     "enterPath": "Please enter or select a mod extraction path"
+  },
+  "defaultSetup": {
+    "title": "Setup",
+    "hint": "Default games only need a configured Mod path",
+    "saveAndEnter": "Save and open manager",
+    "loading": "Loading..."
+  },
+  "common": {
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "warning": "Warning",
+    "edit": "Edit",
+    "noData": "No data",
+    "save": "Save",
+    "close": "Close",
+    "deleteSuccess": "Deleted successfully",
+    "deleteFailed": "Delete failed: {err}"
   }
 }

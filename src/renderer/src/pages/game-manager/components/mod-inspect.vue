@@ -2,7 +2,11 @@
   <v-dialog v-model="showDialog" max-width="800" persistent>
     <v-card>
       <v-card-title class="text-h5 font-weight-bold bg-primary text-white">
-        {{ data.exists ? 'Mod 已存在 - 覆盖安装' : 'Mod 安装预览' }}
+        {{
+          data.exists
+            ? t('gameManager.modInspect.existsTitle')
+            : t('gameManager.modInspect.previewTitle')
+        }}
       </v-card-title>
 
       <v-card-text class="pa-6">
@@ -11,14 +15,14 @@
             <div class="preview-image-container">
               <v-img
                 :src="previewImageUrl"
-                alt="Mod 预览图"
+                :alt="t('gameManager.modInspect.previewAlt')"
                 aspect-ratio="16/9"
                 max-width="320"
                 contain
                 class="rounded-lg shadow-sm border"
               />
               <div v-if="!previewImageUrl" class="text-center py-10 text-medium-emphasis">
-                无预览图
+                {{ t('gameManager.noPreview') }}
               </div>
             </div>
           </v-col>
@@ -27,16 +31,16 @@
             <v-form class="d-flex flex-column gap-4">
               <v-text-field
                 v-model="localForm.modName"
-                label="Mod 名称"
-                placeholder="请输入 Mod 名称"
+                :label="t('gameManager.modInspect.modNameLabel')"
+                :placeholder="t('gameManager.modInspect.modNamePlaceholder')"
                 variant="outlined"
                 required
               />
 
               <v-text-field
                 v-model="localForm.createdAt"
-                label="创建时间"
-                placeholder="创建时间"
+                :label="t('gameManager.modInspect.createdAtLabel')"
+                :placeholder="t('gameManager.modInspect.createdAtPlaceholder')"
                 variant="outlined"
                 readonly
                 color="default"
@@ -49,7 +53,7 @@
                 icon="mdi-alert"
                 class="mt-2"
               >
-                该 Mod 已存在，覆盖安装会替换原有文件！
+                {{ t('gameManager.modInspect.existsWarning') }}
               </v-alert>
             </v-form>
           </v-col>
@@ -57,12 +61,14 @@
       </v-card-text>
 
       <v-card-actions class="px-6 pb-6 justify-end gap-2">
-        <v-btn color="grey" @click="handleCancel"> 取消 </v-btn>
+        <v-btn color="grey" @click="handleCancel">{{ t('common.cancel') }}</v-btn>
 
-        <v-btn v-if="!data.exists" color="primary" @click="handleInstall"> 安装 </v-btn>
+        <v-btn v-if="!data.exists" color="primary" @click="handleInstall">{{
+          t('gameManager.modInspect.install')
+        }}</v-btn>
 
         <v-btn v-if="data.exists" color="red-darken-1" @click="handleOverrideInstall">
-          覆盖安装
+          {{ t('gameManager.modInspect.overrideInstall') }}
         </v-btn>
       </v-card-actions>
     </v-card>
@@ -72,6 +78,8 @@
 <script setup lang="ts">
 import { ModPreviewData } from '@shared/types/mod'
 import { ref } from 'vue'
+import { useI18n } from 'vue-i18n'
+const { t } = useI18n()
 
 const showDialog = ref(false)
 const data = ref<ModPreviewData>({} as ModPreviewData)

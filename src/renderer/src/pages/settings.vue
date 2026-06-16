@@ -5,7 +5,7 @@
       <v-card-text>
         <div class="pl-0">
           <div>
-            <div class="mb-2">主题颜色</div>
+            <div class="mb-2">{{ labels.themeLabel }}</div>
 
             <v-radio-group v-model="themeMode" inline>
               <v-radio
@@ -18,7 +18,7 @@
           </div>
 
           <div>
-            <div class="mb-2">语言</div>
+            <div class="mb-2">{{ labels.languageLabel }}</div>
 
             <v-radio-group v-model="language" inline>
               <v-radio

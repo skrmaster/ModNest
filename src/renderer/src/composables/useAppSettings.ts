@@ -101,12 +101,12 @@ export function useAppSettings(): {
     return [
       {
         label: i18n.global.t('language.zh') as string,
-        value: 'zh' as Language
+        value: 'zh-CN' as Language
       },
 
       {
         label: i18n.global.t('language.en') as string,
-        value: 'en' as Language
+        value: 'en-US' as Language
       }
     ]
   })

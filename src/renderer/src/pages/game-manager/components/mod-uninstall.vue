@@ -7,7 +7,7 @@
   >
     <v-card>
       <v-card-title class="text-h5 font-medium d-flex align-center justify-between">
-        卸载 {{ modName }}
+        {{ t('gameManager.uninstall.title', { name: modName }) }}
         <v-btn
           icon="mdi-close"
           variant="text"
@@ -32,23 +32,34 @@
         <v-radio-group v-model="uninstallType" class="pt-1" :disabled="isLoading">
           <div class="mb-3 pa-3 border rounded">
             <v-radio
-              label="移入回收站"
+              :label="t('gameManager.uninstall.recycle')"
               value="recycle"
               color="primary"
               :disabled="isLoading"
             ></v-radio>
-            <div class="text-caption text-gray-500 ml-10">文件将被移入系统回收站，可以随时恢复</div>
+            <div class="text-caption text-gray-500 ml-10">
+              {{ t('gameManager.uninstall.recycleDesc') }}
+            </div>
           </div>
 
           <div class="mb-2 pa-3 border rounded">
-            <v-radio label="彻底删除" value="delete" color="error" :disabled="isLoading"></v-radio>
-            <div class="text-caption text-error font-medium ml-10">此操作无法撤销！</div>
+            <v-radio
+              :label="t('gameManager.uninstall.delete')"
+              value="delete"
+              color="error"
+              :disabled="isLoading"
+            ></v-radio>
+            <div class="text-caption text-error font-medium ml-10">
+              {{ t('gameManager.uninstall.deleteWarning') }}
+            </div>
           </div>
         </v-radio-group>
       </v-card-text>
 
       <v-card-actions class="justify-end px-4 pb-4">
-        <v-btn color="secondary" :disabled="isLoading" @click="handleCancel"> 取消 </v-btn>
+        <v-btn color="secondary" :disabled="isLoading" @click="handleCancel">{{
+          t('common.cancel')
+        }}</v-btn>
         <v-btn
           variant="tonal"
           :color="'primary'"
@@ -57,7 +68,9 @@
           :disabled="isLoading"
           @click="handleConfirm"
         >
-          {{ isLoading ? '卸载中...' : '确认卸载' }}
+          {{
+            isLoading ? t('gameManager.uninstall.uninstalling') : t('gameManager.uninstall.confirm')
+          }}
         </v-btn>
       </v-card-actions>
     </v-card>
@@ -67,6 +80,8 @@
 <script setup lang="ts">
 import { ModInfo } from '@shared/types/mod'
 import { ref } from 'vue'
+import { useI18n } from 'vue-i18n'
+const { t } = useI18n()
 
 const emit = defineEmits<{
   delete: []

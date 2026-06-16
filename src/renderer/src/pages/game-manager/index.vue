@@ -31,6 +31,7 @@ import ElementsZzz from '@renderer/components/elements-zzz.vue'
 import { Splitpanes, Pane, SplitpanesResizedPayload } from 'splitpanes'
 import 'splitpanes/dist/splitpanes.css'
 import { useAppSettings } from '@renderer/composables/useAppSettings'
+import { useI18n } from 'vue-i18n'
 import { gameGenshinElementList, gameZZZElementList } from '@shared/enums/index'
 // import { wrapGrid } from 'animate-css-grid'
 
@@ -56,6 +57,7 @@ router.beforeEach(async (to) => {
 
 const route = useRoute()
 const { language } = useAppSettings()
+const { t } = useI18n()
 
 const activeSection = ref<string>('1')
 const gameId = computed(() => {
@@ -81,8 +83,21 @@ const getCategoryName = computed(() => {
   return item ? item.name : ''
 })
 
+const getSectionDisplayName = (section: { name?: string; name_zh_cn?: string }): string => {
+  return language.value === 'zh-CN'
+    ? section.name_zh_cn || section.name || ''
+    : section.name || section.name_zh_cn || ''
+}
+
+const getItemDisplayName = (item?: { name?: string; name_zh_cn?: string }): string => {
+  if (!item) return ''
+  return language.value === 'zh-CN'
+    ? item.name_zh_cn || item.name || ''
+    : item.name || item.name_zh_cn || ''
+}
+
 const getActiveItemName = computed(() => {
-  return language.value === 'zh-CN' ? selectedItem.value?.name_zh_cn : selectedItem.value?.name
+  return getItemDisplayName(selectedItem.value)
 })
 
 const activeItems = ref<List>()
@@ -90,11 +105,11 @@ const searchText = ref<string | undefined>()
 const isGettingItems = ref(false)
 const isGettingModList = ref(false)
 
-const options = ref([
-  { label: '默认排序', value: 'default' },
-  { label: 'Mod数量', value: 'ModCount' }
+const options = computed(() => [
+  { label: t('gameManager.sort.default'), value: 'default' },
+  { label: t('gameManager.sort.modCount'), value: 'ModCount' }
 ])
-const selectedText = ref('默认排序')
+const selectedText = ref(t('gameManager.sort.default'))
 const sortType = ref<string>('default')
 function handleSortList(val: (typeof options.value)[0]) {
   sortType.value = val.value
@@ -194,7 +209,7 @@ async function getItems() {
       }
     })
   } catch (error) {
-    console.error('获取物品列表失败：', error)
+    console.error('Failed to retrieve item list:', error)
   } finally {
     isGettingItems.value = false
   }
@@ -248,7 +263,7 @@ async function saveModRootPath(): Promise<void> {
   try {
     const nextPath = modRootPath.value.trim()
     if (!nextPath) {
-      modRootError.value = '请先选择 Mod 根目录'
+      modRootError.value = t('gameManager.selectModRootFirst')
       return
     }
 
@@ -408,7 +423,7 @@ function handleDragOver(e: DragEvent) {
 }
 
 const onCancel = () => {
-  console.log('用户取消')
+  console.log('User canceled')
 }
 
 const onInstall = async (form: Partial<ModPreviewData>, data: ModPreviewData) => {
@@ -426,7 +441,7 @@ const onInstall = async (form: Partial<ModPreviewData>, data: ModPreviewData) =>
 }
 
 const onOverrideInstall = (form) => {
-  console.log('执行覆盖安装：', form)
+  console.log('Performing overwrite install:', form)
   getModList()
 }
 
@@ -500,14 +515,14 @@ async function confirmDelete() {
   try {
     await window.api.itemApi.remove(deletingItem.value.id)
 
-    notify.success('删除成功')
+    notify.success(t('common.deleteSuccess'))
 
     deleteDialog.value = false
     deletingItem.value = undefined
 
     getItems()
   } catch (err) {
-    notify.error(`删除失败：${err}`)
+    notify.error(t('common.deleteFailed', { err }))
   }
 }
 
@@ -534,7 +549,7 @@ onUnmounted(() => {})
           <v-btn
             icon="mdi-cog-outline"
             variant="text"
-            title="修改Mod目录"
+            :title="t('gameManager.modifyModDir')"
             @click="openModRootDialog"
           />
           <v-menu>
@@ -560,7 +575,7 @@ onUnmounted(() => {})
                 class="cursor-pointer"
                 :value="section.id"
               >
-                {{ section.name_zh_cn }}
+                {{ getSectionDisplayName(section) }}
               </v-chip>
             </v-chip-group>
           </div>
@@ -576,8 +591,8 @@ onUnmounted(() => {})
           <div class="w-full max-w-60 flex items-center gap-2">
             <v-text-field
               v-model="searchText"
-              label="请输入搜索名称"
-              placeholder="请输入搜索名称"
+              :label="t('gameManager.searchPlaceholder')"
+              :placeholder="t('gameManager.searchPlaceholder')"
               append-inner-icon="mdi-magnify"
               clearable
               single-line
@@ -587,7 +602,9 @@ onUnmounted(() => {})
               variant="outlined"
             ></v-text-field>
           </div>
-          <v-btn color="primary" prepend-icon="mdi-plus" @click="openItemDialog">添加项目</v-btn>
+          <v-btn color="primary" prepend-icon="mdi-plus" @click="openItemDialog">{{
+            t('gameManager.addItem')
+          }}</v-btn>
         </div>
 
         <div class="flex-1 overflow-hidden">
@@ -634,13 +651,13 @@ onUnmounted(() => {})
                         <v-list density="compact">
                           <v-list-item
                             prepend-icon="mdi-pencil-outline"
-                            title="编辑"
+                            :title="t('common.edit')"
                             @click.stop="handleEditItem(item)"
                           />
 
                           <v-list-item
                             prepend-icon="mdi-delete-outline"
-                            title="删除"
+                            :title="t('common.delete')"
                             class="text-error"
                             @click.stop="openDeleteDialog(item)"
                           />
@@ -650,9 +667,9 @@ onUnmounted(() => {})
                   </div>
                   <div class="w-full gap-3">
                     <div class="text-center">
-                      <div class="text-subtitle-1 truncate">{{ item.name }}</div>
+                      <div class="text-subtitle-1 truncate">{{ getItemDisplayName(item) }}</div>
                       <div class="text-body-2 opacity-70 truncate">
-                        {{ item.name_zh_cn }}
+                        {{ language === 'zh-CN' ? item.name : item.name_zh_cn }}
                       </div>
                     </div>
                   </div>
@@ -660,7 +677,7 @@ onUnmounted(() => {})
               </div>
             </div>
             <div v-if="filteredItems.length === 0">
-              <v-empty-state title="暂无数据"></v-empty-state>
+              <v-empty-state :title="t('common.noData')"></v-empty-state>
             </div>
           </com-scroll>
         </div>
@@ -699,9 +716,9 @@ onUnmounted(() => {})
                 <v-table>
                   <thead>
                     <tr>
-                      <th class="text-left">启用</th>
-                      <th class="text-left">mod名称</th>
-                      <th class="text-left">添加时间</th>
+                      <th class="text-left">{{ t('gameManager.enabled') }}</th>
+                      <th class="text-left">{{ t('gameManager.modName') }}</th>
+                      <th class="text-left">{{ t('gameManager.addedAt') }}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -719,7 +736,7 @@ onUnmounted(() => {})
                           @change.stop="handleModEnabled($event, item)"
                         ></v-checkbox-btn>
                       </td>
-                      <td>{{ item.name }}</td>
+                      <td>{{ getItemDisplayName(item) }}</td>
                       <td>{{ dayjs(item.modifiedAt).format('YYYY-MM-DD HH:mm:ss') }}</td>
                     </tr>
                   </tbody>
@@ -730,12 +747,16 @@ onUnmounted(() => {})
             <Pane :size="sizes[2]">
               <section>
                 <div>
-                  <div class="text-body-2 opacity-70">预览图</div>
+                  <div class="text-body-2 opacity-70">{{ t('gameManager.preview') }}</div>
                   <div v-if="selectTableRow?.cover" class="px-4">
                     <v-img :src="selectTableRow?.cover" cover />
                   </div>
                   <div v-else>
-                    <v-alert density="compact" text="暂无预览" title="" type="warning"></v-alert>
+                    <v-alert
+                      density="compact"
+                      :text="t('gameManager.noPreview')"
+                      type="warning"
+                    ></v-alert>
                   </div>
                 </div>
                 <div></div>
@@ -749,22 +770,20 @@ onUnmounted(() => {})
 
   <v-dialog v-model="deleteDialog" max-width="420">
     <v-card>
-      <v-card-title> 注意 </v-card-title>
+      <v-card-title>{{ t('common.warning') }}</v-card-title>
 
       <v-card-text>
-        确定删除
-        <strong>{{ deletingItem?.name_zh_cn }}</strong>
-        吗？
+        {{ t('gameManager.itemDeleteConfirm', { name: getItemDisplayName(deletingItem) }) }}
         <br />
-        MOD会保留在磁盘上。
+        {{ t('gameManager.itemDeleteWarning') }}
       </v-card-text>
 
       <v-card-actions>
         <v-spacer />
 
-        <v-btn variant="text" @click="deleteDialog = false"> 取消 </v-btn>
+        <v-btn variant="text" @click="deleteDialog = false">{{ t('common.cancel') }}</v-btn>
 
-        <v-btn color="error" variant="flat" @click="confirmDelete"> 删除 </v-btn>
+        <v-btn color="error" variant="flat" @click="confirmDelete">{{ t('common.delete') }}</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -786,11 +805,15 @@ onUnmounted(() => {})
 
   <v-dialog v-model="showModRootDialog" max-width="560">
     <v-card>
-      <v-card-title>修改 Mod 根目录</v-card-title>
+      <v-card-title>{{ t('gameManager.modifyModDirTitle') }}</v-card-title>
 
       <v-card-text>
         <div class="grid gap-4">
-          <v-text-field v-model="modRootPath" label="Mod 根目录" density="compact">
+          <v-text-field
+            v-model="modRootPath"
+            :label="t('gameManager.modRootLabel')"
+            density="compact"
+          >
             <template #append-inner>
               <v-btn
                 icon="mdi-folder-open-outline"
@@ -809,8 +832,10 @@ onUnmounted(() => {})
 
       <v-card-actions>
         <v-spacer />
-        <v-btn variant="text" @click="showModRootDialog = false">取消</v-btn>
-        <v-btn color="primary" :loading="modRootSaving" @click="saveModRootPath">保存</v-btn>
+        <v-btn variant="text" @click="showModRootDialog = false">{{ t('common.cancel') }}</v-btn>
+        <v-btn color="primary" :loading="modRootSaving" @click="saveModRootPath">{{
+          t('common.save')
+        }}</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>

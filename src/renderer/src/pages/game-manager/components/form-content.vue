@@ -37,14 +37,14 @@
         <v-text-field
           v-model="itemForm.name_zh_cn"
           required
-          label="中文名"
+          :label="t('gameManager.nameZh')"
           density="compact"
           :error-messages="nameZhError ? [nameZhError] : []"
         />
         <v-text-field
           v-model="itemForm.name"
           required
-          label="英文名"
+          :label="t('gameManager.nameEn')"
           density="compact"
           :error-messages="nameError ? [nameError] : []"
         />
@@ -53,7 +53,7 @@
       <div class="flex gap-2">
         <v-text-field
           v-model="coverUrl"
-          label="图片链接"
+          :label="t('gameManager.imageUrl')"
           density="compact"
           class="flex-1"
           append-icon="mdi-paperclip"
@@ -68,7 +68,7 @@
             color="white"
             class="mr-1"
           />
-          导入
+          {{ t('games.import') }}
         </v-btn>
       </div>
 
@@ -91,7 +91,7 @@
               rounded
               color="primary"
             >
-              {{ n.name_zh_cn }}
+              {{ language === 'zh-CN' ? n.name_zh_cn || n.name : n.name || n.name_zh_cn }}
             </v-chip>
           </v-chip-group>
         </v-sheet>
@@ -118,7 +118,7 @@
 
   <v-card-actions>
     <v-spacer />
-    <v-btn v-if="propUseMode !== 'inline'" @click="closeDialog">关闭</v-btn>
+    <v-btn v-if="propUseMode !== 'inline'" @click="closeDialog">{{ t('common.close') }}</v-btn>
     <v-btn
       variant="flat"
       color="primary"
@@ -126,16 +126,20 @@
       :disabled="isDownloading"
       @click="saveItem"
     >
-      保存
+      {{ t('common.save') }}
     </v-btn>
   </v-card-actions>
 </template>
 
 <script setup lang="ts">
 import { useNotify } from '@renderer/composables/useNotify'
+import { useAppSettings } from '@renderer/composables/useAppSettings'
 import { CreateItemDto, GameItemRow, ItemDto, UpdateItemDto } from '@shared/dto/item'
 import { extractImageFileName, getUserImageUrl } from '@shared/utils/url'
 import { computed, onMounted, reactive, ref, toRaw, toRef } from 'vue'
+import { useI18n } from 'vue-i18n'
+const { t } = useI18n()
+const { language } = useAppSettings()
 import { categoryStore } from '@renderer/stores/category-store'
 import { UseMode } from '@shared/types/formContent'
 import ElementsGenshin from '@renderer/components/elements-genshin.vue'
@@ -228,7 +232,7 @@ function handleCategoryAdd(v?: string) {
 const downloadCover = async () => {
   clearErrors()
   if (!coverUrl.value) {
-    coverUrlError.value = '请输入图片链接'
+    coverUrlError.value = t('gameManager.enterImageUrl')
     return
   }
 
@@ -238,7 +242,7 @@ const downloadCover = async () => {
 
     showImageCover.value = itemForm.cover ? getUserImageUrl(itemForm.cover) : ''
   } catch (err) {
-    formErrorMessage.value = `图片下载失败：${err}`
+    formErrorMessage.value = t('gameManager.imageDownloadFailed', { err })
   } finally {
     isDownloading.value = false
   }
@@ -262,13 +266,13 @@ const validateForm = (): boolean => {
 
   const zh = itemForm.name_zh_cn?.trim()
   if (!zh) {
-    nameZhError.value = '中文名不能为空'
+    nameZhError.value = t('gameManager.nameZhRequired')
     valid = false
   }
 
   const en = itemForm.name?.trim()
   if (!en) {
-    nameError.value = '英文名不能为空'
+    nameError.value = t('gameManager.nameEnRequired')
     valid = false
   }
   formErrorMessage.value = ''
@@ -279,7 +283,7 @@ const validateForm = (): boolean => {
   // }
 
   if (selectedCategoryIds.value.length <= 0) {
-    formErrorMessage.value += ',请选择分类'
+    formErrorMessage.value += t('gameManager.selectCategory')
     valid = false
   }
 
@@ -298,7 +302,7 @@ const saveItem = async (): Promise<void> => {
   }
 
   if (isDownloading.value) {
-    formErrorMessage.value = '正在保存图片请稍后再试'
+    formErrorMessage.value = t('gameManager.savingImageWait')
     return
   }
 
@@ -318,7 +322,7 @@ const saveItem = async (): Promise<void> => {
         ])
       }
       await window.api.itemApi.update(editData.value.id, updateData)
-      notify.success('更新成功')
+      notify.success(t('common.updateSuccess'))
       emits('update')
     } catch (error) {
       console.log(error)
@@ -355,7 +359,7 @@ const saveItem = async (): Promise<void> => {
     if (data.changes !== 0) {
       emits('update')
     } else {
-      notify.error('添加失败')
+      notify.error(t('common.addFailed'))
     }
   } catch (error) {
     console.log(error)

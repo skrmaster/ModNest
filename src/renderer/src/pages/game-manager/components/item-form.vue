@@ -1,7 +1,9 @@
 <template>
   <v-dialog v-model="itemDialog" max-width="660">
     <v-card>
-      <v-card-title> {{ itemForm.id ? '编辑' : '添加' }} </v-card-title>
+      <v-card-title>
+        {{ itemForm.id ? t('gameManager.itemForm.edit') : t('gameManager.itemForm.add') }}
+      </v-card-title>
       <form-content
         ref="contentRef"
         :game-id="gameId"
@@ -16,6 +18,8 @@
 import { CreateItemDto, ItemDto } from '@shared/dto/item'
 import { reactive, ref, useTemplateRef, nextTick, computed } from 'vue'
 import FormContent from './form-content.vue'
+import { useI18n } from 'vue-i18n'
+const { t } = useI18n()
 
 type Prop = {
   gameId: string
