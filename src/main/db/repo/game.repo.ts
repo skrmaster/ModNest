@@ -13,13 +13,15 @@ export class GameRepository {
         name,
         name_zh_cn,
         cover,
-        mod_root_path
+        mod_root_path,
+        is_custom
       )
       VALUES (
         @name,
         @name_zh_cn,
         @cover,
-        @mod_root_path
+        @mod_root_path,
+        @is_custom
       )
     `)
 

@@ -6,6 +6,7 @@ import { useGameCover } from '@renderer/composables/useGameCover'
 import { gameStore } from '@renderer/stores/game-store'
 import type { UserGame } from '@shared/entities/game'
 import type { CreateGameDto } from '@shared/dto/game'
+import { getUserImageUrl } from '@shared/utils/url'
 
 interface NavConfig {
   expandedWidth?: number
@@ -107,6 +108,8 @@ const openGame = (game: ListItem): void => {
 const openCustomGame = (): void => {
   selectedGameId.value = undefined
   formError.value = ''
+  gameCoverUrl.value = ''
+  showGameCover.value = ''
   Object.assign(gameForm, {
     id: undefined,
     name_zh_cn: '',
@@ -125,10 +128,35 @@ const chooseModPath = async (): Promise<void> => {
   }
 }
 
-const { selectCover, downloadCover } = useGameCover()
+const { selectCover, downloadCover: downloadGameCover } = useGameCover()
+const gameCoverUrl = ref('')
+const isDownloadingCover = ref(false)
+const showGameCover = ref('')
 
-const chooseCover = async (): Promise<void> => {
-  gameForm.cover = await selectCover()
+const chooseGameCover = async (): Promise<void> => {
+  const localUrl = await selectCover()
+  if (localUrl) {
+    const fileName = await downloadGameCover(localUrl, gameForm.name || 'game')
+    gameCoverUrl.value = fileName
+    gameForm.cover = fileName
+    showGameCover.value = fileName
+  }
+}
+
+const downloadGameCoverImage = async (): Promise<void> => {
+  if (!gameCoverUrl.value) {
+    return
+  }
+
+  try {
+    isDownloadingCover.value = true
+    const fileName = await downloadGameCover(gameCoverUrl.value, gameForm.name || 'game')
+
+    gameForm.cover = fileName
+    showGameCover.value = getUserImageUrl(fileName)
+  } finally {
+    isDownloadingCover.value = false
+  }
 }
 
 const saveGame = async (): Promise<void> => {
@@ -166,7 +194,7 @@ const saveGame = async (): Promise<void> => {
     }
 
     if (gameForm.cover) {
-      gameForm.cover = await downloadCover(gameForm.cover, gameForm.name)
+      gameForm.cover = gameForm.cover?.trim()
     }
 
     const result = await window.api.gameApi.create({
@@ -333,45 +361,72 @@ onUnmounted(() => {
 
           <v-card-text>
             <div class="grid gap-4">
-              <div v-if="!isDefaultSelected" class="flex items-center gap-4">
-                <v-avatar rounded="0" size="96">
-                  <v-img v-if="gameForm.cover" :src="gameForm.cover" cover />
-                  <v-icon v-else size="42">mdi-image-plus</v-icon>
-                </v-avatar>
-
-                <div class="grid flex-1 gap-3">
-                  <v-text-field
-                    v-model="gameForm.cover"
-                    :label="'图片URL'"
-                    density="compact"
-                    hide-details
-                  />
-
-                  <v-text-field
-                    v-model="gameForm.cover"
-                    :label="'本地图片'"
-                    density="compact"
-                    hide-details
+              <div v-if="!isDefaultSelected">
+                <div class="flex justify-center mb-4">
+                  <v-img
+                    v-if="showGameCover"
+                    :src="showGameCover"
+                    height="180"
+                    width="240"
+                    contain
+                    class="rounded-md cursor-pointer"
+                    @click="chooseGameCover"
                   >
-                    <template #append-inner>
-                      <v-btn
-                        icon="mdi-image-outline"
-                        size="small"
-                        variant="text"
-                        @click="chooseCover"
-                      />
+                    <template #placeholder>
+                      <div class="d-flex fill-height align-center justify-center bg-grey-lighten-2">
+                        <v-progress-circular indeterminate size="20" />
+                      </div>
                     </template>
-                  </v-text-field>
+                    <template #error>
+                      <div class="d-flex fill-height align-center justify-center bg-grey-lighten-2">
+                        <v-icon size="48" class="text-grey-darken-2">mdi-alert</v-icon>
+                      </div>
+                    </template>
+                  </v-img>
+                  <div
+                    v-else
+                    class="text-center pa-4 bg-grey-lighten-2 rounded-md cursor-pointer w-60"
+                    @click="chooseGameCover"
+                  >
+                    <v-icon size="80" class="text-grey-darken-2"
+                      >mdi-panorama-variant-outline</v-icon
+                    >
+                  </div>
                 </div>
-              </div>
 
-              <div v-if="!isDefaultSelected" class="grid gap-3 md:grid-cols-2">
-                <v-text-field
-                  v-model="gameForm.name_zh_cn"
-                  :label="'游戏名称-中文'"
-                  density="compact"
-                />
-                <v-text-field v-model="gameForm.name" :label="'游戏名称-英文'" density="compact" />
+                <div class="grid gap-3 md:grid-cols-2">
+                  <v-text-field
+                    v-model="gameForm.name_zh_cn"
+                    :label="'游戏名称-中文'"
+                    density="compact"
+                  />
+                  <v-text-field
+                    v-model="gameForm.name"
+                    :label="'游戏名称-英文'"
+                    density="compact"
+                  />
+                </div>
+
+                <div class="flex gap-2">
+                  <v-text-field
+                    v-model="gameCoverUrl"
+                    label="图片链接"
+                    density="compact"
+                    class="flex-1"
+                    append-icon="mdi-paperclip"
+                    @click:append="chooseGameCover"
+                  />
+                  <v-btn variant="flat" class="mt-1" @click="downloadGameCoverImage">
+                    <v-progress-circular
+                      v-if="isDownloadingCover"
+                      indeterminate
+                      size="16"
+                      color="white"
+                      class="mr-1"
+                    />
+                    导入
+                  </v-btn>
+                </div>
               </div>
 
               <v-text-field
@@ -406,12 +461,16 @@ onUnmounted(() => {
 
       <v-dialog v-model="deleteDialog" max-width="420">
         <v-card>
-          <v-card-title>确认删除</v-card-title>
+          <v-card-title>注意</v-card-title>
 
           <v-card-text>
-            <div>确定要删除游戏</div>
-            <div class="font-medium my-2">{{ deleteTarget?.name_zh_cn || deleteTarget?.name }}</div>
-            <div class="text-body-2 opacity-70">
+            <div class="flex gap-2 items-center">
+              <div>确定要删除游戏</div>
+              <div class="font-medium my-2">
+                {{ deleteTarget?.name_zh_cn || deleteTarget?.name }}
+              </div>
+            </div>
+            <div class="text-[16px] opacity-70">
               该操作只会移除数据库记录，不会删除磁盘中的 mod 目录。
             </div>
             <v-alert v-if="deleteError" type="error" variant="tonal" density="compact">
