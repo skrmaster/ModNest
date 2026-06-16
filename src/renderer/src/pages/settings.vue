@@ -1,6 +1,6 @@
 <template>
-  <v-container fluid>
-    <v-card class="mx-auto" max-width="600">
+  <v-container fluid class="fill-height d-flex align-center justify-center">
+    <v-card class="mx-auto w-full" max-width="600">
       <v-card-title>{{ labels.title }}</v-card-title>
       <v-card-text>
         <div class="pl-0">
@@ -50,7 +50,7 @@ const themeModeOptions = computed(() => [
 ])
 
 const languageOptions = computed(() => [
-  { label: t('language.zh'), value: 'zh-CN' },
+  { label: '中文', value: 'zh-CN' },
   { label: t('language.en'), value: 'en-US' }
 ])
 

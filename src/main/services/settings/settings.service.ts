@@ -40,8 +40,13 @@ export class SettingsService extends BaseStoreService<SettingsStore> {
   }
 
   public getSystemLanguage(): SettingsStore['language'] {
-    const locale = app.getLocale().toLowerCase()
+    const language = this.get('language')
 
+    if (language) {
+      return language
+    }
+
+    const locale = app.getLocale().toLowerCase()
     return locale.startsWith('zh') ? 'zh-CN' : 'en-US'
   }
 }
