@@ -384,7 +384,6 @@ async function init(itemData?: GameItemRow, gameId?: string) {
         return e.id.toString()
       })
     secondaryCategoryId.value = data.filter((e) => e.level.toString() == gameId)
-    console.log(secondaryCategoryId.value)
 
     editData.value = itemData
   } else {

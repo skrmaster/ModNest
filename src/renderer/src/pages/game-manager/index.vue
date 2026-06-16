@@ -512,14 +512,14 @@ async function confirmDelete() {
   }
 }
 
-const STORAGE_KEY = 'layout-sizes'
-
-const sizes = ref<number[]>(JSON.parse(localStorage.getItem(STORAGE_KEY) ?? '[20,60,20]'))
+const sizes = ref<number[]>(
+  JSON.parse(localStorage.getItem(`${gameId.value}layout-sizes`) ?? '[20,60,20]')
+)
 
 function handleResize(payload: SplitpanesResizedPayload) {
   sizes.value = payload.panes.map((pane) => pane.size)
 
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(sizes.value))
+  localStorage.setItem(`${gameId.value}layout-sizes`, JSON.stringify(sizes.value))
 }
 
 onMounted(() => {})
