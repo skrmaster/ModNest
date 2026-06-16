@@ -136,5 +136,37 @@
     "name_zh_cn": "电",
     "level": 2,
     "cover": "Zenless Zone Zero/elements/Electric.svg"
+  },
+  {
+    "id": 20,
+    "name": "wind",
+    "icon": "",
+    "name_zh_cn": "风",
+    "level": 2,
+    "cover": "Zenless Zone Zero/elements/Wind.svg"
+  },
+  {
+    "id": 21,
+    "name": "frost",
+    "icon": "",
+    "name_zh_cn": "烈霜",
+    "level": 2,
+    "cover": "Zenless Zone Zero/elements/Frost.svg"
+  },
+  {
+    "id": 22,
+    "name": "auric ink",
+    "icon": "",
+    "name_zh_cn": "玄墨",
+    "level": 2,
+    "cover": "Zenless Zone Zero/elements/Auric Ink.svg"
+  },
+  {
+    "id": 23,
+    "name": "honed edge",
+    "icon": "",
+    "name_zh_cn": "凛刃",
+    "level": 2,
+    "cover": "Zenless Zone Zero/elements/Honed Edge.svg"
   }
 ]

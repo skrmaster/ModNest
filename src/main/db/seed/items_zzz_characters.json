@@ -1,85 +1,148 @@
 [
   {
-    "image": "YeShunguang.webp",
+    "image": "Norma Hollowell.png",
+    "element": "fire",
+    "name": "Norma Hollowell",
+    "zhCn": "诺姆",
+    "rarity": 5
+  },
+  {
+    "image": "Velina Airgid.png",
+    "element": "wind",
+    "name": "Velina Airgid",
+    "zhCn": "维琳娜",
+    "rarity": 5
+  },
+  {
+    "image": "Pelosi.png",
+    "element": "ether",
+    "name": "Pelosi",
+    "zhCn": "佩洛伊斯",
+    "rarity": 5
+  },
+  {
+    "image": "Starlight Billy.png",
     "element": "physical",
+    "name": "Starlight Billy",
+    "zhCn": "星徽·比利",
+    "rarity": 5
+  },
+  {
+    "image": "Promeia.png",
+    "element": "ice",
+    "name": "Promeia",
+    "zhCn": "普罗米娅",
+    "rarity": 5
+  },
+  {
+    "image": "Cissia.png",
+    "element": "electric",
+    "name": "Cissia",
+    "zhCn": "希希芙",
+    "rarity": 5
+  },
+  {
+    "image": "Nangong Yu.png",
+    "element": "ether",
+    "name": "Nangong Yu",
+    "zhCn": "南宫羽",
+    "rarity": 5
+  },
+  {
+    "image": "Aria.png",
+    "element": "ether",
+    "name": "Aria",
+    "zhCn": "爱芮",
+    "rarity": 5
+  },
+  {
+    "image": "Sunna.png",
+    "element": "physical",
+    "name": "Sunna",
+    "zhCn": "千夏",
+    "rarity": 5
+  },
+  {
+    "image": "YeShunguang.png",
+    "element": "honed edge",
     "name": "Ye Shunguang",
     "zhCn": "叶瞬光",
     "rarity": 5
   },
   {
-    "image": "Zhao.webp",
+    "image": "Zhao.png",
     "element": "ice",
     "name": "Zhao",
     "zhCn": "赵",
     "rarity": 5
   },
   {
-    "image": "Dialyn.webp",
+    "image": "Dialyn.png",
     "element": "physical",
     "name": "Dialyn",
-    "zhCn": "黛琳",
+    "zhCn": "琉音",
     "rarity": 5
   },
   {
-    "image": "Banyue.webp",
+    "image": "Banyue.png",
     "element": "fire",
     "name": "Banyue",
-    "zhCn": "半月",
+    "zhCn": "般岳",
     "rarity": 5
   },
   {
     "image": "Lucia.png",
     "element": "ether",
-    "name": "Lucia",
-    "zhCn": "露琪亚",
+    "name": "Lucia Elowen",
+    "zhCn": "卢西娅",
     "rarity": 5
   },
   {
     "image": "Yidhari.png",
     "element": "ice",
-    "name": "Yidhari",
-    "zhCn": "伊达里",
+    "name": "Yidhari Murphy",
+    "zhCn": "伊德海莉",
     "rarity": 5
   },
   {
     "image": "Manato.png",
     "element": "fire",
-    "name": "Manato",
-    "zhCn": "真人",
+    "name": "Komano Manato",
+    "zhCn": "真斗",
     "rarity": 4
   },
   {
     "image": "PanYinhu.png",
     "element": "physical",
     "name": "Pan Yinhu",
-    "zhCn": "潘寅虎",
+    "zhCn": "潘引壶",
     "rarity": 4
   },
   {
     "image": "Seed.png",
     "element": "electric",
     "name": "Seed",
-    "zhCn": "希德",
+    "zhCn": "席德",
     "rarity": 5
   },
   {
     "image": "OrphieMagnusson.png",
     "element": "fire",
-    "name": "Orphie",
-    "zhCn": "奥菲",
+    "name": "Orphie Magnusson",
+    "zhCn": "奥菲丝",
     "rarity": 5
   },
   {
     "image": "AliceThymefield.png",
     "element": "physical",
-    "name": "Alice",
-    "zhCn": "艾莉丝",
+    "name": "Alice Thymefield",
+    "zhCn": "爱丽丝",
     "rarity": 5
   },
   {
     "image": "UkinamiYuzuha.png",
     "element": "physical",
-    "name": "Yuzuha",
+    "name": "Yuzuha Ukinami",
     "zhCn": "柚叶",
     "rarity": 5
   },
@@ -87,14 +150,14 @@
     "image": "JuFufu.png",
     "element": "fire",
     "name": "Ju Fufu",
-    "zhCn": "鞠芙芙",
+    "zhCn": "橘福福",
     "rarity": 5
   },
   {
     "image": "Yixuan.png",
     "element": "ether",
     "name": "Yixuan",
-    "zhCn": "易玄",
+    "zhCn": "仪玄",
     "rarity": 5
   },
   {
@@ -105,238 +168,238 @@
     "rarity": 5
   },
   {
-    "image": "Vivian.webp",
+    "image": "Vivian.png",
     "element": "ether",
     "name": "Vivian",
     "zhCn": "薇薇安",
     "rarity": 5
   },
   {
-    "image": "SSAnby.webp",
+    "image": "SSAnby.png",
     "element": "electric",
-    "name": "Silver Soldier - Anby",
-    "zhCn": "银装安比",
+    "name": "Soldier 0 Anby",
+    "zhCn": "零号·安比",
     "rarity": 5
   },
   {
-    "image": "Trigger.webp",
+    "image": "Trigger.png",
     "element": "electric",
     "name": "Trigger",
-    "zhCn": "崔格",
+    "zhCn": "扳机",
     "rarity": 5
   },
   {
-    "image": "Lighter.webp",
+    "image": "Lighter.png",
     "element": "fire",
     "name": "Lighter",
     "zhCn": "莱特",
     "rarity": 5
   },
   {
-    "image": "Pulchra.webp",
+    "image": "Pulchra.png",
     "element": "physical",
-    "name": "Pulchra",
-    "zhCn": "普尔拉",
+    "name": "Pulchra Fellini",
+    "zhCn": "波可娜",
     "rarity": 5
   },
   {
-    "image": "Evelyn.webp",
+    "image": "Evelyn.png",
     "element": "fire",
-    "name": "Evelyn",
+    "name": "Evelyn Chevalier",
     "zhCn": "伊芙琳",
     "rarity": 5
   },
   {
-    "image": "Astra.webp",
+    "image": "Astra.png",
     "element": "ether",
-    "name": "Astra",
-    "zhCn": "艾丝翠",
+    "name": "Astra Yao",
+    "zhCn": "耀嘉音",
     "rarity": 5
   },
   {
-    "image": "Harumasa.webp",
+    "image": "Harumasa.png",
     "element": "electric",
-    "name": "Harumasa",
-    "zhCn": "晴正",
+    "name": "Asaba Harumasa",
+    "zhCn": "悠真",
     "rarity": 5
   },
   {
-    "image": "Yanagi.webp",
+    "image": "Yanagi.png",
     "element": "electric",
-    "name": "Yanagi",
+    "name": "Yanagi Tsukishiro",
     "zhCn": "柳",
     "rarity": 5
   },
   {
-    "image": "Burnice.webp",
+    "image": "Burnice.png",
     "element": "fire",
-    "name": "Burnice",
+    "name": "Burnice White",
     "zhCn": "柏妮思",
     "rarity": 5
   },
   {
-    "image": "Caesar.webp",
+    "image": "Caesar.png",
     "element": "physical",
-    "name": "Caesar",
+    "name": "Caesar King",
     "zhCn": "凯撒",
     "rarity": 5
   },
   {
-    "image": "Jane.webp",
+    "image": "Jane.png",
     "element": "physical",
-    "name": "Jane",
+    "name": "Jane Doe",
     "zhCn": "简",
     "rarity": 5
   },
   {
-    "image": "Qingyi.webp",
+    "image": "Qingyi.png",
     "element": "electric",
     "name": "Qingyi",
     "zhCn": "青衣",
     "rarity": 5
   },
   {
-    "image": "Seth.webp",
+    "image": "Seth.png",
     "element": "electric",
-    "name": "Seth",
+    "name": "Seth Lowell",
     "zhCn": "赛斯",
     "rarity": 4
   },
   {
-    "image": "Miyabi.webp",
+    "image": "Miyabi.png",
     "element": "ice",
-    "name": "Miyabi",
+    "name": "Hoshimi Miyabi",
     "zhCn": "雅",
     "rarity": 5
   },
   {
-    "image": "Belle.webp",
+    "image": "Belle.png",
     "element": "character",
     "name": "Belle",
-    "zhCn": "贝拉",
+    "zhCn": "铃",
     "rarity": 0
   },
   {
-    "image": "Wise.webp",
+    "image": "Wise.png",
     "element": "character",
     "name": "Wise",
-    "zhCn": "怀斯",
+    "zhCn": "哲",
     "rarity": 0
   },
   {
-    "image": "Rina.webp",
+    "image": "Rina.png",
     "element": "electric",
-    "name": "Rina",
+    "name": "Alexandrina Sebastiane",
     "zhCn": "丽娜",
     "rarity": 5
   },
   {
-    "image": "Ellen.webp",
+    "image": "Ellen.png",
     "element": "ice",
-    "name": "Ellen",
+    "name": "Ellen Joe",
     "zhCn": "艾莲",
     "rarity": 5
   },
   {
-    "image": "Grace.webp",
+    "image": "Grace.png",
     "element": "electric",
-    "name": "Grace",
-    "zhCn": "格蕾丝",
+    "name": "Grace Howard",
+    "zhCn": "格莉丝",
     "rarity": 5
   },
   {
-    "image": "Koleda.webp",
+    "image": "Koleda.png",
     "element": "fire",
-    "name": "Koleda",
-    "zhCn": "可琳妲",
+    "name": "Koleda Belobog",
+    "zhCn": "珂蕾妲",
     "rarity": 5
   },
   {
-    "image": "Nekomata.webp",
+    "image": "Nekomata.png",
     "element": "physical",
-    "name": "Nekomata",
+    "name": "Nekomiya Mana",
     "zhCn": "猫又",
     "rarity": 5
   },
   {
-    "image": "Soldier11.webp",
+    "image": "Soldier11.png",
     "element": "fire",
     "name": "Soldier 11",
     "zhCn": "11号",
     "rarity": 5
   },
   {
-    "image": "Lycaon.webp",
+    "image": "Lycaon.png",
     "element": "ice",
-    "name": "Lycaon",
+    "name": "Von Lycaon",
     "zhCn": "莱卡恩",
     "rarity": 5
   },
   {
-    "image": "ZhuYuan.webp",
+    "image": "ZhuYuan.png",
     "element": "ether",
     "name": "Zhu Yuan",
     "zhCn": "朱鸢",
     "rarity": 5
   },
   {
-    "image": "Anby.webp",
+    "image": "Anby.png",
     "element": "electric",
-    "name": "Anby",
+    "name": "Anby Demara",
     "zhCn": "安比",
     "rarity": 4
   },
   {
-    "image": "Anton.webp",
+    "image": "Anton.png",
     "element": "electric",
-    "name": "Anton",
+    "name": "Anton Ivanov",
     "zhCn": "安东",
     "rarity": 4
   },
   {
-    "image": "Ben.webp",
+    "image": "Ben.png",
     "element": "fire",
-    "name": "Ben",
+    "name": "Ben Bigger",
     "zhCn": "本",
     "rarity": 4
   },
   {
-    "image": "Billy.webp",
+    "image": "Billy.png",
     "element": "physical",
-    "name": "Billy",
+    "name": "Billy Kid",
     "zhCn": "比利",
     "rarity": 4
   },
   {
-    "image": "Corin.webp",
+    "image": "Corin.png",
     "element": "physical",
-    "name": "Corin",
+    "name": "Corin Wickes",
     "zhCn": "可琳",
     "rarity": 4
   },
   {
-    "image": "Lucy.webp",
+    "image": "Lucy.png",
     "element": "fire",
-    "name": "Lucy",
+    "name": "Luciana de Montefio",
     "zhCn": "露西",
     "rarity": 4
   },
   {
-    "image": "Nicole.webp",
+    "image": "Nicole.png",
     "element": "ether",
-    "name": "Nicole",
+    "name": "Nicole Demara",
     "zhCn": "妮可",
     "rarity": 4
   },
   {
-    "image": "Piper.webp",
+    "image": "Piper.png",
     "element": "physical",
-    "name": "Piper",
+    "name": "Piper Wheel",
     "zhCn": "派珀",
     "rarity": 4
   },
   {
-    "image": "Soukaku.webp",
+    "image": "Soukaku.png",
     "element": "ice",
     "name": "Soukaku",
     "zhCn": "苍角",

@@ -20,7 +20,8 @@ export function up(db: Database.Database) {
       name,
       name_zh_cn,
       cover,
-      mod_root_path
+      mod_root_path,
+      is_custom
     )
     VALUES (
       @id,
@@ -34,10 +35,7 @@ export function up(db: Database.Database) {
 
   const transaction = db.transaction(() => {
     for (const item of items) {
-      stmt.run({
-        ...item,
-        is_custom: 0
-      })
+      stmt.run(item)
     }
   })
 
