@@ -212,6 +212,49 @@ const notify = useNotify()
 const dialogRef = useTemplateRef('dialogRef')
 const tableData = ref<ModInfo[]>([])
 const selectTableRow = ref<ModInfo>()
+const showModRootDialog = ref(false)
+const modRootPath = ref('')
+const modRootError = ref('')
+const modRootSaving = ref(false)
+
+async function openModRootDialog() {
+  modRootError.value = ''
+  modRootPath.value = game.value?.mod_root_path ?? ''
+  showModRootDialog.value = true
+}
+
+async function chooseModRootPath(): Promise<void> {
+  const selectedPath = await window.api.fileApi.selectDirectory()
+  if (selectedPath) {
+    modRootPath.value = selectedPath
+  }
+}
+
+async function saveModRootPath(): Promise<void> {
+  if (!game.value) return
+
+  modRootError.value = ''
+  modRootSaving.value = true
+
+  try {
+    const nextPath = modRootPath.value.trim()
+    if (!nextPath) {
+      modRootError.value = '请先选择 Mod 根目录'
+      return
+    }
+
+    await window.api.gameApi.update(game.value.id, { mod_root_path: nextPath })
+    await window.api.itemApi.checkMod(game.value.id)
+    await gameStore.refresh()
+    game.value = gameStore.getById(game.value.id)
+    await getItems()
+    showModRootDialog.value = false
+  } catch (err: unknown) {
+    modRootError.value = err instanceof Error ? err.message : String(err)
+  } finally {
+    modRootSaving.value = false
+  }
+}
 
 function handleRowSelect(item: ModInfo) {
   selectTableRow.value = item
@@ -469,6 +512,12 @@ onUnmounted(() => {})
     <section class="h-full w-full">
       <div v-if="!selectedItem" class="flex flex-col h-full w-full">
         <div class="flex items-center gap-4 justify-between py-4 pr-3 flex-wrap">
+          <v-btn
+            icon="mdi-cog-outline"
+            variant="text"
+            title="修改Mod目录"
+            @click="openModRootDialog"
+          />
           <v-menu>
             <template #activator="{ props }">
               <v-btn v-bind="props" variant="flat" class="d-flex align-items-center">
@@ -715,6 +764,37 @@ onUnmounted(() => {})
   ></mod-uninstall>
 
   <item-form ref="itemFormRef" :game-id="gameId" @update="getItems"></item-form>
+
+  <v-dialog v-model="showModRootDialog" max-width="560">
+    <v-card>
+      <v-card-title>修改 Mod 根目录</v-card-title>
+
+      <v-card-text>
+        <div class="grid gap-4">
+          <v-text-field v-model="modRootPath" label="Mod 根目录" density="compact">
+            <template #append-inner>
+              <v-btn
+                icon="mdi-folder-open-outline"
+                size="small"
+                variant="text"
+                @click="chooseModRootPath"
+              />
+            </template>
+          </v-text-field>
+
+          <v-alert v-if="modRootError" type="error" variant="tonal" density="compact">
+            {{ modRootError }}
+          </v-alert>
+        </div>
+      </v-card-text>
+
+      <v-card-actions>
+        <v-spacer />
+        <v-btn variant="text" @click="showModRootDialog = false">取消</v-btn>
+        <v-btn color="primary" :loading="modRootSaving" @click="saveModRootPath">保存</v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
 </template>
 
 <style scoped>

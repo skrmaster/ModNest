@@ -41,6 +41,10 @@ const isExpanded = ref(true)
 const userToggled = ref(false)
 const drawer = ref(true)
 const gameDialog = ref(false)
+const deleteDialog = ref(false)
+const deleteTarget = ref<ListItem | null>(null)
+const deleteLoading = ref(false)
+const deleteError = ref('')
 const games = computed(() => gameStore.getState().items)
 const selectedGameId = ref<string>()
 const isSaving = ref(false)
@@ -49,7 +53,8 @@ const gameForm = reactive<CreateGameDto>({
   name: '',
   name_zh_cn: '',
   mod_root_path: '',
-  cover: ''
+  cover: '',
+  is_custom: 1
 })
 
 const isDefaultGame = (gameId?: string): boolean => gameId === '1' || gameId === '2'
@@ -168,7 +173,8 @@ const saveGame = async (): Promise<void> => {
       name: gameForm.name,
       name_zh_cn: gameForm.name_zh_cn,
       mod_root_path: gameForm.mod_root_path,
-      cover: gameForm.cover
+      cover: gameForm.cover,
+      is_custom: 1
     })
 
     await gameStore.refresh()
@@ -184,6 +190,38 @@ const saveGame = async (): Promise<void> => {
     formError.value = error instanceof Error ? error.message : t('games.imageDownloadFailed')
   } finally {
     isSaving.value = false
+  }
+}
+
+const openDeleteGame = (game: ListItem): void => {
+  if (isDefaultGame(game.id)) {
+    return
+  }
+
+  deleteError.value = ''
+  deleteTarget.value = game
+  deleteDialog.value = true
+}
+
+const confirmDeleteGame = async (): Promise<void> => {
+  if (!deleteTarget.value) return
+
+  deleteError.value = ''
+  deleteLoading.value = true
+
+  try {
+    await window.api.gameApi.remove(deleteTarget.value.id)
+    await gameStore.refresh()
+    deleteDialog.value = false
+    const currentGameId = router.currentRoute.value.params.gameId
+    if (currentGameId === deleteTarget.value.id) {
+      router.push({ name: 'Home' })
+    }
+    deleteTarget.value = null
+  } catch (error) {
+    deleteError.value = error instanceof Error ? error.message : String(error)
+  } finally {
+    deleteLoading.value = false
   }
 }
 
@@ -238,21 +276,30 @@ onUnmounted(() => {
           <template #prepend>
             <div
               class="flex items-center w-full"
-              :class="[isExpanded ? 'gap-3' : 'justify-center']"
+              :class="[isExpanded ? 'justify-between gap-3' : 'justify-center']"
             >
-              <v-avatar size="34" rounded="0">
-                <v-img v-if="game.cover" :src="game.cover" cover />
-                <v-icon v-else size="large">mdi-gamepad-variant</v-icon>
-              </v-avatar>
+              <div class="flex items-center gap-3 min-w-0 flex-1">
+                <v-avatar size="34" rounded="0">
+                  <v-img v-if="game.cover" :src="game.cover" cover />
+                  <v-icon v-else size="large">mdi-gamepad-variant</v-icon>
+                </v-avatar>
 
-              <transition name="fade" :duration="config.transitionDuration">
-                <div v-if="isExpanded" key="game-item" class="min-w-0 flex-1">
-                  <v-list-item-title>{{ getGameName(game) }}</v-list-item-title>
-                  <v-list-item-subtitle>
-                    {{ game.mod_root_path ? '已配置' : '未配置' }}
-                  </v-list-item-subtitle>
-                </div>
-              </transition>
+                <transition name="fade" :duration="config.transitionDuration">
+                  <div v-if="isExpanded" key="game-item" class="min-w-0">
+                    <v-list-item-title class="truncate">{{ getGameName(game) }}</v-list-item-title>
+                    <v-list-item-subtitle class="truncate">
+                      {{ game.mod_root_path ? '已配置' : '未配置' }}
+                    </v-list-item-subtitle>
+                  </div>
+                </transition>
+              </div>
+            </div>
+          </template>
+          <template #append>
+            <div v-if="isExpanded && !isDefaultGame(game.id)" class="shrink-0">
+              <v-btn icon size="small" variant="text" @click.stop="openDeleteGame(game)">
+                <v-icon icon="mdi-delete-outline" />
+              </v-btn>
             </div>
           </template>
         </v-list-item>
@@ -353,6 +400,29 @@ onUnmounted(() => {
             <v-spacer />
             <v-btn variant="text" @click="gameDialog = false"> 取消 </v-btn>
             <v-btn color="primary" :loading="isSaving" @click="saveGame"> 保存 </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+
+      <v-dialog v-model="deleteDialog" max-width="420">
+        <v-card>
+          <v-card-title>确认删除</v-card-title>
+
+          <v-card-text>
+            <div>确定要删除游戏</div>
+            <div class="font-medium my-2">{{ deleteTarget?.name_zh_cn || deleteTarget?.name }}</div>
+            <div class="text-body-2 opacity-70">
+              该操作只会移除数据库记录，不会删除磁盘中的 mod 目录。
+            </div>
+            <v-alert v-if="deleteError" type="error" variant="tonal" density="compact">
+              {{ deleteError }}
+            </v-alert>
+          </v-card-text>
+
+          <v-card-actions>
+            <v-spacer />
+            <v-btn variant="text" @click="deleteDialog = false">取消</v-btn>
+            <v-btn color="error" :loading="deleteLoading" @click="confirmDeleteGame">删除</v-btn>
           </v-card-actions>
         </v-card>
       </v-dialog>

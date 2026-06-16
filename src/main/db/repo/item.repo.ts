@@ -4,7 +4,6 @@ import { getAppImageUrl, getUserImageUrl } from '@shared/utils/url'
 import { CreateItemDto, GameItemList, UpdateItemDto } from '@shared/dto/item'
 import type Database from 'better-sqlite3'
 import { UserGame } from '@shared/entities/game'
-import { readdir } from 'fs/promises'
 import path, { join } from 'path'
 import { isDirExists } from '../../utils/file'
 import { Category } from '@shared/entities/category'
@@ -266,6 +265,50 @@ export class ItemRepo {
     return stmt.run(params)
   }
 
+  private async getItemPrimaryCategoryMap(
+    itemIds: string[]
+  ): Promise<Map<string, Category | undefined>> {
+    if (itemIds.length === 0) {
+      return new Map()
+    }
+
+    const ph = itemIds.map(() => '?').join(',')
+    const records = this.db
+      .prepare(`SELECT item_id, category_id FROM t_category_records WHERE item_id IN (${ph})`)
+      .all(...itemIds) as Array<{ item_id: string; category_id: string }>
+
+    if (records.length === 0) {
+      return new Map()
+    }
+
+    const categoryIds = [...new Set(records.map((record) => record.category_id))]
+    const categoryPh = categoryIds.map(() => '?').join(',')
+    const categories = this.db
+      .prepare(`SELECT * FROM t_game_category WHERE id IN (${categoryPh})`)
+      .all(...categoryIds) as Category[]
+
+    const categoryMap = new Map<string, Category>()
+    categories.forEach((category) => categoryMap.set(category.id, category))
+
+    const itemCategoryMap = new Map<string, Category[]>()
+    for (const record of records) {
+      const itemId = record.item_id.toString()
+      const category = categoryMap.get(record.category_id)
+      if (!category) continue
+
+      const list = itemCategoryMap.get(itemId) ?? []
+      list.push(category)
+      itemCategoryMap.set(itemId, list)
+    }
+
+    const primaryMap = new Map<string, Category | undefined>()
+    itemCategoryMap.forEach((categories, itemId) => {
+      primaryMap.set(itemId, categories.find((category) => category.level === 0) ?? categories[0])
+    })
+
+    return primaryMap
+  }
+
   async checkMod(gameId: string) {
     const row = this.db
       .prepare(
@@ -290,33 +333,39 @@ export class ItemRepo {
       )
       .all(gameId) as ItemEntity[]
 
-    for (let i = 0; i < items.length; i++) {
-      const e = items[i]
-      let enabledCount = 0
-      let modCount = 0
+    if (items.length === 0) {
+      return
+    }
 
-      const targetPath = path.join(row.mod_root_path, 'character', e.name.toLocaleLowerCase())
+    const itemIds = items.map((item) => item.id.toString())
+    const primaryCategoryMap = await this.getItemPrimaryCategoryMap(itemIds)
 
-      const res = await isDirExists(targetPath)
+    for (const item of items) {
+      const category = primaryCategoryMap.get(item.id.toString())
 
-      if (!res) {
+      if (!category) {
+        await this.update(item.id, { mod_count: 0, mod_count_enable: 0 })
         continue
       }
 
-      const entries = await readdir(targetPath, {
-        withFileTypes: true
-      })
+      const targetPath = path.join(row.mod_root_path, category.name, item.name.toLocaleLowerCase())
+      const exists = await isDirExists(targetPath)
 
-      for (const entry of entries) {
-        if (!entry.isDirectory()) continue
-        if (!entry.name.startsWith('DISABLED_')) {
-          enabledCount++
-          this.update(e.id, { mod_count_enable: enabledCount })
-        }
-        modCount++
-        this.update(e.id, { mod_count: modCount })
+      if (!exists) {
+        await this.update(item.id, { mod_count: 0, mod_count_enable: 0 })
+        continue
       }
+
+      const { total, disabled } = await ModRepository.countMod(targetPath)
+      await this.update(item.id, {
+        mod_count: total,
+        mod_count_enable: Math.max(0, total - disabled)
+      })
     }
+  }
+
+  async refreshModCount(gameId: string) {
+    return this.checkMod(gameId)
   }
 
   remove(id: string) {

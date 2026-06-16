@@ -72,6 +72,9 @@ export class GameRepository {
   }
 
   remove(id: string) {
+    const deleteItemsStmt = this.db.prepare('DELETE FROM t_game_item WHERE game_id = ?')
+    deleteItemsStmt.run(id)
+
     const stmt = this.db.prepare('DELETE FROM t_user_game WHERE id = ?')
     return stmt.run(id)
   }
