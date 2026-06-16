@@ -273,9 +273,9 @@ const uninstallRef = useTemplateRef('uninstallRef')
 const uninstallData = ref<ModInfo>()
 
 async function handleDelete(data: ModInfo) {
+  selectTableRow.value = undefined
   uninstallData.value = data
   uninstallRef.value?.openModal(data)
-  selectTableRow.value = undefined
 }
 
 async function handleDeleteMod() {
