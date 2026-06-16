@@ -28,7 +28,7 @@ import ItemForm from './components/item-form.vue'
 import formContent from './components/form-content.vue'
 import { getAppImageUrl } from '@shared/utils/url'
 import ElementsZzz from '@renderer/components/elements-zzz.vue'
-import { Splitpanes, Pane } from 'splitpanes'
+import { Splitpanes, Pane, SplitpanesResizedPayload } from 'splitpanes'
 import 'splitpanes/dist/splitpanes.css'
 import { useAppSettings } from '@renderer/composables/useAppSettings'
 import { gameGenshinElementList, gameZZZElementList } from '@shared/enums/index'
@@ -124,7 +124,17 @@ const filteredItems = computed(() => {
     result = [...result]
   }
 
-  return result
+  return result.sort((a, b) => {
+    if (a.is_custom !== b.is_custom) {
+      return b.is_custom - a.is_custom
+    }
+
+    if (a.is_custom === 1) {
+      return Number(b.id) - Number(a.id)
+    }
+
+    return Number(a.id) - Number(b.id)
+  })
 })
 
 const gameImageMap: Record<
@@ -502,6 +512,16 @@ async function confirmDelete() {
   }
 }
 
+const STORAGE_KEY = 'layout-sizes'
+
+const sizes = ref<number[]>(JSON.parse(localStorage.getItem(STORAGE_KEY) ?? '[20,60,20]'))
+
+function handleResize(payload: SplitpanesResizedPayload) {
+  sizes.value = payload.panes.map((pane) => pane.size)
+
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(sizes.value))
+}
+
 onMounted(() => {})
 
 onUnmounted(() => {})
@@ -662,8 +682,8 @@ onUnmounted(() => {})
         </div>
 
         <div class="flex-1 overflow-hidden">
-          <Splitpanes>
-            <Pane :size="20">
+          <Splitpanes @resized="handleResize">
+            <Pane :size="sizes[0]">
               <section>
                 <div class="">
                   <form-content
@@ -675,7 +695,7 @@ onUnmounted(() => {})
               </section>
             </Pane>
 
-            <Pane :size="60">
+            <Pane :size="sizes[1]">
               <section class="min-w-0 h-full overflow-auto border-x border-black/10">
                 <v-table>
                   <thead>
@@ -708,7 +728,7 @@ onUnmounted(() => {})
               </section>
             </Pane>
 
-            <Pane :size="20">
+            <Pane :size="sizes[2]">
               <section>
                 <div>
                   <div class="text-body-2 opacity-70">预览图</div>

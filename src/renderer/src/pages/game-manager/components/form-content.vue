@@ -100,12 +100,12 @@
       <com-scroll>
         <elements-genshin
           v-if="gameId == '1'"
-          :value="selectedCategoryIds"
+          :value="secondaryCategoryId"
           @select="handleCategoryAdd"
         ></elements-genshin>
         <elements-ZZZ
           v-else-if="gameId == '2'"
-          :value="selectedCategoryIds"
+          :value="secondaryCategoryId"
           @select="handleCategoryAdd"
         ></elements-ZZZ>
       </com-scroll>
@@ -141,6 +141,7 @@ import { UseMode } from '@shared/types/formContent'
 import ElementsGenshin from '@renderer/components/elements-genshin.vue'
 import ElementsZZZ from '@renderer/components/elements-zzz.vue'
 import comScroll from '@renderer/components/com-scroll.vue'
+import { Category } from '@shared/entities/category'
 
 type Prop = {
   useMode?: UseMode
@@ -216,17 +217,12 @@ const closeDialog = () => {
   emits('close')
 }
 
+const secondaryCategorySelectedId = ref()
 function handleCategoryAdd(v?: string) {
   if (!v) {
     return
   }
-  const tmp = [...new Set(selectedCategoryIds.value.concat([v]))]
-  if (tmp.length !== selectedCategoryIds.value.length) {
-    selectedCategoryIds.value.pop()
-    selectedCategoryIds.value.push(v)
-  } else {
-    selectedCategoryIds.value = tmp
-  }
+  secondaryCategorySelectedId.value = v
 }
 
 const downloadCover = async () => {
@@ -311,15 +307,17 @@ const saveItem = async (): Promise<void> => {
   }
   saveItemInfoLoading.value = true
 
-  if (editData) {
+  if (editData.value) {
     try {
       const updateData: UpdateItemDto = {
         name: itemForm.name.trim(),
         name_zh_cn: itemForm.name_zh_cn.trim(),
         cover: extractImageFileName(itemForm.cover),
-        category_ids: toRaw(selectedCategoryIds.value)
+        category_ids: toRaw([
+          ...new Set(selectedCategoryIds.value.concat([toRaw(secondaryCategorySelectedId.value)]))
+        ])
       }
-      await window.api.itemApi.update(editData.id, updateData)
+      await window.api.itemApi.update(editData.value.id, updateData)
       notify.success('更新成功')
       emits('update')
     } catch (error) {
@@ -369,7 +367,9 @@ const saveItem = async (): Promise<void> => {
 }
 
 const game_id = ref<string | undefined>()
-let editData: undefined | GameItemRow
+const editData = ref<undefined | GameItemRow>()
+const secondaryCategoryId = ref<Category[]>()
+
 async function init(itemData?: GameItemRow, gameId?: string) {
   game_id.value = gameId
   resetForm()
@@ -378,13 +378,20 @@ async function init(itemData?: GameItemRow, gameId?: string) {
     showImageCover.value = itemForm.cover || ''
     const data = await window.api.categoryApi.findCategoriesByItemId(itemData.id)
     coverUrl.value = extractImageFileName(itemData.cover) || ''
-    selectedCategoryIds.value = data.map((e) => {
-      return e.id.toString()
-    })
-    editData = itemData
+    selectedCategoryIds.value = data
+      .filter((e) => e.level === 0)
+      .map((e) => {
+        return e.id.toString()
+      })
+    secondaryCategoryId.value = data.filter((e) => e.level.toString() == gameId)
+    console.log(secondaryCategoryId.value)
+
+    editData.value = itemData
   } else {
-    editData = undefined
+    editData.value = undefined
+    console.log(secondaryCategoryId.value, 'add')
   }
+
   itemDialog.value = true
 }
 

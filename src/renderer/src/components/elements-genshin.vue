@@ -10,7 +10,7 @@
   >
     <v-tooltip v-for="(e, index) in elementList" :key="e.id" location="top" :text="getValueText(e)">
       <template #activator="{ props }">
-        <v-btn v-bind="props" class="px-0!" @click="handleSelect(e, index)">
+        <v-btn v-bind="props" ref="btnRefs" class="px-0!" @click="handleSelect(e, index)">
           <div class="w-10 h-10">
             <img :src="e.cover" />
           </div>
@@ -21,30 +21,26 @@
 </template>
 
 <script setup lang="ts">
-import { computed, nextTick, onMounted, ref, watch } from 'vue'
+import { computed, nextTick, onMounted, ref, useTemplateRef, watch } from 'vue'
 import { useAppSettings } from '@renderer/composables/useAppSettings'
 import { categoryStore } from '@renderer/stores/category-store'
 import { getAppImageUrl } from '@shared/utils/url'
 import { GameGenshinElement } from '@shared/types/item'
 import { gameGenshinElementList } from '@shared/enums'
+import { Category } from '@shared/entities/category'
+import { useResizeObserver } from '@vueuse/core'
 
 type Prop = {
-  value?: string[]
+  value?: Category[]
 }
 
 const propss = withDefaults(defineProps<Prop>(), {
   value: undefined
 })
 
-watch(
-  () => propss.value,
-  () => {
-    selected.value = propss.value
-  }
-)
-
 const gameElementList: GameGenshinElement[] = gameGenshinElementList
 
+const btnRefs = useTemplateRef('btnRefs')
 const setting = useAppSettings()
 
 const elementList = computed(() => {
@@ -61,6 +57,23 @@ const elementList = computed(() => {
 
   return tmp
 })
+
+watch(
+  () => propss.value,
+  () => {
+    let activeItem = ''
+    for (const e of propss.value || []) {
+      if (elementList.value.map((e) => e.name).includes(e.name as GameGenshinElement)) {
+        activeItem = e.name
+        break
+      }
+    }
+
+    const index = elementList.value.map((e) => e.name).findIndex((e) => e === activeItem)
+    selected.value = index
+    scrollToSelected(index)
+  }
+)
 
 const selected = ref<unknown | undefined>()
 
@@ -89,16 +102,29 @@ function handleSelect(value: (typeof elementList.value)[0], index: number): void
   }
 }
 const category = computed(() => categoryStore.getState().items)
+const relativeMap: Map<string, string> = new Map()
 
-const toggleRef = ref()
+const toggleRef = useTemplateRef('toggleRef')
 const hasHorizontalScroll = ref(false)
 
 function checkScroll() {
-  const el = toggleRef.value.$el as HTMLElement
+  const el = toggleRef.value?.$el
   if (!el) return
 
   hasHorizontalScroll.value = el.scrollWidth > el.clientWidth
 }
+async function scrollToSelected(index: number) {
+  await nextTick()
+  btnRefs.value?.[index]?.$el.scrollIntoView({
+    behavior: 'smooth',
+    block: 'nearest',
+    inline: 'center'
+  })
+}
+
+useResizeObserver(toggleRef, () => {
+  checkScroll()
+})
 
 watch(
   () => elementList,
@@ -112,6 +138,10 @@ watch(
 onMounted(async () => {
   if (!categoryStore.getState().loaded) {
     await categoryStore.load()
+    categoryStore.getState().items.forEach((e) => {
+      relativeMap.set(e.id, e.name)
+      relativeMap.set(e.name, e.id)
+    })
   }
   nextTick(checkScroll)
 })

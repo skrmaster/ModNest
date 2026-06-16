@@ -27,11 +27,12 @@ import { categoryStore } from '@renderer/stores/category-store'
 import { getAppImageUrl } from '@shared/utils/url'
 import { gameZZZElementList } from '@shared/enums'
 import { GameZZZElement } from '@shared/types/item'
+import { Category } from '@shared/entities/category'
 
 const gameElementList: GameZZZElement[] = gameZZZElementList
 
 type Prop = {
-  value?: string[]
+  value?: Category[]
 }
 
 const propss = withDefaults(defineProps<Prop>(), {
@@ -58,14 +59,16 @@ const elementList = computed(() => {
 watch(
   () => propss.value,
   () => {
-    selected.value = propss.value?.flatMap((it) => {
-      const index = elementList.value.findIndex((e) => e.id == it)
-      if (index >= 0) {
-        return index.toString()
-      } else {
-        return []
+    let activeItem = ''
+    for (const e of propss.value || []) {
+      if (gameElementList.includes(e.name as GameZZZElement)) {
+        activeItem = e.name
+        break
       }
-    })[0]
+    }
+
+    const index = gameElementList.findIndex((e) => e === activeItem)
+    selected.value = index
   }
 )
 
@@ -88,7 +91,6 @@ function getValueText(value: (typeof elementList.value)[0]): string {
 function handleSelect(value: (typeof elementList.value)[0], index: number): void {
   selected.value = selected.value === index ? undefined : index
   const categoryItem = category.value.find((e) => e.name === value.name)
-  console.log(selected.value, 'select')
 
   if (selected.value?.toString() && categoryItem) {
     emits('select', categoryItem.id)
