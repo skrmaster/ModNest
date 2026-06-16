@@ -5,10 +5,11 @@ import { CreateItemDto, GameItemList, UpdateItemDto } from '@shared/dto/item'
 import type Database from 'better-sqlite3'
 import { UserGame } from '@shared/entities/game'
 import { readdir } from 'fs/promises'
-import path from 'path'
+import path, { join } from 'path'
 import { isDirExists } from '../../utils/file'
 import { Category } from '@shared/entities/category'
 import { splitBatch } from '@shared/utils/split'
+import { ModRepository } from '../../mod/ModRepository'
 
 type List = Array<ItemEntity & { categoryDtos?: Category[] }>
 
@@ -17,7 +18,7 @@ export class ItemRepo {
     return DatabaseManager.getDb()
   }
 
-  create(data: CreateItemDto) {
+  async create(data: CreateItemDto) {
     const stmt = this.db.prepare(`
       INSERT INTO t_game_item (
         name,
@@ -40,10 +41,44 @@ export class ItemRepo {
     `)
 
     const res = stmt.run(data)
-
     if (res.changes === 0) {
       return res
     }
+
+    //#region count mod
+    const createId = res.lastInsertRowid.toString()
+    const gameId = data.game_id
+    const gameInfo = this.db
+      .prepare(
+        `
+        SELECT *
+        FROM t_user_game
+        WHERE id = ?
+      `
+      )
+      .get(gameId) as UserGame
+    let categoryInfo: Category | undefined
+    for (const category_id of data.category_ids) {
+      const tmp = this.db
+        .prepare(
+          `
+        SELECT *
+        FROM t_game_category
+        WHERE id = ?
+        `
+        )
+        .get(category_id) as Category
+      if (tmp.level === 0) {
+        categoryInfo = tmp
+      }
+    }
+
+    if (gameInfo.mod_root_path && categoryInfo?.name) {
+      const targetPath = join(gameInfo.mod_root_path, categoryInfo.name, data.name)
+      const { total, disabled } = await ModRepository.countMod(targetPath)
+      this.update(createId, { mod_count: total, mod_count_enable: total - disabled })
+    }
+    //#endregion
 
     const loopData = data.category_ids || []
     const relativeResList: Database.RunResult[] = []

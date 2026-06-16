@@ -31,6 +31,7 @@ import { getAppImageUrl } from '@shared/utils/url.js'
 import ElementsZzz from '@renderer/components/elements-zzz.vue'
 import { Splitpanes, Pane } from 'splitpanes'
 import 'splitpanes/dist/splitpanes.css'
+import { useAppSettings } from '@renderer/composables/useAppSettings'
 // import { wrapGrid } from 'animate-css-grid'
 
 type List = Array<GameItemRow & { element?: string; rarityBg?: string }>
@@ -54,6 +55,7 @@ router.beforeEach(async (to) => {
 })
 
 const route = useRoute()
+const { language } = useAppSettings()
 
 const activeSection = ref<string>('1')
 const gameId = computed(() => {
@@ -77,6 +79,10 @@ const selectedItemId = ref<string>()
 const getCategoryName = computed(() => {
   const item = category.value.find((e) => e.id == queryParams.primaryCategoryId)
   return item ? item.name : ''
+})
+
+const getActiveItemName = computed(() => {
+  return language.value === 'zh-CN' ? selectedItem.value?.name_zh_cn : selectedItem.value?.name
 })
 
 const activeItems = ref<List>()
@@ -217,6 +223,7 @@ const uninstallData = ref<ModInfo>()
 async function handleDelete(data: ModInfo) {
   uninstallData.value = data
   uninstallRef.value?.openModal(data)
+  selectTableRow.value = undefined
 }
 
 async function handleDeleteMod() {
@@ -304,6 +311,7 @@ watch(
   async (newGameId) => {
     if (!newGameId) return
     selectedItemId.value = undefined
+    selectedItem.value = undefined
     activeSection.value = '1'
     if (!gameStore.getState().loaded) {
       await gameStore.load()
@@ -400,6 +408,9 @@ async function getModList() {
     }
     const data = await window.api.modApi.list(params)
     tableData.value = data
+    if (tableData.value.length > 0) {
+      handleRowSelect(tableData.value[0])
+    }
   } catch (error) {
     console.error('获取Mod列表失败：', error)
     tableData.value = []
@@ -597,7 +608,7 @@ onUnmounted(() => {})
         <div class="flex items-center gap-3">
           <v-btn icon="mdi-arrow-left" variant="text" @click="backToItems" />
           <div>
-            <div class="text-body-2 opacity-70">{{ selectedItem.name }}</div>
+            <div class="text-body-2 opacity-70">{{ getActiveItemName }}</div>
           </div>
         </div>
 
@@ -677,7 +688,7 @@ onUnmounted(() => {})
         <strong>{{ deletingItem?.name_zh_cn }}</strong>
         吗？
         <br />
-        此操作会删除改项目下的所有mod。
+        MOD会保留在磁盘上。
       </v-card-text>
 
       <v-card-actions>

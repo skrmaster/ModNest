@@ -58,6 +58,32 @@ export class ModRepository {
     return total
   }
 
+  public static async countMod(path: string) {
+    const entries = await readdir(path, {
+      withFileTypes: true
+    })
+
+    let total = 0
+    let disabled = 0
+
+    for (const entry of entries) {
+      if (!entry.isDirectory()) {
+        continue
+      }
+
+      total++
+
+      if (entry.name.startsWith('DISABLED_')) {
+        disabled++
+      }
+    }
+
+    return {
+      total,
+      disabled
+    }
+  }
+
   private async getPreview(modPath: string): Promise<string | null> {
     const candidates = ['preview.png', 'preview.jpg', 'preview.jpeg']
 
@@ -94,8 +120,6 @@ export class ModRepository {
     categoryPathString: string[],
     overwrite = false
   ) {
-    console.log('install')
-
     const categoryPath = this.getCategoryPath(modRootPath, categoryPathString)
     const itemPath = await this.createItemFolder(categoryPath, itemName)
     const tempDir = await mkdtemp(join(itemPath, '.tmp-'))
@@ -132,10 +156,11 @@ export class ModRepository {
       }).catch(() => {})
 
       const item = new ItemRepo()
+      const { total, disabled } = await ModRepository.countMod(itemPath)
 
       item.update(itemData.id, {
-        mod_count: itemData.mod_count + 1,
-        mod_count_enable: itemData.mod_count_enable + 1
+        mod_count: total || 0,
+        mod_count_enable: Math.abs(total - disabled)
       })
     }
   }
@@ -258,9 +283,17 @@ export class ModRepository {
         await rm(targetPath, { recursive: true, force: true })
       }
 
-      itemRepo.update(itemData.id, {
-        mod_count: itemData.mod_count_enable - 1
-      })
+      if (targetPath.includes('DISABLED_')) {
+        itemRepo.update(itemData.id, {
+          mod_count: itemData.mod_count_enable - 1
+        })
+      } else {
+        itemRepo.update(itemData.id, {
+          mod_count: itemData.mod_count_enable - 1,
+          mod_count_enable: itemData.mod_count_enable - 1
+        })
+      }
+
       res = true
     } catch (err) {
       res = false
