@@ -341,7 +341,9 @@ const saveItem = async (): Promise<void> => {
     game_id: game_id.value,
     is_custom: 1,
     mod_count_enable: 0,
-    category_ids: toRaw(selectedCategoryIds.value)
+    category_ids: toRaw([
+      ...new Set(selectedCategoryIds.value.concat([toRaw(secondaryCategorySelectedId.value)]))
+    ])
   }
 
   try {
@@ -388,7 +390,6 @@ async function init(itemData?: GameItemRow, gameId?: string) {
     editData.value = itemData
   } else {
     editData.value = undefined
-    console.log(secondaryCategoryId.value, 'add')
   }
 
   itemDialog.value = true

@@ -5,7 +5,7 @@ import { CreateItemDto, GameItemList, UpdateItemDto } from '@shared/dto/item'
 import type Database from 'better-sqlite3'
 import { UserGame } from '@shared/entities/game'
 import path, { join } from 'path'
-import { isDirExists } from '../../utils/file'
+import { exists, isDirExists } from '../../utils/file'
 import { Category } from '@shared/entities/category'
 import { splitBatch } from '@shared/utils/split'
 import { ModRepository } from '../../mod/ModRepository'
@@ -74,8 +74,11 @@ export class ItemRepo {
 
     if (gameInfo.mod_root_path && categoryInfo?.name) {
       const targetPath = join(gameInfo.mod_root_path, categoryInfo.name, data.name)
-      const { total, disabled } = await ModRepository.countMod(targetPath)
-      this.update(createId, { mod_count: total, mod_count_enable: total - disabled })
+
+      if (await exists(targetPath)) {
+        const { total, disabled } = await ModRepository.countMod(targetPath)
+        this.update(createId, { mod_count: total, mod_count_enable: total - disabled })
+      }
     }
     //#endregion
 
