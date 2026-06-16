@@ -120,8 +120,7 @@ const filteredItems = computed(() => {
       const countB = b.mod_count ?? 0
       return countB - countA
     })
-  } else {
-    result = [...result]
+    return result
   }
 
   return result.sort((a, b) => {
