@@ -4,10 +4,13 @@ import fs from 'fs/promises'
 import path from 'path'
 import { existsSync } from 'fs'
 import { ModInstallPreview } from '@shared/types/mod'
+import { spawn } from 'child_process'
+import os from 'os'
+import { MOD_IMAGE_PROTOCOL, MOD_PREVIEW_TMP } from '@shared/constants'
 
 const { extractFull, list } = Seven
 
-export function extract(archivePath: string, targetDir: string): Promise<void> {
+export function extractAll(archivePath: string, targetDir: string): Promise<void> {
   return new Promise((resolve, reject) => {
     const stream = extractFull(archivePath, targetDir, {
       $bin: path7za
@@ -16,6 +19,51 @@ export function extract(archivePath: string, targetDir: string): Promise<void> {
     stream.on('end', () => resolve())
 
     stream.on('error', (error) => reject(error))
+  })
+}
+
+export async function getArchiveFiles(archivePath: string): Promise<string[]> {
+  return new Promise((resolve, reject) => {
+    const files: string[] = []
+
+    const stream = list(archivePath, {
+      $bin: path7za
+    })
+
+    stream.on('data', (data) => {
+      if (data.file) {
+        files.push(data.file.toLowerCase())
+      }
+    })
+
+    stream.on('end', () => {
+      resolve(files)
+    })
+
+    stream.on('error', reject)
+  })
+}
+
+export async function extractPreviewImage(
+  archivePath: string,
+  previewPathInArchive: string
+): Promise<string> {
+  const tempDir = path.join(os.tmpdir(), MOD_PREVIEW_TMP, crypto.randomUUID())
+
+  await fs.mkdir(tempDir, { recursive: true })
+
+  return new Promise((resolve, reject) => {
+    const child = spawn(path7za, ['e', archivePath, previewPathInArchive, `-o${tempDir}`, '-y'])
+
+    child.on('error', reject)
+
+    child.on('exit', (code) => {
+      if (code === 0) {
+        resolve(path.join(tempDir, path.basename(previewPathInArchive)))
+      } else {
+        reject(new Error(`7za exited with code ${code}`))
+      }
+    })
   })
 }
 
@@ -34,26 +82,25 @@ export async function inspectArchive(
 
   const archiveStat = await fs.stat(archivePath)
   const createdAt = archiveStat.birthtime.toISOString()
+  console.log(createdAt)
 
   let previewImage: string | undefined
   const previewImageNames = ['preview.png', 'preview.jpg', 'preview.jpeg', 'preview.webp']
 
   try {
-    const archiveFiles: string[] = []
-    for await (const file of list(archivePath, { recursive: false })) {
-      if (file.type === 'file') {
-        archiveFiles.push(file.name.toLowerCase())
-      }
-    }
+    const archiveFiles = await getArchiveFiles(archivePath)
 
-    const matchedPreview = previewImageNames.find((name) =>
-      archiveFiles.includes(name.toLowerCase())
+    const matchedPreview = archiveFiles.find((file) =>
+      previewImageNames.some((preview) => file.endsWith(preview.toLowerCase()))
     )
+
     if (matchedPreview) {
-      previewImage = matchedPreview
+      const previewImagePath = await extractPreviewImage(archivePath, matchedPreview)
+
+      previewImage = `${MOD_IMAGE_PROTOCOL}:///` + encodeURI(previewImagePath.replaceAll('\\', '/'))
     }
   } catch (error) {
-    console.error('解析压缩包文件列表失败:', error)
+    console.error(error)
   }
 
   return {

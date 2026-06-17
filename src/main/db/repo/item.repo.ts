@@ -347,7 +347,7 @@ export class ItemRepo {
       const category = primaryCategoryMap.get(item.id.toString())
 
       if (!category) {
-        await this.update(item.id, { mod_count: 0, mod_count_enable: 0 })
+        this.update(item.id, { mod_count: 0, mod_count_enable: 0 })
         continue
       }
 
@@ -355,12 +355,12 @@ export class ItemRepo {
       const exists = await isDirExists(targetPath)
 
       if (!exists) {
-        await this.update(item.id, { mod_count: 0, mod_count_enable: 0 })
+        this.update(item.id, { mod_count: 0, mod_count_enable: 0 })
         continue
       }
 
       const { total, disabled } = await ModRepository.countMod(targetPath)
-      await this.update(item.id, {
+      this.update(item.id, {
         mod_count: total,
         mod_count_enable: Math.max(0, total - disabled)
       })

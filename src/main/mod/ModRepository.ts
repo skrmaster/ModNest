@@ -3,7 +3,7 @@ import { mkdir, readdir, rename, mkdtemp, stat, rm } from 'node:fs/promises'
 import { access } from 'node:fs/promises'
 import { ModInfo, ModInstallPreview } from '@shared/types/mod'
 import { basename, extname } from 'node:path'
-import { extract, inspectArchive } from '../utils/zip'
+import { extractAll, inspectArchive } from '../utils/zip'
 import { ensureOverwrite, exists } from '../utils/file'
 import { existsSync } from 'node:fs'
 import { ItemRepo } from '../db/repo/item.repo'
@@ -35,7 +35,7 @@ export class ModRepository {
   private async getModifiedAt(modPath: string): Promise<Date> {
     const stats = await stat(modPath)
 
-    return stats.mtime
+    return stats.birthtime
   }
 
   private async getDirectorySize(dir: string): Promise<number> {
@@ -116,6 +116,7 @@ export class ModRepository {
     itemData: ItemEntity,
     modRootPath: string,
     itemName: string,
+    modName: string,
     archivePath: string,
     categoryPathString: string[],
     overwrite = false
@@ -125,21 +126,21 @@ export class ModRepository {
     const tempDir = await mkdtemp(join(itemPath, '.tmp-'))
 
     try {
-      await extract(archivePath, tempDir)
+      await extractAll(archivePath, tempDir)
 
       const entries = await readdir(tempDir, {
         withFileTypes: true
       })
 
       let sourcePath: string
-      let modName: string
+      let dirName: string
 
       if (entries.length === 1 && entries[0].isDirectory()) {
-        modName = entries[0].name
+        dirName = entries[0].name
 
-        sourcePath = join(tempDir, modName)
+        sourcePath = join(tempDir, dirName)
       } else {
-        modName = basename(archivePath, extname(archivePath))
+        dirName = basename(archivePath, extname(archivePath))
 
         sourcePath = tempDir
       }
@@ -155,13 +156,15 @@ export class ModRepository {
         force: true
       }).catch(() => {})
 
-      const item = new ItemRepo()
-      const { total, disabled } = await ModRepository.countMod(itemPath)
+      if (!overwrite) {
+        const item = new ItemRepo()
+        const { total, disabled } = await ModRepository.countMod(itemPath)
 
-      item.update(itemData.id, {
-        mod_count: total || 0,
-        mod_count_enable: Math.abs(total - disabled)
-      })
+        item.update(itemData.id, {
+          mod_count: total || 0,
+          mod_count_enable: Math.abs(total - disabled)
+        })
+      }
     }
   }
 
@@ -225,9 +228,11 @@ export class ModRepository {
 
     await rename(join(itemPath, `DISABLED_${modName}`), join(itemPath, modName))
 
-    const item = new ItemRepo()
-    item.update(itemData.id, {
-      mod_count_enable: itemData.mod_count_enable + 1
+    const itemRepo = new ItemRepo()
+    const { total, disabled } = await ModRepository.countMod(itemPath)
+    itemRepo.update(itemData.id, {
+      mod_count: total,
+      mod_count_enable: Math.max(0, total - disabled)
     })
   }
 
@@ -242,10 +247,12 @@ export class ModRepository {
     const itemPath = await this.createItemFolder(categoryPath, itemName)
 
     await rename(join(itemPath, modName), join(itemPath, `DISABLED_${modName}`))
-    const item = new ItemRepo()
 
-    item.update(itemData.id, {
-      mod_count_enable: itemData.mod_count_enable - 1
+    const itemRepo = new ItemRepo()
+    const { total, disabled } = await ModRepository.countMod(itemPath)
+    itemRepo.update(itemData.id, {
+      mod_count: total,
+      mod_count_enable: Math.max(0, total - disabled)
     })
   }
 
@@ -283,16 +290,11 @@ export class ModRepository {
         await rm(targetPath, { recursive: true, force: true })
       }
 
-      if (targetPath.includes('DISABLED_')) {
-        itemRepo.update(itemData.id, {
-          mod_count: itemData.mod_count_enable - 1
-        })
-      } else {
-        itemRepo.update(itemData.id, {
-          mod_count: itemData.mod_count_enable - 1,
-          mod_count_enable: itemData.mod_count_enable - 1
-        })
-      }
+      const { total, disabled } = await ModRepository.countMod(itemPath)
+      itemRepo.update(itemData.id, {
+        mod_count: total,
+        mod_count_enable: Math.max(0, total - disabled)
+      })
 
       res = true
     } catch (err) {

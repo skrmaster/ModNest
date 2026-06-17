@@ -20,3 +20,20 @@ export const gameZZZElementList: GameZZZElement[] = [
   'honed edge',
   'wind'
 ]
+
+export const gameImageMap: Record<
+  string,
+  {
+    elementList: string[]
+    rarityList: string[]
+  }
+> = {
+  1: {
+    elementList: gameGenshinElementList,
+    rarityList: ['rarity3', 'rarity4', 'rarity5']
+  },
+  2: {
+    elementList: gameZZZElementList,
+    rarityList: ['rarity3', 'rarity4', 'rarity5']
+  }
+}

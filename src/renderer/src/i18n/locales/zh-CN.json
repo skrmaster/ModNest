@@ -81,7 +81,7 @@
     },
     "searchPlaceholder": "请输入搜索名称",
     "preview": "预览图",
-    "noPreview": "暂无预览",
+    "noPreview": "暂未检测到预览图",
     "modifyModDir": "修改 Mod 目录",
     "modifyModDirTitle": "修改 Mod 根目录",
     "modRootLabel": "Mod 根目录",
@@ -151,6 +151,8 @@
     "deleteSuccess": "删除成功",
     "deleteFailed": "删除失败：{err}",
     "updateSuccess": "更新成功",
-    "addFailed": "添加失败"
+    "addFailed": "添加失败",
+    "allInstall": "全部安装",
+    "allCoverInstall": "全部覆盖安装"
   }
 }

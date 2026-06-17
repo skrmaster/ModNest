@@ -77,7 +77,7 @@
     },
     "searchPlaceholder": "Enter name to search",
     "preview": "Preview",
-    "noPreview": "No preview",
+    "noPreview": "No preview images were detected.",
     "modifyModDir": "Modify Mod directory",
     "modifyModDirTitle": "Modify Mod root directory",
     "modRootLabel": "Mod root",
@@ -145,6 +145,8 @@
     "save": "Save",
     "close": "Close",
     "deleteSuccess": "Deleted successfully",
-    "deleteFailed": "Delete failed: {err}"
+    "deleteFailed": "Delete failed: {err}",
+    "allInstall": "Install all",
+    "allCoverInstall": "Full coverage installation"
   }
 }

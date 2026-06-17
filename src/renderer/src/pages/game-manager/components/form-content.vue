@@ -146,6 +146,7 @@ import ElementsGenshin from '@renderer/components/elements-genshin.vue'
 import ElementsZZZ from '@renderer/components/elements-zzz.vue'
 import comScroll from '@renderer/components/com-scroll.vue'
 import { Category } from '@shared/entities/category'
+import { gameImageMap } from '@shared/enums'
 
 type Prop = {
   useMode?: UseMode
@@ -310,6 +311,9 @@ const saveItem = async (): Promise<void> => {
     return
   }
   saveItemInfoLoading.value = true
+  const category_ids = toRaw([
+    ...new Set(selectedCategoryIds.value.concat([toRaw(secondaryCategorySelectedId.value)]))
+  ]).filter(Boolean)
 
   if (editData.value) {
     try {
@@ -317,10 +321,10 @@ const saveItem = async (): Promise<void> => {
         name: itemForm.name.trim(),
         name_zh_cn: itemForm.name_zh_cn.trim(),
         cover: extractImageFileName(itemForm.cover),
-        category_ids: toRaw([
-          ...new Set(selectedCategoryIds.value.concat([toRaw(secondaryCategorySelectedId.value)]))
-        ])
+        category_ids
       }
+      console.log(updateData)
+
       await window.api.itemApi.update(editData.value.id, updateData)
       notify.success(t('common.updateSuccess'))
       emits('update')
@@ -345,9 +349,7 @@ const saveItem = async (): Promise<void> => {
     game_id: game_id.value,
     is_custom: 1,
     mod_count_enable: 0,
-    category_ids: toRaw([
-      ...new Set(selectedCategoryIds.value.concat([toRaw(secondaryCategorySelectedId.value)]))
-    ])
+    category_ids
   }
 
   try {
@@ -375,6 +377,13 @@ const saveItem = async (): Promise<void> => {
 const game_id = ref<string | undefined>()
 const editData = ref<undefined | GameItemRow>()
 const secondaryCategoryId = ref<Category[]>()
+const gameElementList = computed(() => {
+  if (!game_id.value) {
+    return []
+  }
+
+  return gameImageMap[game_id.value]?.elementList || []
+})
 
 async function init(itemData?: GameItemRow, gameId?: string) {
   game_id.value = gameId
@@ -389,8 +398,8 @@ async function init(itemData?: GameItemRow, gameId?: string) {
       .map((e) => {
         return e.id.toString()
       })
-    secondaryCategoryId.value = data.filter((e) => e.level.toString() == gameId)
-
+    secondaryCategoryId.value = data.filter((e) => gameElementList.value.includes(e.name))
+    secondaryCategorySelectedId.value = secondaryCategoryId.value[0].id
     editData.value = itemData
   } else {
     editData.value = undefined

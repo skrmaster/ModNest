@@ -10,6 +10,7 @@ export function registerModIpc(): void {
       payload.itemData,
       payload.modRootPath,
       payload.itemName,
+      payload.modName,
       payload.archivePath,
       payload.categoryPathString
     )

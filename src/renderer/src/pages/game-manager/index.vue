@@ -19,7 +19,7 @@ import type { ItemDto, GameItemRow } from '@shared/dto/item'
 import { GameGenshinElement, QueryParams } from '@shared/types/item'
 import { UserGame } from '@shared/entities/game'
 import modInspect from './components/mod-inspect.vue'
-import { ListQuery, ModInfo, ModOpt, ModPreviewData } from '@shared/types/mod'
+import { ListQuery, ModInfo, ModInstallPreview, ModOpt, ModPreviewData } from '@shared/types/mod'
 import dayjs from 'dayjs'
 import { useNotify } from '@renderer/composables/useNotify'
 import modUninstall from './components/mod-uninstall.vue'
@@ -32,10 +32,11 @@ import { Splitpanes, Pane, SplitpanesResizedPayload } from 'splitpanes'
 import 'splitpanes/dist/splitpanes.css'
 import { useAppSettings } from '@renderer/composables/useAppSettings'
 import { useI18n } from 'vue-i18n'
-import { gameGenshinElementList, gameZZZElementList } from '@shared/enums/index'
+import { gameImageMap } from '@shared/enums/index'
 // import { wrapGrid } from 'animate-css-grid'
 
 type List = Array<GameItemRow & { element?: string; rarityBg?: string }>
+type TableData = ModInfo & { isChoose: boolean }
 
 const router = useRouter()
 router.beforeEach(async (to) => {
@@ -111,7 +112,6 @@ const options = computed(() => [
 ])
 
 const SORT_TYPE_KEY_PREFIX = 'game-manager-sort-type-'
-
 const sortType = ref<string>('default')
 
 const selectedText = computed(() => {
@@ -171,22 +171,6 @@ const filteredItems = computed(() => {
   })
 })
 
-const gameImageMap: Record<
-  string,
-  {
-    elementList: string[]
-    rarityList: string[]
-  }
-> = {
-  1: {
-    elementList: gameGenshinElementList,
-    rarityList: ['rarity3', 'rarity4', 'rarity5']
-  },
-  2: {
-    elementList: gameZZZElementList,
-    rarityList: ['rarity3', 'rarity4', 'rarity5']
-  }
-}
 const gameElementList = computed(() => {
   if (!game.value?.id) {
     return []
@@ -238,6 +222,7 @@ async function getItems() {
 const formContentRef = useTemplateRef('formContentRef')
 async function handleDetail(item: GameItemRow) {
   selectedItem.value = item
+  selectTableRow.value = undefined
   await nextTick()
   formContentRef.value?.init(item, game.value?.id)
   getModList()
@@ -254,12 +239,20 @@ function handleEditItem(item: GameItemRow) {
 
 const notify = useNotify()
 const dialogRef = useTemplateRef('dialogRef')
-const tableData = ref<ModInfo[]>([])
+const tableData = ref<TableData[]>([])
 const selectTableRow = ref<ModInfo>()
 const showModRootDialog = ref(false)
 const modRootPath = ref('')
 const modRootError = ref('')
 const modRootSaving = ref(false)
+
+const isEnableMutipleMod = computed(() => {
+  return (
+    tableData.value?.reduce((a, b) => {
+      return a + +b.enabled
+    }, 0) > 1
+  )
+})
 
 async function openModRootDialog() {
   modRootError.value = ''
@@ -305,81 +298,31 @@ function handleRowSelect(item: ModInfo) {
 }
 
 const uninstallRef = useTemplateRef('uninstallRef')
-const uninstallData = ref<ModInfo>()
 
-async function handleDelete(data: ModInfo) {
-  selectTableRow.value = undefined
-  uninstallData.value = data
-  uninstallRef.value?.openModal(data)
-}
-
-async function handleDeleteMod() {
-  if (
-    !game.value ||
-    !game.value?.mod_root_path ||
-    !selectedItem.value ||
-    !uninstallData.value?.name
-  ) {
-    return
-  }
-  const res = await window.api.modApi.uninstall({
-    itemData: toRaw(selectedItem.value),
-    modRootPath: game.value.mod_root_path,
-    itemName: selectedItem.value.name,
-    modName: uninstallData.value.name,
-    categoryPathString: [getCategoryName.value],
-    toTrash: false
-  })
-
-  if (res[0]) {
-    uninstallRef.value?.closeModal()
-  } else {
-    uninstallRef.value?.setError(res[1])
-  }
-  getModList()
-}
-
-async function handleMoveRecycle() {
-  if (
-    !game.value ||
-    !game.value?.mod_root_path ||
-    !selectedItem.value ||
-    !uninstallData.value?.name
-  ) {
-    return
-  }
-  const res = await window.api.modApi.uninstall({
-    itemData: toRaw(selectedItem.value),
-    modRootPath: game.value.mod_root_path,
-    itemName: selectedItem.value.name,
-    modName: uninstallData.value.name,
-    categoryPathString: [getCategoryName.value],
-    toTrash: true
-  })
-
-  if (res[0]) {
-    uninstallRef.value?.closeModal()
-  } else {
-    uninstallRef.value?.setError(res[1])
-  }
-  getModList()
+function handleModDelCannel() {
+  prevDeleteItem.value = []
 }
 
 async function handleModInstall(event: DragEvent) {
+  event.preventDefault()
   event.stopPropagation()
   const files = event.dataTransfer?.files
   if (!files?.length || !game.value) return
+  const res: ModInstallPreview[] = []
 
-  const archivePath = window.api.fileApi.getPathForFile(files[0])
-  if (game.value.mod_root_path && selectedItem.value?.name) {
-    const items = await window.api.modApi.inspectArchive({
-      archivePath: archivePath,
-      category: toRaw(getCategoryName.value),
-      itemName: selectedItem.value.name,
-      modsRoot: game.value.mod_root_path
-    })
-    dialogRef.value?.openModal(items)
+  for await (const file of files) {
+    const archivePath = window.api.fileApi.getPathForFile(file)
+    if (game.value.mod_root_path && selectedItem.value?.name) {
+      const items = (await window.api.modApi.inspectArchive({
+        archivePath: archivePath,
+        category: toRaw(getCategoryName.value),
+        itemName: selectedItem.value.name,
+        modsRoot: game.value.mod_root_path
+      })) as ModInstallPreview
+      res.push(items)
+    }
   }
+  dialogRef.value?.openModal(res)
 }
 
 const backToItems = (): void => {
@@ -447,22 +390,29 @@ const onCancel = () => {
   console.log('User canceled')
 }
 
-const onInstall = async (form: Partial<ModPreviewData>, data: ModPreviewData) => {
-  if (!game.value || !game.value?.mod_root_path || !form.modName || !selectedItem.value) {
-    return
+const tableLoading = ref(false)
+const onInstall = async (data?: ModPreviewData[]) => {
+  tableLoading.value = true
+  for await (const item of data || []) {
+    if (!game.value || !game.value?.mod_root_path || !item.modName || !selectedItem.value) {
+      continue
+    }
+    await window.api.modApi.install({
+      itemData: toRaw(selectedItem.value),
+      modRootPath: game.value?.mod_root_path,
+      itemName: item.itemName,
+      modName: item.modName,
+      categoryPathString: [getCategoryName.value],
+      archivePath: item.archivePath
+    })
   }
-  await window.api.modApi.install({
-    itemData: toRaw(selectedItem.value),
-    modRootPath: game.value?.mod_root_path,
-    itemName: data.itemName,
-    categoryPathString: [getCategoryName.value],
-    archivePath: data.archivePath
-  })
+  tableLoading.value = false
+
   getModList()
 }
 
-const onOverrideInstall = (form) => {
-  console.log('Performing overwrite install:', form)
+const onOverrideInstall = (data?: ModPreviewData[]) => {
+  console.log('Performing overwrite install:', data)
   getModList()
 }
 
@@ -481,6 +431,37 @@ async function handleModEnabled(_: unknown, data: ModInfo) {
   getModList()
 }
 
+const chooseMap: Map<string, boolean> = reactive(new Map())
+const chooseAll = ref(false)
+const indeterminate = computed(() => {
+  return chooseMap.size > 0 && chooseMap.size < tableData.value.length
+})
+
+function handleChooseAll() {
+  tableData.value.forEach((e) => {
+    chooseMap.set(e.name, chooseAll.value)
+    e.isChoose = chooseAll.value
+  })
+
+  if (!chooseAll.value) {
+    chooseMap.clear()
+  }
+}
+
+function handleChoose(item: TableData) {
+  if (item.isChoose) {
+    chooseMap.set(item.name, item.isChoose)
+  } else {
+    chooseMap.delete(item.name)
+  }
+
+  if (chooseMap.size === tableData.value.length) {
+    chooseAll.value = true
+  } else if (chooseMap.size === 0) {
+    chooseAll.value = false
+  }
+}
+
 async function getModList() {
   if (isGettingModList.value) return
   isGettingModList.value = true
@@ -494,9 +475,19 @@ async function getModList() {
       itemName: selectedItem.value.name,
       categoryPathString: [getCategoryName.value]
     }
-    const data = await window.api.modApi.list(params)
+    const data = (await window.api.modApi.list(params)) as ModInfo[]
+
     tableData.value = data
-    if (tableData.value.length > 0) {
+      .map((e) => {
+        return {
+          ...e,
+          isChoose: chooseMap.get(e.name) || false
+        }
+      })
+      .sort((a, b) => {
+        return +new Date(b.modifiedAt) - +new Date(a.modifiedAt)
+      })
+    if (tableData.value.length > 0 && !selectTableRow.value) {
       handleRowSelect(tableData.value[0])
     }
   } catch (error) {
@@ -504,6 +495,67 @@ async function getModList() {
     tableData.value = []
   } finally {
     isGettingModList.value = false
+  }
+}
+
+async function handleRemoveAllMod() {
+  if (chooseMap.size === 0) {
+    return notify.warning('请先选择需要卸载的MOD')
+  }
+  if (!game.value || !game.value?.mod_root_path || !selectedItem.value) {
+    return
+  }
+
+  const choosedList = tableData.value?.flatMap((e) => {
+    if (chooseMap.get(e.name)) {
+      return e
+    } else {
+      return []
+    }
+  })
+
+  prevDeleteItem.value = choosedList
+
+  uninstallRef.value?.openModal(prevDeleteItem.value)
+}
+
+const prevDeleteItem = ref<TableData[]>([])
+const deleteNameStr = ref('')
+async function handleUninstallMod(item: TableData) {
+  deleteNameStr.value = item.name
+
+  prevDeleteItem.value.push(item)
+
+  uninstallRef.value?.openModal(prevDeleteItem.value)
+}
+
+async function handleConfirmUninstallMod(toTrash = false) {
+  if (!game.value || !game.value?.mod_root_path || !selectedItem.value) {
+    return
+  }
+
+  const errorstr: string[] = []
+
+  for await (const item of prevDeleteItem.value || []) {
+    const res = await window.api.modApi.uninstall({
+      itemData: toRaw(selectedItem.value),
+      modRootPath: game.value.mod_root_path,
+      itemName: selectedItem.value.name,
+      modName: item.name,
+      categoryPathString: [getCategoryName.value],
+      toTrash
+    })
+
+    if (!res[0]) {
+      errorstr.push(res[1])
+    }
+  }
+
+  if (errorstr.length === 0) {
+    prevDeleteItem.value = []
+    getModList()
+  } else {
+    uninstallRef.value?.setError(errorstr.join(','))
   }
 }
 
@@ -651,7 +703,7 @@ onUnmounted(() => {})
                     </div>
                     <div
                       v-if="item.mod_count"
-                      class="absolute right-4 bottom-0 border-b-2 border-solid border-blue-500"
+                      class="absolute right-4 bottom-0 border-b-4 border-solid border-blue-500 text-[18px] font-bold"
                     >
                       <span>{{ item.mod_count_enable }}/</span>
                       <span>{{ item.mod_count }}</span>
@@ -733,43 +785,92 @@ onUnmounted(() => {})
             </Pane>
 
             <Pane :size="sizes[1]">
-              <section class="min-w-0 h-full overflow-auto border-x border-black/10">
+              <section
+                class="min-w-0 h-full overflow-auto border-x border-black/10 relative pb-15 transition-all duration-200"
+              >
+                <v-alert
+                  v-show="isEnableMutipleMod"
+                  text="请注意,启用了多个MOD,可能会有冲突"
+                  type="warning"
+                  variant="tonal"
+                  closable
+                ></v-alert>
                 <v-table>
                   <thead>
                     <tr>
+                      <th>
+                        <v-checkbox-btn
+                          v-model="chooseAll"
+                          color="primary"
+                          :indeterminate="indeterminate"
+                          @change="handleChooseAll"
+                        ></v-checkbox-btn>
+                      </th>
                       <th class="text-left">{{ t('gameManager.enabled') }}</th>
                       <th class="text-left">{{ t('gameManager.modName') }}</th>
                       <th class="text-left">{{ t('gameManager.addedAt') }}</th>
+                      <th></th>
                     </tr>
                   </thead>
                   <tbody>
                     <tr
                       v-for="item in tableData"
                       :key="item.name"
-                      :class="[{ 'bg-blue-200': selectTableRow?.name === item.name }]"
+                      :class="[{ 'select-row-color': selectTableRow?.name === item.name }]"
                       tabindex="0"
                       @click.stop="handleRowSelect(item)"
-                      @keydown.delete="handleDelete(item)"
                     >
-                      <td>
+                      <td @click.stop="() => {}">
                         <v-checkbox-btn
-                          v-model="item.enabled"
-                          @change.stop="handleModEnabled($event, item)"
+                          v-model="item.isChoose"
+                          color="primary"
+                          @change="handleChoose(item)"
                         ></v-checkbox-btn>
+                      </td>
+                      <td>
+                        <div class="w-full h-full flex items-center" @click.stop="() => {}">
+                          <v-switch
+                            v-model="item.enabled"
+                            color="primary"
+                            hide-details
+                            true-icon="mdi-check"
+                            false-icon="mdi-close"
+                            @change.stop="handleModEnabled($event, item)"
+                          ></v-switch>
+                        </div>
                       </td>
                       <td>{{ getItemDisplayName(item) }}</td>
                       <td>{{ dayjs(item.modifiedAt).format('YYYY-MM-DD HH:mm:ss') }}</td>
+                      <td>
+                        <div @click.stop="() => {}">
+                          <v-btn
+                            variant="plain"
+                            icon="mdi-delete-outline"
+                            @click="handleUninstallMod(item)"
+                          ></v-btn>
+                        </div>
+                      </td>
                     </tr>
                   </tbody>
                 </v-table>
+                <v-overlay
+                  :model-value="tableLoading"
+                  contained
+                  class="align-center justify-center"
+                >
+                  <v-progress-circular indeterminate size="64" />
+                </v-overlay>
+                <div class="absolute bottom-5 right-2">
+                  <v-btn color="red" @click="handleRemoveAllMod">批量删除</v-btn>
+                </div>
               </section>
             </Pane>
 
             <Pane :size="sizes[2]">
-              <section>
+              <section class="pr-4 pl-2">
                 <div>
                   <div class="text-body-2 opacity-70">{{ t('gameManager.preview') }}</div>
-                  <div v-if="selectTableRow?.cover" class="px-4">
+                  <div v-if="selectTableRow?.cover">
                     <v-img :src="selectTableRow?.cover" cover />
                   </div>
                   <div v-else>
@@ -809,21 +910,6 @@ onUnmounted(() => {})
     </v-card>
   </v-dialog>
 
-  <mod-inspect
-    ref="dialogRef"
-    @cancel="onCancel"
-    @install="onInstall"
-    @override-install="onOverrideInstall"
-  />
-
-  <mod-uninstall
-    ref="uninstallRef"
-    @delete="handleDeleteMod"
-    @recycle="handleMoveRecycle"
-  ></mod-uninstall>
-
-  <item-form ref="itemFormRef" :game-id="gameId" @update="getItems"></item-form>
-
   <v-dialog v-model="showModRootDialog" max-width="560">
     <v-card>
       <v-card-title>{{ t('gameManager.modifyModDirTitle') }}</v-card-title>
@@ -860,6 +946,24 @@ onUnmounted(() => {})
       </v-card-actions>
     </v-card>
   </v-dialog>
+
+  <mod-inspect
+    ref="dialogRef"
+    @cancel="onCancel"
+    @install="onInstall"
+    @install-all="onInstall"
+    @override-install-all="onOverrideInstall"
+    @override-install="onOverrideInstall"
+  />
+
+  <mod-uninstall
+    ref="uninstallRef"
+    @delete="handleConfirmUninstallMod"
+    @recycle="handleConfirmUninstallMod(true)"
+    @cannel="handleModDelCannel"
+  ></mod-uninstall>
+
+  <item-form ref="itemFormRef" :game-id="gameId" @update="getItems"></item-form>
 </template>
 
 <style scoped>
@@ -881,5 +985,14 @@ onUnmounted(() => {})
   opacity: 0.5;
 
   font-size: 14px;
+}
+
+.select-row-color {
+  transition: all 0.2s ease-in;
+  background-color: var(--color-blue-300);
+}
+
+.v-theme--dark .select-row-color {
+  background-color: var(--color-blue-600);
 }
 </style>

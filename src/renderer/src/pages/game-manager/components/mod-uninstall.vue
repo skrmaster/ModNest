@@ -7,7 +7,7 @@
   >
     <v-card>
       <v-card-title class="text-h5 font-medium d-flex align-center justify-between">
-        {{ t('gameManager.uninstall.title', { name: modName }) }}
+        {{ t('gameManager.uninstall.title') }}MOD
         <v-btn
           icon="mdi-close"
           variant="text"
@@ -18,6 +18,10 @@
       </v-card-title>
 
       <v-card-text class="py-4">
+        <v-alert class="mb-4" color="info">
+          请注意,这些MOD:<br />
+          {{ modName }}<br />将会被卸载
+        </v-alert>
         <v-alert
           v-if="errorMessage"
           type="error"
@@ -30,25 +34,33 @@
         </v-alert>
 
         <v-radio-group v-model="uninstallType" class="pt-1" :disabled="isLoading">
-          <div class="mb-3 pa-3 border rounded">
+          <div
+            class="mb-3 pa-3 border border-blue-200 rounded cursor-pointer"
+            :class="{ 'bg-blue-200!': uninstallType === 'recycle' }"
+            @click="uninstallType = 'recycle'"
+          >
             <v-radio
               :label="t('gameManager.uninstall.recycle')"
               value="recycle"
               color="primary"
               :disabled="isLoading"
-            ></v-radio>
+            />
             <div class="text-caption text-gray-500 ml-10">
               {{ t('gameManager.uninstall.recycleDesc') }}
             </div>
           </div>
 
-          <div class="mb-2 pa-3 border rounded">
+          <div
+            class="mb-2 pa-3 border border-red-200 rounded cursor-pointer"
+            :class="{ 'bg-red-200!': uninstallType === 'delete' }"
+            @click="uninstallType = 'delete'"
+          >
             <v-radio
               :label="t('gameManager.uninstall.delete')"
               value="delete"
               color="error"
               :disabled="isLoading"
-            ></v-radio>
+            />
             <div class="text-caption text-error font-medium ml-10">
               {{ t('gameManager.uninstall.deleteWarning') }}
             </div>
@@ -86,6 +98,7 @@ const { t } = useI18n()
 const emit = defineEmits<{
   delete: []
   recycle: []
+  cannel: []
 }>()
 
 const isDialogOpen = ref(false)
@@ -96,6 +109,7 @@ const errorMessage = ref('')
 const handleCancel = () => {
   if (!isLoading.value) {
     isDialogOpen.value = false
+    emit('cannel')
   }
 }
 
@@ -106,13 +120,14 @@ const handleConfirm = () => {
   } else {
     emit('recycle')
   }
+  isDialogOpen.value = false
 }
 
 const modName = ref('')
-function openModal(data: ModInfo) {
+function openModal(data: ModInfo[]) {
   isDialogOpen.value = true
-  modName.value = data.name
   uninstallType.value = 'recycle'
+  modName.value = data.map((e) => e.name).join(',')
 }
 
 function closeModal() {

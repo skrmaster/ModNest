@@ -6,6 +6,7 @@ import icon from '../../resources/icon.png?asset'
 import { DatabaseManager } from './db'
 import { registerIpcHandlers } from './ipc'
 import { registerModIpc } from './mod/Mod.ipc'
+import { clearPreviewCache } from './services/cache/cache.service'
 
 function createWindow(): BrowserWindow {
   // Create the browser window.
@@ -87,6 +88,8 @@ function createCsp(): void {
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(async () => {
   DatabaseManager.init()
+
+  await clearPreviewCache()
 
   //set csp
   createCsp()

@@ -31,6 +31,7 @@ export interface ModInstall {
   itemData: ItemEntity
   modRootPath: string
   itemName: string
+  modName: string
   archivePath: string
   categoryPathString: string[]
 }
