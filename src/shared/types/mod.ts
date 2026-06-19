@@ -71,3 +71,21 @@ export interface ModPreviewData {
   exists: boolean
   previewImage?: string
 }
+
+export interface UpdateModPreview {
+  modRootPath: string
+  itemName: string
+  modeName: string
+  oldName?: string
+  downloadUrl: string
+  categoryPathString: string[]
+  enable: boolean
+}
+
+export interface ModOpenFolder {
+  modRootPath: string
+  itemName: string
+  modeName: string
+  categoryPathString: string[]
+  enable: boolean
+}

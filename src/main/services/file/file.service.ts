@@ -1,9 +1,10 @@
 import { USER_IMAGE_NAME } from '@shared/constants/index'
 import { createHash } from 'crypto'
-import { app, dialog } from 'electron'
+import { app, dialog, shell } from 'electron'
 import { join, extname, resolve, dirname, basename } from 'path'
 import { promises as fsPromises } from 'fs'
-import { access, copyFile } from 'fs/promises'
+import { access, copyFile, rm, stat } from 'fs/promises'
+import { ModOpenFolder } from '@shared/types/mod'
 
 export class FileService {
   private imageDir: string
@@ -26,7 +27,7 @@ export class FileService {
     return null
   }
 
-  async downloadImage(url: string, gameName?: string) {
+  async downloadImage(url: string, gameName?: string, isFullName = false) {
     const imageUrl = new URL(url)
 
     if (!['http:', 'https:'].includes(imageUrl.protocol)) {
@@ -57,7 +58,7 @@ export class FileService {
     gameName = !gameName ? (+Date.now()).toString() : gameName
     const hash = createHash('sha1').update(`${gameName}:${url}`).digest('hex').slice(0, 12)
 
-    const fileName = `${gameName}-${hash}${extension}`
+    const fileName = isFullName ? gameName : `${gameName}-${hash}${extension}`
     const imagePath = join(this.imageDir, fileName)
 
     await fsPromises.mkdir(this.imageDir, { recursive: true })
@@ -66,7 +67,7 @@ export class FileService {
     return fileName
   }
 
-  async copyLocalImage(sourcePath: string, gameName?: string): Promise<string> {
+  async copyLocalImage(sourcePath: string, gameName?: string, isFullName = false): Promise<string> {
     await access(sourcePath)
 
     if (dirname(sourcePath) === this.imageDir) {
@@ -89,7 +90,8 @@ export class FileService {
       .digest('hex')
       .slice(0, 12)
 
-    const fileName = `${hash}${ext}`
+    gameName = !gameName ? (+Date.now()).toString() : gameName
+    const fileName = isFullName ? gameName : `${hash}${ext}`
 
     const target = join(this.imageDir, fileName)
 
@@ -98,12 +100,12 @@ export class FileService {
     return fileName
   }
 
-  async importImage(pathOrUrl: string, gameName?: string): Promise<string> {
+  async importImage(pathOrUrl: string, gameName?: string, isFullName = false): Promise<string> {
     if (pathOrUrl.startsWith('http://') || pathOrUrl.startsWith('https://')) {
-      return this.downloadImage(pathOrUrl, gameName)
+      return this.downloadImage(pathOrUrl, gameName, isFullName)
     }
 
-    return this.copyLocalImage(pathOrUrl, gameName)
+    return this.copyLocalImage(pathOrUrl, gameName, isFullName)
   }
 
   async chooseImage(): Promise<string | null> {
@@ -136,5 +138,49 @@ export class FileService {
       const errorMsg = err instanceof Error ? err.message : String(err)
       return { success: false, error: `创建目录失败: ${errorMsg}` }
     }
+  }
+
+  async openInExplorer(path: string): Promise<[boolean, string]> {
+    try {
+      const stats = await stat(path)
+
+      if (stats.isDirectory()) {
+        await shell.openPath(path)
+      } else {
+        shell.showItemInFolder(path)
+      }
+
+      return [true, '']
+    } catch (e) {
+      return [false, JSON.stringify(e)]
+    }
+  }
+
+  async openModFolder(data: ModOpenFolder): Promise<[boolean, string]> {
+    const modeName = data.enable ? data.modeName : `DISABLED_${data.modeName}`
+
+    const path = join(data.modRootPath, ...data.categoryPathString, data.itemName, modeName)
+
+    return this.openInExplorer(path)
+  }
+
+  async resetUserData() {
+    const userData = app.getPath('userData')
+
+    await rm(userData, {
+      recursive: true,
+      force: true
+    })
+
+    app.relaunch()
+    app.exit()
+  }
+
+  async openLink(url: string) {
+    if (!url) {
+      return ''
+    }
+
+    return shell.openExternal(url)
   }
 }

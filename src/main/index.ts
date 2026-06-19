@@ -7,6 +7,7 @@ import { DatabaseManager } from './db'
 import { registerIpcHandlers } from './ipc'
 import { registerModIpc } from './mod/Mod.ipc'
 import { clearPreviewCache } from './services/cache/cache.service'
+import { IMAGE_PROTOCOL, MOD_IMAGE_PROTOCOL, NO_CACHE_MOD_PREVIEW_IMAGE } from '@shared/constants'
 
 function createWindow(): BrowserWindow {
   // Create the browser window.
@@ -52,22 +53,22 @@ function createCsp(): void {
     const csp = isDev
       ? `
           default-src 'self';
-          script-src 'self';
-          style-src 'self' 'unsafe-inline';
+          script-src 'self' https://unpkg.com;
+          style-src 'self' 'unsafe-inline' https://unpkg.com;
           connect-src 'self' ws://localhost:5173 http://localhost:5173;
-          img-src 'self' data: blob: https: app-image: mod-preview:;
-          font-src 'self' data:;
+          img-src 'self' data: blob: https: ${IMAGE_PROTOCOL}: ${MOD_IMAGE_PROTOCOL}: ${NO_CACHE_MOD_PREVIEW_IMAGE}:;
+          font-src 'self' data: https://unpkg.com;
           object-src 'none';
           base-uri 'self';
           form-action 'self';
         `
       : `
           default-src 'self';
-          script-src 'self';
-          style-src 'self' 'unsafe-inline';
+          script-src 'self' https://unpkg.com;
+          style-src 'self' 'unsafe-inline' https://unpkg.com;
           connect-src 'self';
-          img-src 'self' data: https: app-image: mod-preview:;
-          font-src 'self' data:;
+          img-src 'self' data: https: ${IMAGE_PROTOCOL}: ${MOD_IMAGE_PROTOCOL}: ${NO_CACHE_MOD_PREVIEW_IMAGE}:;
+          font-src 'self' data: https://unpkg.com;
           object-src 'none';
           base-uri 'self';
           form-action 'self';

@@ -233,7 +233,7 @@ function handleCategoryAdd(v?: string) {
 const downloadCover = async () => {
   clearErrors()
   if (!coverUrl.value) {
-    coverUrlError.value = t('gameManager.enterImageUrl')
+    coverUrlError.value = t('games.enterImageUrl')
     return
   }
 
@@ -243,7 +243,7 @@ const downloadCover = async () => {
 
     showImageCover.value = itemForm.cover ? getUserImageUrl(itemForm.cover) : ''
   } catch (err) {
-    formErrorMessage.value = t('gameManager.imageDownloadFailed', { err })
+    formErrorMessage.value = t('games.imageDownloadFailed', { err })
   } finally {
     isDownloading.value = false
   }

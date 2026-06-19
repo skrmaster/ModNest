@@ -1,4 +1,5 @@
 import './assets/main.css'
+import 'md-editor-v3/lib/style.css'
 
 import { createApp } from 'vue'
 import App from './App.vue'

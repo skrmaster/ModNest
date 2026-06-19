@@ -1,7 +1,7 @@
 import { join } from 'node:path'
-import { mkdir, readdir, rename, mkdtemp, stat, rm } from 'node:fs/promises'
+import { mkdir, readdir, rename, mkdtemp, stat, rm, copyFile } from 'node:fs/promises'
 import { access } from 'node:fs/promises'
-import { ModInfo, ModInstallPreview } from '@shared/types/mod'
+import { ModInfo, ModInstallPreview, UpdateModPreview } from '@shared/types/mod'
 import { basename, extname } from 'node:path'
 import { extractAll, inspectArchive } from '../utils/zip'
 import { ensureOverwrite, exists } from '../utils/file'
@@ -9,7 +9,8 @@ import { existsSync } from 'node:fs'
 import { ItemRepo } from '../db/repo/item.repo'
 import { ItemEntity } from '@shared/entities/item'
 import trash from 'trash'
-import { MOD_IMAGE_PROTOCOL } from '@shared/constants/index'
+import { MOD_IMAGE_PROTOCOL, NO_CACHE_MOD_PREVIEW_IMAGE } from '@shared/constants/index'
+import { FileService } from '../services/file/file.service'
 
 export class ModRepository {
   private getCategoryPath(modRootPath: string, categoryPathString: string[]): string {
@@ -303,5 +304,39 @@ export class ModRepository {
     }
 
     return [res, '删除失败']
+  }
+
+  async updateModPreview(data: UpdateModPreview): Promise<[boolean, string]> {
+    try {
+      const fileService = new FileService()
+
+      const tmpFileName = await fileService.importImage(data.downloadUrl, 'preview.png', true)
+
+      const tmpPath = fileService.getImageProtocol()
+
+      const sourceFile = join(tmpPath, tmpFileName)
+
+      const modeName = data.enable ? data.modeName : `DISABLED_${data.modeName}`
+
+      const targetDir = join(data.modRootPath, ...data.categoryPathString, data.itemName, modeName)
+
+      const targetFile = data.oldName?.trim()
+        ? join(targetDir, data.oldName)
+        : join(targetDir, tmpFileName)
+
+      if (data.oldName?.trim()) {
+        await rm(targetFile, { force: true })
+      }
+
+      await copyFile(sourceFile, targetFile)
+      await rm(sourceFile, { force: true })
+
+      return [
+        true,
+        `${NO_CACHE_MOD_PREVIEW_IMAGE}:///` + encodeURI(targetFile.replaceAll('\\', '/'))
+      ]
+    } catch (e) {
+      return [false, e instanceof Error ? e.message : String(e)]
+    }
   }
 }

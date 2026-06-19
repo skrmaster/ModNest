@@ -5,7 +5,7 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: '/',
     name: 'Home',
-    redirect: '/default-setup/1'
+    component: () => import('../pages/home.vue')
   },
   {
     path: '/settings',

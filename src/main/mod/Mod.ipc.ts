@@ -1,6 +1,13 @@
 import { ipcMain } from 'electron'
 import { ModRepository } from './ModRepository'
-import { InspectArchive, ListQuery, ModInstall, ModOpt, ModUninstall } from '@shared/types/mod'
+import {
+  InspectArchive,
+  ListQuery,
+  ModInstall,
+  ModOpt,
+  ModUninstall,
+  UpdateModPreview
+} from '@shared/types/mod'
 
 export function registerModIpc(): void {
   const repo = new ModRepository()
@@ -58,5 +65,9 @@ export function registerModIpc(): void {
       payload.categoryPathString,
       payload.toTrash
     )
+  })
+
+  ipcMain.handle('mod:updatePreview', (_, payload: UpdateModPreview) => {
+    return repo.updateModPreview(payload)
   })
 }

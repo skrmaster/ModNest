@@ -1,8 +1,14 @@
 import { pathToFileURL } from 'url'
-import { ipcMain, protocol, net } from 'electron'
-import { join } from 'path'
-import { IMAGE_PROTOCOL, MOD_IMAGE_PROTOCOL } from '@shared/constants/index'
+import { ipcMain, protocol, net, app } from 'electron'
+import path, { extname, join } from 'path'
+import {
+  IMAGE_PROTOCOL,
+  MOD_IMAGE_PROTOCOL,
+  NO_CACHE_MOD_PREVIEW_IMAGE
+} from '@shared/constants/index'
 import { FileService } from '../services/file/file.service'
+import { readFile } from 'fs/promises'
+import { ModOpenFolder } from '@shared/types/mod'
 
 export function register(): void {
   const fileServices = new FileService()
@@ -44,8 +50,6 @@ export function register(): void {
 
       const filePath = decodeURIComponent(encodedPath)
 
-      console.log(pathToFileURL(filePath).toString())
-
       return net.fetch(pathToFileURL(filePath).toString())
     } catch (error) {
       console.error('[mod-preview] load failed:', error)
@@ -54,6 +58,46 @@ export function register(): void {
         status: 404
       })
     }
+  })
+
+  protocol.handle(NO_CACHE_MOD_PREVIEW_IMAGE, async (request) => {
+    try {
+      const encodedPath = request.url.replace(`${NO_CACHE_MOD_PREVIEW_IMAGE}:///`, '')
+
+      const filePath = decodeURIComponent(encodedPath)
+
+      const buffer = await readFile(filePath)
+
+      const ext = extname(filePath).toLowerCase()
+
+      const contentType =
+        ext === '.png'
+          ? 'image/png'
+          : ext === '.jpg' || ext === '.jpeg'
+            ? 'image/jpeg'
+            : ext === '.webp'
+              ? 'image/webp'
+              : 'application/octet-stream'
+
+      return new Response(buffer, {
+        headers: {
+          'Content-Type': contentType,
+          'Cache-Control': 'no-store, no-cache, must-revalidate',
+          Pragma: 'no-cache',
+          Expires: '0'
+        }
+      })
+    } catch (error) {
+      console.error('[mod-preview] load failed:', error)
+
+      return new Response('Not Found', {
+        status: 404
+      })
+    }
+  })
+
+  ipcMain.handle('open-folder', async (_, data: ModOpenFolder): Promise<[boolean, string]> => {
+    return fileServices.openModFolder(data)
   })
 
   ipcMain.handle('select-directory', () => {
@@ -73,5 +117,18 @@ export function register(): void {
 
   ipcMain.handle('create-mod-directory', async (_event, { path }: { path: string }) => {
     fileServices.createDir(path)
+  })
+
+  ipcMain.handle('open-link', (_, url: string) => {
+    return fileServices.openLink(url)
+  })
+
+  ipcMain.handle('open-download', () => {
+    const downloadPath = app.isPackaged
+      ? path.join(process.resourcesPath, 'download')
+      : path.join(process.cwd(), 'resources', 'download')
+    console.log(downloadPath)
+
+    return fileServices.openInExplorer(downloadPath)
   })
 }

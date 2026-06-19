@@ -147,6 +147,8 @@
     "deleteSuccess": "Deleted successfully",
     "deleteFailed": "Delete failed: {err}",
     "allInstall": "Install all",
-    "allCoverInstall": "Full coverage installation"
+    "allCoverInstall": "Full coverage installation",
+    "batchdel": "Batch delete",
+    "openModFolder": "Open the MOD directory"
   }
 }

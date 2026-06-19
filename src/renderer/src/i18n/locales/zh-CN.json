@@ -153,6 +153,8 @@
     "updateSuccess": "更新成功",
     "addFailed": "添加失败",
     "allInstall": "全部安装",
-    "allCoverInstall": "全部覆盖安装"
+    "allCoverInstall": "全部覆盖安装",
+    "batchdel": "批量删除",
+    "openModFolder": "打开MOD目录"
   }
 }

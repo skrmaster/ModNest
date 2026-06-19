@@ -7,6 +7,7 @@ import { gameStore } from '@renderer/stores/game-store'
 import type { UserGame } from '@shared/entities/game'
 import type { CreateGameDto } from '@shared/dto/game'
 import { getUserImageUrl } from '@shared/utils/url'
+import comScroll from './com-scroll.vue'
 
 interface NavConfig {
   expandedWidth?: number
@@ -253,6 +254,25 @@ const confirmDeleteGame = async (): Promise<void> => {
   }
 }
 
+// const modSiteList = ref([
+//   {
+//     name: 'GameBanana',
+//     href: 'https://gamebanana.com'
+//   },
+//   {
+//     name: '미호요스킨모드 채널',
+//     href: 'https://arca.live/b/genshinskinmode?category=%EC%A7%88%EB%AC%B8(%EB%AA%A8%EB%93%9C%EC%A0%9C%EC%9E%91)'
+//   },
+//   {
+//     name: 'https://huihui168.org',
+//     href: 'Hui站'
+//   }
+// ])
+
+function gohome() {
+  router.push('/')
+}
+
 onMounted(async () => {
   if (!gameStore.getState().loaded) {
     await gameStore.load()
@@ -280,7 +300,11 @@ onUnmounted(() => {
     :class="{ 'icon-only': !isExpanded }"
   >
     <v-list nav class="h-full flex flex-col">
-      <v-list-item v-if="config.showHeader" class="pb-3 flex items-center gap-3 min-h-14">
+      <v-list-item
+        v-if="config.showHeader"
+        class="pb-3 flex items-center gap-3 min-h-14"
+        @click="gohome"
+      >
         <template #prepend>
           <v-btn icon size="small" @click="toggleMenu">
             <v-icon icon="mdi-menu" />
@@ -291,208 +315,78 @@ onUnmounted(() => {
 
       <v-divider class="pt-3" />
 
-      <div class="flex flex-col gap-2">
-        <v-list-item
-          v-for="game in games"
-          :key="game.id"
-          class="menu-item cursor-pointer"
-          variant="plain"
-          density="compact"
-          color="primary"
-          @click="openGame(game)"
-        >
-          <template #prepend>
-            <div
-              class="flex items-center w-full"
-              :class="[isExpanded ? 'justify-between gap-3' : 'justify-center']"
+      <div class="flex-1 min-h-0 overflow-hidden">
+        <com-scroll>
+          <div class="flex flex-col gap-2">
+            <v-list-item
+              v-for="game in games"
+              :key="game.id"
+              class="menu-item cursor-pointer"
+              variant="plain"
+              density="compact"
+              color="primary"
+              @click="openGame(game)"
             >
-              <div class="flex items-center gap-3 min-w-0 flex-1">
-                <v-avatar size="34" rounded="0">
-                  <v-img v-if="game.cover" :src="game.cover" cover />
-                  <v-icon v-else size="large">mdi-gamepad-variant</v-icon>
-                </v-avatar>
+              <template #prepend>
+                <div
+                  class="flex items-center w-full"
+                  :class="[isExpanded ? 'justify-between gap-3' : 'justify-center']"
+                >
+                  <div class="flex items-center gap-3 min-w-0 flex-1">
+                    <v-avatar size="34" rounded="0">
+                      <v-img v-if="game.cover" :src="game.cover" cover />
+                      <v-icon v-else size="large">mdi-gamepad-variant</v-icon>
+                    </v-avatar>
 
-                <transition name="fade" :duration="config.transitionDuration">
-                  <div v-if="isExpanded" key="game-item" class="min-w-0">
-                    <v-list-item-title class="truncate">{{ getGameName(game) }}</v-list-item-title>
-                    <v-list-item-subtitle class="truncate">
-                      {{ game.mod_root_path ? t('games.configured') : t('games.notConfigured') }}
-                    </v-list-item-subtitle>
-                  </div>
-                </transition>
-              </div>
-            </div>
-          </template>
-          <template #append>
-            <div v-if="isExpanded && !isDefaultGame(game.id)" class="shrink-0">
-              <v-btn icon size="small" variant="text" @click.stop="openDeleteGame(game)">
-                <v-icon icon="mdi-delete-outline" />
-              </v-btn>
-            </div>
-          </template>
-        </v-list-item>
-
-        <v-list-item
-          class="menu-item cursor-pointer"
-          variant="plain"
-          density="compact"
-          @click="openCustomGame"
-        >
-          <template #prepend>
-            <div
-              class="flex items-center w-full"
-              :class="[isExpanded ? 'gap-3' : 'justify-center']"
-            >
-              <v-icon size="large">mdi-plus-circle-outline</v-icon>
-
-              <transition name="fade" :duration="config.transitionDuration">
-                <v-list-item-title v-if="isExpanded" key="add-game">{{
-                  t('games.addGame')
-                }}</v-list-item-title>
-              </transition>
-            </div>
-          </template>
-        </v-list-item>
-      </div>
-
-      <v-dialog v-model="gameDialog" max-width="680">
-        <v-card>
-          <v-card-title class="flex items-center gap-2">
-            {{ !gameForm.id ? t('games.addGame') : t('games.configureGame') }}
-          </v-card-title>
-
-          <v-card-text>
-            <div class="grid gap-4">
-              <div v-if="!isDefaultSelected">
-                <div class="flex justify-center mb-4">
-                  <v-img
-                    v-if="showGameCover"
-                    :src="showGameCover"
-                    height="180"
-                    width="240"
-                    contain
-                    class="rounded-md cursor-pointer"
-                    @click="chooseGameCover"
-                  >
-                    <template #placeholder>
-                      <div class="d-flex fill-height align-center justify-center bg-grey-lighten-2">
-                        <v-progress-circular indeterminate size="20" />
+                    <transition name="fade" :duration="config.transitionDuration">
+                      <div v-if="isExpanded" key="game-item" class="min-w-0">
+                        <v-list-item-title class="truncate">{{
+                          getGameName(game)
+                        }}</v-list-item-title>
+                        <v-list-item-subtitle class="truncate">
+                          {{
+                            game.mod_root_path ? t('games.configured') : t('games.notConfigured')
+                          }}
+                        </v-list-item-subtitle>
                       </div>
-                    </template>
-                    <template #error>
-                      <div class="d-flex fill-height align-center justify-center bg-grey-lighten-2">
-                        <v-icon size="48" class="text-grey-darken-2">mdi-alert</v-icon>
-                      </div>
-                    </template>
-                  </v-img>
-                  <div
-                    v-else
-                    class="text-center pa-4 bg-grey-lighten-2 rounded-md cursor-pointer w-60"
-                    @click="chooseGameCover"
-                  >
-                    <v-icon size="80" class="text-grey-darken-2"
-                      >mdi-panorama-variant-outline</v-icon
-                    >
+                    </transition>
                   </div>
                 </div>
-
-                <div class="grid gap-3 md:grid-cols-2">
-                  <v-text-field
-                    v-model="gameForm.name_zh_cn"
-                    :label="t('games.nameZh')"
-                    density="compact"
-                  />
-                  <v-text-field
-                    v-model="gameForm.name"
-                    :label="t('games.nameEn')"
-                    density="compact"
-                  />
-                </div>
-
-                <div class="flex gap-2">
-                  <v-text-field
-                    v-model="gameCoverUrl"
-                    :label="t('games.imageUrl')"
-                    density="compact"
-                    class="flex-1"
-                    append-icon="mdi-paperclip"
-                    @click:append="chooseGameCover"
-                  />
-                  <v-btn variant="flat" class="mt-1" @click="downloadGameCoverImage">
-                    <v-progress-circular
-                      v-if="isDownloadingCover"
-                      indeterminate
-                      size="16"
-                      color="white"
-                      class="mr-1"
-                    />
-                    {{ t('games.import') }}
+              </template>
+              <template #append>
+                <div v-if="isExpanded && !isDefaultGame(game.id)" class="shrink-0">
+                  <v-btn icon size="small" variant="text" @click.stop="openDeleteGame(game)">
+                    <v-icon icon="mdi-delete-outline" />
                   </v-btn>
                 </div>
-              </div>
+              </template>
+            </v-list-item>
 
-              <v-text-field
-                v-model="gameForm.mod_root_path"
-                :label="t('games.modPath')"
-                density="compact"
-                required
-              >
-                <template #append-inner>
-                  <v-btn
-                    icon="mdi-folder-open-outline"
-                    size="small"
-                    variant="text"
-                    @click="chooseModPath"
-                  />
-                </template>
-              </v-text-field>
+            <v-list-item
+              class="menu-item cursor-pointer"
+              variant="plain"
+              density="compact"
+              @click="openCustomGame"
+            >
+              <template #prepend>
+                <div
+                  class="flex items-center w-full"
+                  :class="[isExpanded ? 'gap-3' : 'justify-center']"
+                >
+                  <v-icon size="large">mdi-plus-circle-outline</v-icon>
 
-              <v-alert v-if="formError" type="error" variant="tonal" density="compact">
-                {{ formError }}
-              </v-alert>
-            </div>
-          </v-card-text>
+                  <transition name="fade" :duration="config.transitionDuration">
+                    <v-list-item-title v-if="isExpanded" key="add-game">{{
+                      t('games.addGame')
+                    }}</v-list-item-title>
+                  </transition>
+                </div>
+              </template>
+            </v-list-item>
+          </div>
+        </com-scroll>
+      </div>
 
-          <v-card-actions>
-            <v-spacer />
-            <v-btn variant="text" @click="gameDialog = false">{{ t('common.cancel') }}</v-btn>
-            <v-btn color="primary" :loading="isSaving" @click="saveGame">{{
-              t('games.save')
-            }}</v-btn>
-          </v-card-actions>
-        </v-card>
-      </v-dialog>
-
-      <v-dialog v-model="deleteDialog" max-width="420">
-        <v-card>
-          <v-card-title>{{ t('common.warning') }}</v-card-title>
-
-          <v-card-text>
-            <div class="flex gap-2 items-center">
-              <div>{{ t('games.deleteConfirm') }}</div>
-              <div class="font-medium my-2">
-                {{ deleteTarget?.name_zh_cn || deleteTarget?.name }}
-              </div>
-            </div>
-            <div class="text-[16px] opacity-70">
-              {{ t('games.deleteWarning') }}
-            </div>
-            <v-alert v-if="deleteError" type="error" variant="tonal" density="compact">
-              {{ deleteError }}
-            </v-alert>
-          </v-card-text>
-
-          <v-card-actions>
-            <v-spacer />
-            <v-btn variant="text" @click="deleteDialog = false">{{ t('common.cancel') }}</v-btn>
-            <v-btn color="error" :loading="deleteLoading" @click="confirmDeleteGame">{{
-              t('common.delete')
-            }}</v-btn>
-          </v-card-actions>
-        </v-card>
-      </v-dialog>
-
-      <v-spacer />
       <v-divider class="my-2" />
 
       <v-list-item :to="'/settings'" link>
@@ -508,6 +402,135 @@ onUnmounted(() => {
       </v-list-item>
     </v-list>
   </v-navigation-drawer>
+
+  <v-dialog v-model="gameDialog" max-width="680">
+    <v-card>
+      <v-card-title class="flex items-center gap-2">
+        {{ !gameForm.id ? t('games.addGame') : t('games.configureGame') }}
+      </v-card-title>
+
+      <v-card-text>
+        <div class="grid gap-4">
+          <div v-if="!isDefaultSelected">
+            <div class="flex justify-center mb-4">
+              <v-img
+                v-if="showGameCover"
+                :src="showGameCover"
+                height="180"
+                width="240"
+                contain
+                class="rounded-md cursor-pointer"
+                @click="chooseGameCover"
+              >
+                <template #placeholder>
+                  <div class="d-flex fill-height align-center justify-center bg-grey-lighten-2">
+                    <v-progress-circular indeterminate size="20" />
+                  </div>
+                </template>
+                <template #error>
+                  <div class="d-flex fill-height align-center justify-center bg-grey-lighten-2">
+                    <v-icon size="48" class="text-grey-darken-2">mdi-alert</v-icon>
+                  </div>
+                </template>
+              </v-img>
+              <div
+                v-else
+                class="text-center pa-4 bg-grey-lighten-2 rounded-md cursor-pointer w-60"
+                @click="chooseGameCover"
+              >
+                <v-icon size="80" class="text-grey-darken-2">mdi-panorama-variant-outline</v-icon>
+              </div>
+            </div>
+
+            <div class="grid gap-3 md:grid-cols-2">
+              <v-text-field
+                v-model="gameForm.name_zh_cn"
+                :label="t('games.nameZh')"
+                density="compact"
+              />
+              <v-text-field v-model="gameForm.name" :label="t('games.nameEn')" density="compact" />
+            </div>
+
+            <div class="flex gap-2">
+              <v-text-field
+                v-model="gameCoverUrl"
+                :label="t('games.imageUrl')"
+                density="compact"
+                class="flex-1"
+                append-icon="mdi-paperclip"
+                @click:append="chooseGameCover"
+              />
+              <v-btn variant="flat" class="mt-1" @click="downloadGameCoverImage">
+                <v-progress-circular
+                  v-if="isDownloadingCover"
+                  indeterminate
+                  size="16"
+                  color="white"
+                  class="mr-1"
+                />
+                {{ t('games.import') }}
+              </v-btn>
+            </div>
+          </div>
+
+          <v-text-field
+            v-model="gameForm.mod_root_path"
+            :label="t('games.modPath')"
+            density="compact"
+            required
+          >
+            <template #append-inner>
+              <v-btn
+                icon="mdi-folder-open-outline"
+                size="small"
+                variant="text"
+                @click="chooseModPath"
+              />
+            </template>
+          </v-text-field>
+
+          <v-alert v-if="formError" type="error" variant="tonal" density="compact">
+            {{ formError }}
+          </v-alert>
+        </div>
+      </v-card-text>
+
+      <v-card-actions>
+        <v-spacer />
+        <v-btn variant="text" @click="gameDialog = false">{{ t('common.cancel') }}</v-btn>
+        <v-btn color="primary" :loading="isSaving" @click="saveGame">{{ t('games.save') }}</v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
+
+  <v-dialog v-model="deleteDialog" max-width="420">
+    <v-card>
+      <v-card-title>{{ t('common.warning') }}</v-card-title>
+
+      <v-card-text>
+        <div class="flex gap-2 items-center">
+          <div>{{ t('games.deleteConfirm') }}</div>
+          <div class="font-medium my-2">
+            {{ deleteTarget?.name_zh_cn || deleteTarget?.name }}
+          </div>
+        </div>
+        <div class="text-[16px] opacity-70">
+          {{ t('games.deleteWarning') }}
+        </div>
+        <v-alert v-if="deleteError" type="error" variant="tonal" density="compact">
+          {{ deleteError }}
+        </v-alert>
+      </v-card-text>
+
+      <v-card-actions>
+        <v-spacer />
+        <v-btn variant="text" @click="deleteDialog = false">{{ t('common.cancel') }}</v-btn>
+        <v-btn color="error" :loading="deleteLoading" @click="confirmDeleteGame">{{
+          t('common.delete')
+        }}</v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
 </template>
 
 <style scoped>

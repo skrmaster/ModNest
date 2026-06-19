@@ -1,5 +1,12 @@
 import { ipcRenderer } from 'electron'
-import { InspectArchive, ListQuery, ModInstall, ModOpt, ModUninstall } from '@shared/types/mod'
+import {
+  InspectArchive,
+  ListQuery,
+  ModInstall,
+  ModOpt,
+  ModUninstall,
+  UpdateModPreview
+} from '@shared/types/mod'
 
 export const modApi = {
   install(data: ModInstall) {
@@ -24,5 +31,9 @@ export const modApi = {
 
   uninstall(data: ModUninstall): Promise<[boolean, string]> {
     return ipcRenderer.invoke('mod:uninstall', data)
+  },
+
+  updatePreview(data: UpdateModPreview): Promise<[boolean, string]> {
+    return ipcRenderer.invoke('mod:updatePreview', data)
   }
 }

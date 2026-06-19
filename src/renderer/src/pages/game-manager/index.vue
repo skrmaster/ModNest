@@ -386,6 +386,83 @@ function handleDragOver(e: DragEvent) {
   }
 }
 
+const coverUrl = ref('')
+const isDownloading = ref(false)
+const coverUrlError = ref('')
+
+async function chooseFile() {
+  const localUrl = await window.api.fileApi.selectImage()
+  if (!localUrl) {
+    return
+  }
+
+  coverUrl.value = localUrl
+}
+
+function clearErrors() {
+  coverUrlError.value = ''
+}
+
+const imageVersion = ref()
+
+async function downloadCover() {
+  clearErrors()
+  if (!coverUrl.value) {
+    coverUrlError.value = t('games.enterImageUrl')
+    return
+  }
+
+  if (!game.value || !game.value?.mod_root_path || !selectedItem.value || !selectTableRow.value) {
+    return
+  }
+
+  try {
+    isDownloading.value = true
+    const [status, res] = await window.api.modApi.updatePreview({
+      modRootPath: game.value?.mod_root_path,
+      itemName: selectedItem.value?.name,
+      modeName: selectTableRow.value?.name,
+      downloadUrl: coverUrl.value,
+      categoryPathString: [getCategoryName.value],
+      oldName: selectTableRow.value?.cover?.split('/').slice(-1)[0] || '',
+      enable: selectTableRow.value.enabled
+    })
+    if (status) {
+      imageVersion.value = +Date.now()
+      await nextTick()
+      selectTableRow.value.cover = res
+      coverUrl.value = ''
+    } else {
+      coverUrlError.value = res
+    }
+  } catch (err) {
+    coverUrlError.value = t('games.imageDownloadFailed', { err })
+  } finally {
+    isDownloading.value = false
+  }
+}
+
+const openFolderError = ref('')
+
+async function openModFolder() {
+  if (!game.value || !game.value?.mod_root_path || !selectedItem.value || !selectTableRow.value) {
+    return
+  }
+  openFolderError.value = ''
+
+  const [status, error] = await window.api.fileApi.openFolder({
+    modRootPath: game.value?.mod_root_path,
+    itemName: selectedItem.value?.name,
+    modeName: selectTableRow.value?.name,
+    categoryPathString: [getCategoryName.value],
+    enable: selectTableRow.value.enabled
+  })
+
+  if (!status) {
+    openFolderError.value = error
+  }
+}
+
 const onCancel = () => {
   console.log('User canceled')
 }
@@ -786,8 +863,12 @@ onUnmounted(() => {})
 
             <Pane :size="sizes[1]">
               <section
-                class="min-w-0 h-full overflow-auto border-x border-black/10 relative pb-15 transition-all duration-200"
+                class="min-w-0 h-full overflow-auto px-5 border-x border-black/10 relative pb-15 transition-all duration-200"
               >
+                <div class="flex items-center mb-3 gap-3 justify-between">
+                  <v-btn color="red" @click="handleRemoveAllMod">{{ t('common.batchdel') }}</v-btn>
+                  <v-btn color="grey" @click="openModFolder">{{ t('common.openModFolder') }}</v-btn>
+                </div>
                 <v-alert
                   v-show="isEnableMutipleMod"
                   text="请注意,启用了多个MOD,可能会有冲突"
@@ -795,7 +876,15 @@ onUnmounted(() => {})
                   variant="tonal"
                   closable
                 ></v-alert>
-                <v-table>
+                <v-alert
+                  v-if="openFolderError"
+                  density="compact"
+                  :text="openFolderError"
+                  type="error"
+                  closable
+                >
+                </v-alert>
+                <v-table class="">
                   <thead>
                     <tr>
                       <th>
@@ -803,6 +892,7 @@ onUnmounted(() => {})
                           v-model="chooseAll"
                           color="primary"
                           :indeterminate="indeterminate"
+                          hide-message
                           @change="handleChooseAll"
                         ></v-checkbox-btn>
                       </th>
@@ -860,9 +950,6 @@ onUnmounted(() => {})
                 >
                   <v-progress-circular indeterminate size="64" />
                 </v-overlay>
-                <div class="absolute bottom-5 right-2">
-                  <v-btn color="red" @click="handleRemoveAllMod">批量删除</v-btn>
-                </div>
               </section>
             </Pane>
 
@@ -871,7 +958,7 @@ onUnmounted(() => {})
                 <div>
                   <div class="text-body-2 opacity-70">{{ t('gameManager.preview') }}</div>
                   <div v-if="selectTableRow?.cover">
-                    <v-img :src="selectTableRow?.cover" cover />
+                    <v-img :key="imageVersion" :src="selectTableRow?.cover" cover />
                   </div>
                   <div v-else>
                     <v-alert
@@ -879,6 +966,29 @@ onUnmounted(() => {})
                       :text="t('gameManager.noPreview')"
                       type="warning"
                     ></v-alert>
+                  </div>
+                  <div class="flex items-center mt-3">
+                    <v-text-field
+                      v-model="coverUrl"
+                      :label="t('gameManager.imageUrl')"
+                      density="compact"
+                      class="flex-1"
+                      append-icon="mdi-paperclip"
+                      :error-messages="coverUrlError ? [coverUrlError] : []"
+                      @click:append="chooseFile"
+                    />
+                  </div>
+                  <div class="text-end">
+                    <v-btn variant="flat" class="mt-1" @click="downloadCover">
+                      <v-progress-circular
+                        v-if="isDownloading"
+                        indeterminate
+                        size="16"
+                        color="white"
+                        class="mr-1"
+                      />
+                      {{ t('games.import') }}
+                    </v-btn>
                   </div>
                 </div>
                 <div></div>
