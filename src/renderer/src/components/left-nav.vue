@@ -306,7 +306,7 @@ onUnmounted(() => {
         @click="gohome"
       >
         <template #prepend>
-          <v-btn icon size="small" @click="toggleMenu">
+          <v-btn icon size="small" @click.stop="toggleMenu">
             <v-icon icon="mdi-menu" />
           </v-btn>
         </template>

@@ -6,13 +6,27 @@
 
 ## YuanShen.exe 原神10612-4001错误码
 
-<img src="app-image://seed-images/logo/error.png" width="100" style="display:inline;vertical-align:middle;margin-right: 10px;" />
+<img src="app-image://seed-images/logo/error.png" width="100" class="mb-4" style="display:inline;vertical-align:middle;margin-right: 10px;" />
 
 > 替换XXMI工具中的GIMI目录中的文件+断网策略实现
 
 1. [参考-원신 4001 올인원 해결법](https://arca.live/b/genshinskinmode/168042118?category=%EC%A7%88%EB%AC%B8%28%EB%AA%A8%EB%93%9C%EC%A0%9C%EC%9E%91%29&p=1)
 
 2. [参考https://gamebanana.com/search?\_sOrder=best_match&\_sSearchString=10612-4001](https://gamebanana.com/search?_sOrder=best_match&_sSearchString=10612-4001)
+
+---
+
+先不用看**前置内容** **替换文件** **修改配置** **启动游戏**，如果点击开始游戏无法启动游戏再进行查看
+
+<span class="text-red-600">!!!注意：请先启动XXMI!!!</span>,如果没有安装XXMI就请先[`安装`](app-image://open-XXMI.msi)&nbsp;&nbsp;&nbsp;&nbsp;[`官网`](https://github.com/SpectrumQT/XXMI-Launcher/releases)
+
+<a href="app-action://start-genshin" style="background:#f0c14b;color:#333;border;border-radius:6px;padding:12px 30px;font-size:20px;font-weight:700;cursor;box-shadow:0 2px 8px rgba(0,0,0,.25);display:inline-block;margin-inline: auto;">🎮开始游戏</a>&nbsp;&nbsp;&nbsp;&nbsp;等待游戏运行成功，等到加载进行到如图所示<img src="app-image://seed-images/logo/genshin-loading.png" width="180" style="display:inline;vertical-align:middle;margin-right: 10px;border: 1px solid #eee" />后，点击[`开始断网`](app-action://internet_outage)
+
+> 游戏会在2min~3min中断网，不建议在游戏启动后前3min内游玩，3min过后还需要检测，只要游戏时间过5分钟没出现错误，恭喜你成功了！！！
+
+> 还有一句话，你得先有MOD在XXMI/GIMI/Mods才能查看效果
+
+---
 
 #### 前置内容
 
@@ -31,15 +45,13 @@
 #### 修改配置
 
 1. 修改`XXMI\GIMI`下的`d3dx.ini`文件<img src="app-image://seed-images/logo/d3dxini.png" width="100" style="display:inline;vertical-align:middle;margin-right: 10px;" />把红框(launch=)中的路径换成自己的游戏路径
-2. 用记事本打开`genshin_bad_network.ps1`<img src="app-image://seed-images/logo/ps1.png" width="100" style="display:inline;vertical-align:middle;margin-right: 10px;" />，其中红框(processName,programPath)是要修改的内容，`$programPath`改为自己的游戏路径，需要注意`"`是否缺失，绿框(processName="`值`"，`值`是否等于programPath中X:xxx\\xxx\\xxx\\`值`.exe)是确保内容一致
+2. [直接应用](action://updatePs1) 若成功则不用看2.后续：(用记事本打开`genshin_bad_network.ps1`<img src="app-image://seed-images/logo/ps1.png" width="100" style="display:inline;vertical-align:middle;margin-right: 10px;" />，其中红框(processName,programPath)是要修改的内容，`$programPath`改为自己的游戏路径，需要注意`"`是否缺失，绿框(processName="`值`"，`值`是否等于programPath中X:xxx\\xxx\\xxx\\`值`.exe)是确保内容一致)
 3. 若没有移动`genshin_bad_network.ps1`则不用修改。若移动过则用记事本打开`badwork.bat`<img src="app-image://seed-images/logo/badwork.png" width="100" style="display:inline;vertical-align:middle;margin-right: 10px;" />，将`E:\bad_work.ps1`改为自己`genshin_bad_network.ps1`所在的绝对路径
 
 #### 启动游戏
 
 1. 通过`XXMI\GIMI`中的`3DMigoto Loader.exe`双击启动游戏
 2. 一旦进入提瓦特大陆就双击运行`badwork.bat`, 游戏会在2min~3min中断网，不建议在游戏启动后前3min内游玩，3min过后还需要检测，只要游戏时间过5分钟没出现错误，恭喜你成功了！！！
-
-##
 
 ---
 
@@ -54,4 +66,4 @@
 #### 使用方式
 
 1. 安装AutoHotkey_2.0.26_setup.exe，右键fButton.ahk文件，以管理员方式运行
-2. 进入游戏，在需要跳过的剧情处按`F8`(F8开启和F8关闭)，解放双手，刷会儿视频剧情也完了。不过需要注意由于某些剧情可能出现死循环，避开循环线再使用
+2. 进入游戏，在需要跳过的剧情处按`F8`(F8开启和F8关闭)，解放双手，刷会儿视频剧情也完了。不过需要注意由于某些剧情可能出现`死循环`，避开循环线再使用

@@ -149,6 +149,11 @@
     "allInstall": "Install all",
     "allCoverInstall": "Full coverage installation",
     "batchdel": "Batch delete",
-    "openModFolder": "Open the MOD directory"
+    "openModFolder": "Open the MOD directory",
+    "success": "success"
+  },
+  "home": {
+    "update": "Modify configuration",
+    "run": "Please start XXMI first"
   }
 }

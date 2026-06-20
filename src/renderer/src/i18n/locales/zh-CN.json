@@ -155,6 +155,11 @@
     "allInstall": "全部安装",
     "allCoverInstall": "全部覆盖安装",
     "batchdel": "批量删除",
-    "openModFolder": "打开MOD目录"
+    "openModFolder": "打开MOD目录",
+    "success": "成功"
+  },
+  "home": {
+    "update": "修改配置",
+    "run": "请先启动XXMI"
   }
 }

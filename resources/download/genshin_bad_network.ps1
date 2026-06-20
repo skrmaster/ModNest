@@ -1,4 +1,4 @@
-﻿$processName = "YuanShen"  
+$processName = "YuanShen"
 $ruleName = "badnetwork" 
 $programPath = "Z:\miHoYo Launcher\games\Genshin Impact Game\YuanShen.exe"
 

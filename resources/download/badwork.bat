@@ -11,6 +11,6 @@ echo Administrator privileges have been obtained.
 
 powershell -Command "Set-ExecutionPolicy RemoteSigned -Scope LocalMachine -Force"
 
-powershell -ExecutionPolicy Bypass -File ".\genshin_bad_network.ps1"
+powershell -ExecutionPolicy Bypass -File "%~dp0genshin_bad_network.ps1"
 
 pause
