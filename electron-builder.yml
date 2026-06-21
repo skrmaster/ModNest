@@ -1,5 +1,4 @@
 appId: com.cygf.app
-productName: Dimension Workshop
 directories:
   buildResources: build
 files:
