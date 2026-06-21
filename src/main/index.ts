@@ -8,6 +8,8 @@ import { registerIpcHandlers } from './ipc'
 import { registerModIpc } from './mod/Mod.ipc'
 import { clearPreviewCache } from './services/cache/cache.service'
 import { IMAGE_PROTOCOL, MOD_IMAGE_PROTOCOL, NO_CACHE_MOD_PREVIEW_IMAGE } from '@shared/constants'
+import { TaskEvent, TaskSummary } from '@shared/types/task-engine'
+import { Genshin } from './services/genshin/genshin.service'
 
 function createWindow(): BrowserWindow {
   // Create the browser window.
@@ -84,6 +86,26 @@ function createCsp(): void {
   })
 }
 
+function registerGenshinIpc(win: BrowserWindow): void {
+  let genshin: Genshin | null = null
+
+  ipcMain.handle('genshin:start', (): Promise<TaskSummary> => {
+    genshin = new Genshin()
+
+    genshin.on('task:event', (event: TaskEvent) => {
+      if (!win.isDestroyed()) {
+        win.webContents.send('task:event', event)
+      }
+    })
+
+    return genshin.startGame()
+  })
+
+  ipcMain.handle('genshin:cancel', (): void => {
+    genshin?.cancel()
+  })
+}
+
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
@@ -113,6 +135,8 @@ app.whenReady().then(async () => {
   registerModIpc()
 
   const win = createWindow()
+
+  registerGenshinIpc(win)
 
   electronLocalshortcut.register(win, 'F12', () => {
     win.webContents.toggleDevTools()

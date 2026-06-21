@@ -4,8 +4,8 @@ import { settingsApi } from './setting'
 import { categoryApi } from './category'
 import { itemApi } from './item'
 import { modApi } from './mod'
-import { updatePath } from './update-path'
 import { genshinApi } from './genshin'
+import { taskBridge } from './taskBridge'
 
 export const api = {
   gameApi,
@@ -14,6 +14,6 @@ export const api = {
   categoryApi,
   itemApi,
   modApi,
-  updatePath,
-  genshinApi
+  genshinApi,
+  taskBridge
 }

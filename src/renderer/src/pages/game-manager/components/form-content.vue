@@ -39,12 +39,14 @@
           required
           :label="t('gameManager.nameZh')"
           density="compact"
+          :readonly="!canEdit"
           :error-messages="nameZhError ? [nameZhError] : []"
         />
         <v-text-field
           v-model="itemForm.name"
           required
           :label="t('gameManager.nameEn')"
+          :readonly="!canEdit"
           density="compact"
           :error-messages="nameError ? [nameError] : []"
         />
@@ -58,9 +60,10 @@
           class="flex-1"
           append-icon="mdi-paperclip"
           :error-messages="coverUrlError ? [coverUrlError] : []"
+          :readonly="!canEdit"
           @click:append="chooseFile"
         />
-        <v-btn variant="flat" class="mt-1" @click="downloadCover">
+        <v-btn v-if="canEdit" variant="flat" class="mt-1" @click="downloadCover">
           <v-progress-circular
             v-if="isDownloading"
             indeterminate
@@ -79,6 +82,7 @@
             multiple
             show-arrows
             column
+            :readonly="!canEdit"
             required
             active-class="primary"
             class="pa-2"
@@ -120,6 +124,7 @@
     <v-spacer />
     <v-btn v-if="propUseMode !== 'inline'" @click="closeDialog">{{ t('common.close') }}</v-btn>
     <v-btn
+      v-if="canEdit"
       variant="flat"
       color="primary"
       :loading="saveItemInfoLoading"
@@ -178,6 +183,10 @@ const itemForm = reactive<CreateItemDto | ItemDto>({
   is_custom: 0,
   mod_count_enable: 0,
   category_ids: []
+})
+
+const canEdit = computed(() => {
+  return itemForm.is_custom
 })
 
 const emits = defineEmits<{

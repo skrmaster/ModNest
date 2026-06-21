@@ -80,7 +80,7 @@
       "modCount": "Mod数量"
     },
     "searchPlaceholder": "请输入搜索名称",
-    "preview": "预览图",
+    "preview": "MOD预览图",
     "noPreview": "暂未检测到预览图",
     "modifyModDir": "修改 Mod 目录",
     "modifyModDirTitle": "修改 Mod 根目录",
@@ -161,5 +161,29 @@
   "home": {
     "update": "修改配置",
     "run": "请先启动XXMI"
+  },
+  "taskStep": {
+    "title": "启动游戏",
+    "retry": "第 {n} 次重试",
+    "cancel": "取消",
+    "close": "关闭",
+    "status": {
+      "running": "正在启动中...",
+      "success": "启动成功",
+      "cancelled": "已取消",
+      "error": "启动失败"
+    },
+    "steps": {
+      "getPath": "获取 XXMI 路径",
+      "resolveDir": "解析目录结构",
+      "prepareFiles": "准备文件列表",
+      "pack": "打包原有文件",
+      "prerequisite": "解压并替换 3DMigoto",
+      "updateConfig": "更新配置文件",
+      "launch": "启动游戏"
+    },
+    "errors": {
+      "xxmiNotFound": "未检测到 XXMI 进程，请先启动 XXMI Launcher"
+    }
   }
 }

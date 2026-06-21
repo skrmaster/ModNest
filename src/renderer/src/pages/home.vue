@@ -10,6 +10,7 @@
       </com-scroll>
     </div>
   </div>
+  <taskStep ref="taskRef"></taskStep>
 </template>
 
 <script setup lang="ts">
@@ -19,8 +20,9 @@ import markdownEnText from '@renderer/assets/home-en.md?raw'
 import { IMAGE_PROTOCOL } from '@shared/constants/index'
 import comScroll from '@renderer/components/com-scroll.vue'
 import { useAppSettings } from '@renderer/composables/useAppSettings'
-import { computed, ref } from 'vue'
+import { computed, ref, useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
+import taskStep from './task-step.vue'
 
 const { t } = useI18n()
 
@@ -29,8 +31,8 @@ const mdStr = computed(() => {
   return language.value === 'zh-CN' ? markdownText : markdownEnText
 })
 const errorStr = ref('')
-
 const successPs1Str = ref('')
+const taskRef = useTemplateRef('taskRef')
 
 const onMarkdownClick = async (e: MouseEvent) => {
   const target = e.target as HTMLElement
@@ -41,15 +43,8 @@ const onMarkdownClick = async (e: MouseEvent) => {
 
   e.preventDefault()
 
-  if (link.href.startsWith(`app-action://start-genshin`)) {
-    const [s, str] = await window.api.genshinApi.startGame()
-    if (!s) {
-      if (str === 'XXMIPathNull') {
-        errorStr.value = t('home.run')
-      } else {
-        errorStr.value = str
-      }
-    }
+  if (link.href.startsWith('app-action://start-genshin')) {
+    taskRef.value?.openModal()
     return
   }
 
@@ -71,7 +66,7 @@ const onMarkdownClick = async (e: MouseEvent) => {
   }
 
   if (link.href.startsWith(`action://updatePs1`)) {
-    const [status, error] = await window.api.updatePath.updatePs1Path()
+    const [status, error] = await window.api.genshinApi.updatePs1Path()
     if (!status) {
       errorStr.value = error
       successPs1Str.value = ''

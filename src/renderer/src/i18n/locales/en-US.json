@@ -76,7 +76,7 @@
       "modCount": "Mod count"
     },
     "searchPlaceholder": "Enter name to search",
-    "preview": "Preview",
+    "preview": "MOD Preview",
     "noPreview": "No preview images were detected.",
     "modifyModDir": "Modify Mod directory",
     "modifyModDirTitle": "Modify Mod root directory",
@@ -155,5 +155,29 @@
   "home": {
     "update": "Modify configuration",
     "run": "Please start XXMI first"
+  },
+  "taskStep": {
+    "title": "Launching Game",
+    "retry": "Retry #{n}",
+    "cancel": "Cancel",
+    "close": "Close",
+    "status": {
+      "running": "Launching...",
+      "success": "Launched successfully",
+      "cancelled": "Cancelled",
+      "error": "Launch failed"
+    },
+    "steps": {
+      "getPath": "Fetching XXMI path",
+      "resolveDir": "Resolving directory structure",
+      "prepareFiles": "Preparing file list",
+      "pack": "Backing up existing files",
+      "prerequisite": "Extracting 3DMigoto",
+      "updateConfig": "Updating config",
+      "launch": "Launching game"
+    },
+    "errors": {
+      "xxmiNotFound": "XXMI process not found, please launch XXMI Launcher first"
+    }
   }
 }
