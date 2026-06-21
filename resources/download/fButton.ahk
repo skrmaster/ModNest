@@ -9,30 +9,26 @@ F8::
 
     running := !running
 
-    if (running)
-    {
+    if (running) {
         SetTimer(PressF, 1000)
 
-        ToolTip("自动F：开启")
+        ToolTip("自动F:开启(Auto F: ON)")
         SetTimer(RemoveTip, -1000)
     }
-    else
-    {
+    else {
         SetTimer(PressF, 0)
 
-        ToolTip("自动F：关闭")
+        ToolTip("自动F:关闭(Auto F: OFF)")
         SetTimer(RemoveTip, -1000)
     }
 }
 
-PressF()
-{
+PressF() {
     SendInput("{f down}")
     Sleep(30)
     SendInput("{f up}")
 }
 
-RemoveTip()
-{
+RemoveTip() {
     ToolTip()
 }

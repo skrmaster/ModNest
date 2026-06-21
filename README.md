@@ -1,48 +1,49 @@
 # Dimension Workshop
 
-一个桌面工具，集 **Mod 管理、游戏解决方案** 于一体。
+English | [简体中文](README.zh-CN.md)
 
-Dimension Workshop 致力于为玩家提供更便捷的游戏管理体验
+A desktop application that integrates **Mod Management** and **Game Solutions** into a single platform.
 
----
-
-## ✨ 功能特性
-
-### 📦 Mod 管理
-
-轻松管理游戏 Mod 资源：
-
-- Mod 导入
-- Mod 启用与禁用
-- Mod 分类管理
-- 多游戏支持
+Dimension Workshop aims to provide a more convenient and efficient game management experience for players.
 
 ---
 
-### 🎮 自定义游戏管理
+## ✨ Features
 
-除了预设游戏外，还支持：
+### 📦 Mod Management
 
-- 自定义添加游戏
-- 自定义 Mod 目录
-- 独立配置管理
-- 多游戏切换
+Easily manage your game mods:
 
----
-
-### 🔧 游戏解决方案
-
-内置常见问题解决方案，帮助玩家快速排查和修复问题。
-
-当前包含：
-
-#### 原神 10612-4001 错误解决方案
-
-#### ⚡ 自动 F 跳过剧情方案
+- Import Mods
+- Enable / Disable Mods
+- Organize Mods by Categories
+- Multi-Game Support
 
 ---
 
-## 🛠️ 技术栈
+### 🎮 Custom Game Management
+
+In addition to built-in game presets, Dimension Workshop also supports:
+
+- Adding Custom Games
+- Custom Mod Directories
+- Independent Configuration Management
+- Switching Between Multiple Games
+
+---
+
+### 🔧 Game Solutions
+
+Built-in troubleshooting guides help players quickly diagnose and resolve common game issues.
+
+Currently includes:
+
+1. **Genshin Impact Error 10612-4001 Solution**
+2. **Auto-F Story Skipping Solution ⚡**
+
+---
+
+## 🛠️ Tech Stack
 
 - Electron
 - TypeScript
@@ -55,16 +56,16 @@ Dimension Workshop 致力于为玩家提供更便捷的游戏管理体验
 
 ---
 
-## 🚀 快速开始
+## 🚀 Getting Started
 
 ```bash
-# 安装依赖
+# Install dependencies
 npm install
 
-# 开发模式
+# Run in development mode
 npm run dev
 
-# 构建应用
+# Build the application
 npm run build
 ```
 
