@@ -23,6 +23,7 @@ asarUnpack:
 
 win:
   executableName: Dimension Workshop
+  icon: build/icon.ico
   target:
     - nsis
 

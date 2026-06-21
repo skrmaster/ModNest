@@ -10,6 +10,10 @@ import { FileService } from '../services/file/file.service'
 import { readFile } from 'fs/promises'
 import { ModOpenFolder } from '@shared/types/mod'
 
+const basePath = app.isPackaged
+  ? join(process.resourcesPath, 'resources')
+  : join(process.cwd(), 'resources')
+
 export function register(): void {
   const fileServices = new FileService()
 
@@ -21,8 +25,7 @@ export function register(): void {
 
       if (url.hostname === 'seed-images') {
         filePath = join(
-          process.cwd(),
-          'resources',
+          basePath,
           'seed-images',
           decodeURIComponent(url.pathname.replace(/^\//, ''))
         )

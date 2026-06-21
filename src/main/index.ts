@@ -1,8 +1,8 @@
-import { app, shell, BrowserWindow, ipcMain, session } from 'electron'
+import { app, shell, BrowserWindow, ipcMain, session, Menu } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import electronLocalshortcut from 'electron-localshortcut'
-import icon from '../../resources/icon.png?asset'
+import icon from '../../build/icon.ico?asset'
 import { DatabaseManager } from './db'
 import { registerIpcHandlers } from './ipc'
 import { registerModIpc } from './mod/Mod.ipc'
@@ -20,13 +20,14 @@ function createWindow(): BrowserWindow {
     autoHideMenuBar: true,
     minWidth: 500,
     minHeight: 500,
-
-    ...(process.platform === 'linux' ? { icon } : {}),
+    icon,
     webPreferences: {
       preload: join(__dirname, '../preload/index.mjs'),
       sandbox: false
     }
   })
+
+  Menu.setApplicationMenu(null)
 
   mainWindow.on('ready-to-show', () => {
     mainWindow.show()
