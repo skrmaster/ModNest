@@ -3,6 +3,7 @@ import { SettingsService } from '../services/settings/settings.service'
 
 export function register(): void {
   const settings = SettingsService.getInstance()
+  settings.initialize()
 
   ipcMain.handle('settings:get', (_, key) => {
     return settings.get(key)
@@ -14,5 +15,4 @@ export function register(): void {
 
   ipcMain.handle('settings:getSystemTheme', () => settings.getSystemTheme())
   ipcMain.handle('settings:getSystemLanguage', () => settings.getSystemLanguage())
-  settings.initialize()
 }

@@ -943,6 +943,19 @@ onUnmounted(() => {})
                     </tr>
                   </tbody>
                 </v-table>
+                <v-sheet
+                  v-if="tableData.length === 0"
+                  class="d-flex flex-column align-center justify-center text-center mt-10"
+                  color="transparent"
+                >
+                  <v-icon size="80" color="grey-lighten-1" class="mb-4">
+                    mdi-package-variant-closed-remove
+                  </v-icon>
+                  <h2 class="text-h5 font-weight-medium mb-2">{{ t('gameManager.noMod') }}</h2>
+                  <p class="text-medium-emphasis mb-6">
+                    {{ t('gameManager.drapHere') }}
+                  </p>
+                </v-sheet>
                 <v-overlay
                   :model-value="tableLoading"
                   contained

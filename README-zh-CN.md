@@ -1,8 +1,11 @@
-# Dimension Workshop
+<h1 align="center">Dimension Workshop</h1>
 
-[English](README.md) | 简体中文
+<p align="center">
+  <a href="README.md">English</a> •
+  简体中文
+</p>
 
-一个桌面工具，基于[XXMI]() 集 **Mod 管理、游戏解决方案** 于一体。
+一个桌面工具，集 **Mod 管理、游戏解决方案** 于一体。
 
 Dimension Workshop 提供更便捷的游戏管理体验
 

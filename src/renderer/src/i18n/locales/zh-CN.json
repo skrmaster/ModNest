@@ -54,6 +54,8 @@
     "deleteWarning": "该操作只会移除数据库记录，不会删除磁盘中的 mod 目录。"
   },
   "gameManager": {
+    "noMod": "还没有安装MOD",
+    "drapHere": "把你的MOD文件拖拽到这里",
     "unknownGame": "未知游戏",
     "characterHint": "选择人物查看可用 Mod 和配置。",
     "modCount": "{count} 个 Mod",

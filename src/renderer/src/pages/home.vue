@@ -6,7 +6,13 @@
           <v-alert v-if="errorStr" type="error" closable>{{ errorStr }}</v-alert>
           <v-alert v-if="successPs1Str" type="success" closable>{{ successPs1Str }}</v-alert>
         </div>
-        <MdPreview :model-value="mdStr" :preview-theme="'github'" editor-id="help" />
+        <MdPreview
+          :model-value="mdStr"
+          :preview-theme="'github'"
+          :theme="appTheme"
+          editor-id="help"
+          style="--md-bk-color: rgb(var(--v-theme-background))"
+        />
       </com-scroll>
     </div>
   </div>
@@ -26,7 +32,8 @@ import taskStep from './task-step.vue'
 
 const { t } = useI18n()
 
-const { language } = useAppSettings()
+const { language, appTheme } = useAppSettings()
+
 const mdStr = computed(() => {
   return language.value === 'zh-CN' ? markdownText : markdownEnText
 })

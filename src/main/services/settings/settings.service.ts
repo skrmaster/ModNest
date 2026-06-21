@@ -1,13 +1,14 @@
 import { app, BrowserWindow, nativeTheme } from 'electron'
 import { BaseStoreService } from '../core/base-store.service'
 import type { SettingsStore } from '../settings/settings.type'
+import { AppTheme } from '@shared/types/settings'
 
 export class SettingsService extends BaseStoreService<SettingsStore> {
   private static instance: SettingsService
 
   private constructor() {
     super('settings', {
-      theme: 'system',
+      theme: 'light',
       language: 'en-US'
     })
   }
@@ -29,7 +30,7 @@ export class SettingsService extends BaseStoreService<SettingsStore> {
     return SettingsService.instance
   }
 
-  public getSystemTheme(): SettingsStore['theme'] {
+  public getSystemTheme(): AppTheme {
     const theme = this.get('theme')
 
     if (theme === 'system') {

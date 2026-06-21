@@ -1,5 +1,7 @@
 export type ThemeMode = 'light' | 'dark' | 'system'
 
+export type AppTheme = 'light' | 'dark'
+
 export type Language = 'en-US' | 'zh-CN'
 
 export interface GameConfig {

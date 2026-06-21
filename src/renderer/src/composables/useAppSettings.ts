@@ -1,63 +1,35 @@
-import { computed, ref, watch, onMounted } from 'vue'
+import { ref, watch, onMounted } from 'vue'
 import { useTheme } from 'vuetify'
 import i18n from '@renderer/i18n'
-import type { ComputedRef, Ref } from 'vue'
-import type { ThemeMode, Language } from '@shared/types/settings'
+import type { Ref } from 'vue'
+import type { ThemeMode, Language, AppTheme } from '@shared/types/settings'
 
-const theme = (await window.api.settingsApi.getSystemTheme()) as ThemeMode
+const theme = (await window.api.settingsApi.getSystemTheme()) as AppTheme
 const savedLang = (await window.api.settingsApi.get('language')) as Language | undefined
 const lang = savedLang || ((await window.api.settingsApi.getSystemLanguage()) as Language)
 
-const themeMode = ref<ThemeMode>(theme)
+const themeMode = ref<ThemeMode>('system')
+const appTheme = ref<AppTheme>(theme)
 const language = ref<Language>(lang)
 
-const getSystemTheme = async (): Promise<ThemeMode> => await window.api.settingsApi.getSystemTheme()
+const getSystemTheme = () => window.api.settingsApi.getSystemTheme()
 
 export function useAppSettings(): {
   themeMode: Ref<ThemeMode>
+  appTheme: Ref<AppTheme>
   language: Ref<Language>
-  themeModeOptions: ComputedRef<
-    Array<{
-      label: string
-      value: ThemeMode
-    }>
-  >
-  languageOptions: ComputedRef<
-    Array<{
-      label: string
-      value: Language
-    }>
-  >
-
-  initialize: () => Promise<void>
 } {
   const theme = useTheme()
 
-  window.api.settingsApi.onSystemThemeChanged(() => applyTheme())
+  window.api.settingsApi.onSystemThemeChanged((t) => {
+    theme.change(t)
+  })
 
   const applyTheme = async (): Promise<void> => {
-    if (themeMode.value === 'system') {
-      theme.change(await getSystemTheme())
-    } else {
-      theme.change(themeMode.value)
-    }
-  }
+    const currentT = await getSystemTheme()
 
-  const initialize = async (): Promise<void> => {
-    const savedTheme = await window.api.settingsApi.getSystemTheme()
-    const savedLanguage = await window.api.settingsApi.getSystemLanguage()
-
-    if (savedTheme) {
-      themeMode.value = savedTheme as ThemeMode
-    }
-
-    if (savedLanguage) {
-      language.value = savedLanguage
-    }
-
-    i18n.global.locale.value = language.value
-
-    applyTheme()
+    appTheme.value = currentT
+    theme.change(currentT)
   }
 
   watch(themeMode, async (value) => {
@@ -73,53 +45,14 @@ export function useAppSettings(): {
   })
 
   onMounted(() => {
-    if (themeMode.value === 'system') {
-      applyTheme()
-    }
-  })
-
-  const themeModeOptions = computed(() => {
-    return [
-      {
-        label: i18n.global.t('theme.light') as string,
-        value: 'light' as ThemeMode
-      },
-
-      {
-        label: i18n.global.t('theme.dark') as string,
-        value: 'dark' as ThemeMode
-      },
-
-      {
-        label: i18n.global.t('theme.system') as string,
-        value: 'system' as ThemeMode
-      }
-    ]
-  })
-
-  const languageOptions = computed(() => {
-    return [
-      {
-        label: i18n.global.t('language.zh') as string,
-        value: 'zh-CN' as Language
-      },
-
-      {
-        label: i18n.global.t('language.en') as string,
-        value: 'en-US' as Language
-      }
-    ]
+    applyTheme()
   })
 
   return {
     themeMode,
 
-    language,
+    appTheme,
 
-    themeModeOptions,
-
-    languageOptions,
-
-    initialize
+    language
   }
 }

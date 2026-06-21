@@ -1,6 +1,9 @@
-# Dimension Workshop
+<h1 align="center">Dimension Workshop</h1>
 
-English | [简体中文](README.zh-CN.md)
+<p align="center">
+  English •
+  <a href="README.zh-CN.md">简体中文</a>
+</p>
 
 A desktop application that integrates **Mod Management** and **Game Solutions** into a single platform.
 
