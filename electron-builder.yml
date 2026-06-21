@@ -1,6 +1,11 @@
 appId: com.cygf.app
+
+productName: Dimension-Workshop
+
 directories:
+  output: dist
   buildResources: build
+
 files:
   - '!**/.vscode/*'
   - '!src/*'
@@ -8,26 +13,42 @@ files:
   - '!{.eslintcache,eslint.config.mjs,.prettierignore,.prettierrc.yaml,dev-app-update.yml,CHANGELOG.md,README.md}'
   - '!{.env,.env.*,.npmrc,pnpm-lock.yaml}'
   - '!{tsconfig.json,tsconfig.node.json,tsconfig.web.json}'
+
+extraResources:
+  - from: resources
+    to: resources
+
 asarUnpack:
   - resources/**
+
 win:
   executableName: Dimension Workshop
+  target:
+    - nsis
+
 nsis:
-  artifactName: ${name}-${version}-setup.${ext}
+  oneClick: false
+  allowToChangeInstallationDirectory: true
+  deleteAppDataOnUninstall: false
+  include: build/installer.nsh
+
+  artifactName: ${productName}-Setup-${version}.${ext}
   shortcutName: ${productName}
   uninstallDisplayName: ${productName}
   createDesktopShortcut: always
+
 dmg:
-  artifactName: ${name}-${version}.${ext}
+  artifactName: ${productName}-${version}.${ext}
+
 appImage:
-  artifactName: ${name}-${version}.${ext}
+  artifactName: ${productName}-${version}.${ext}
+
 npmRebuild: false
+
 publish:
   provider: github
   owner: skrmaster
   repo: dimension-workshop
+
 electronDownload:
   mirror: https://npmmirror.com/mirrors/electron/
-extraResources:
-  - from: resources
-    to: resources
