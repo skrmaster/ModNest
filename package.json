@@ -1,15 +1,15 @@
 {
-  "name": "electron-app",
+  "name": "Dimension Workshop",
   "version": "1.0.0",
   "type": "module",
-  "description": "An Electron application with Vue and TypeScript",
+  "description": "Mod Management · Automation Tools · Game Solutions",
   "main": "./out/main/index.js",
   "author": "skrmaster",
   "license": "MIT",
   "homepage": "https://electron-vite.org",
   "build": {
-    "appId": "com.example.electronapp",
-    "productName": "Electron App",
+    "appId": "com.cygf.app",
+    "productName": "Dimension Workshop",
     "directories": {
       "output": "dist"
     },

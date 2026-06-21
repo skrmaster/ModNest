@@ -1,34 +1,75 @@
-# electron-app
+# Dimension Workshop
 
-An Electron application with Vue and TypeScript
+一个桌面工具，集 **Mod 管理、游戏解决方案** 于一体。
 
-## Recommended IDE Setup
+Dimension Workshop 致力于为玩家提供更便捷的游戏管理体验
 
-- [VSCode](https://code.visualstudio.com/) + [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint) + [Prettier](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar)
+---
 
-## Project Setup
+## ✨ 功能特性
 
-### Install
+### 📦 Mod 管理
+
+轻松管理游戏 Mod 资源：
+
+- Mod 导入
+- Mod 启用与禁用
+- Mod 分类管理
+- 多游戏支持
+
+---
+
+### 🎮 自定义游戏管理
+
+除了预设游戏外，还支持：
+
+- 自定义添加游戏
+- 自定义 Mod 目录
+- 独立配置管理
+- 多游戏切换
+
+---
+
+### 🔧 游戏解决方案
+
+内置常见问题解决方案，帮助玩家快速排查和修复问题。
+
+当前包含：
+
+#### 原神 10612-4001 错误解决方案
+
+#### ⚡ 自动 F 跳过剧情方案
+
+---
+
+## 🛠️ 技术栈
+
+- Electron
+- TypeScript
+- Vue 3
+- Vite
+- Vuetify
+- Electron Builder
+- ESLint
+- Prettier
+
+---
+
+## 🚀 快速开始
 
 ```bash
-$ npm install
+# 安装依赖
+npm install
+
+# 开发模式
+npm run dev
+
+# 构建应用
+npm run build
 ```
 
-### Development
+---
 
-```bash
-$ npm run dev
-```
+## 📄 License
 
-### Build
-
-```bash
-# For windows
-$ npm run build:win
-
-# For macOS
-$ npm run build:mac
-
-# For Linux
-$ npm run build:linux
-```
+MIT License

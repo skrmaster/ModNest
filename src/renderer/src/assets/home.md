@@ -23,6 +23,7 @@
 <a href="app-action://start-genshin" style="background:#f0c14b;color:#333;border;border-radius:6px;padding:12px 30px;font-size:20px;font-weight:700;cursor;box-shadow:0 2px 8px rgba(0,0,0,.25);display:inline-block;margin-inline: auto;">🎮开始游戏</a>&nbsp;&nbsp;&nbsp;&nbsp;等待游戏运行成功，等到加载进行到如图所示<img src="app-image://seed-images/logo/genshin-loading.png" width="180" style="display:inline;vertical-align:middle;margin-right: 10px;border: 1px solid #eee" />后，点击[`开始断网`](app-action://internet_outage)
 
 > 游戏会在2min~3min中断网，不建议在游戏启动后前3min内游玩，3min过后还需要检测，只要游戏时间过5分钟没出现错误，恭喜你成功了！！！
+> 建议使用MOD的时候不要联机匹配，容易出现问题
 
 > 还有一句话，你得先有MOD在XXMI/GIMI/Mods才能查看效果
 

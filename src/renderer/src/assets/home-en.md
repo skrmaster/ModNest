@@ -30,6 +30,7 @@ If XXMI is not installed, please install it first [`Install`](app-image://open-X
 Then click [`Start Network Disconnection`](app-action://internet_outage)
 
 > The game will disconnect from the network after about 2–3 minutes. It is not recommended to play within the first 3 minutes after launch. After 3 minutes, additional checks may still occur. If you can pass 5 minutes of gameplay without errors, congratulations — it worked!!!
+> It is recommended to avoid online matchmaking when using mods, as it can easily cause problems.
 
 > Also: you must already have mods placed in XXMI/GIMI/Mods to see any effect.
 
