@@ -1,7 +1,7 @@
 import { app, shell, BrowserWindow, ipcMain, session, Menu } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
-import electronLocalshortcut from 'electron-localshortcut'
+// import electronLocalshortcut from 'electron-localshortcut'
 import icon from '../../build/icon.ico?asset'
 import { DatabaseManager } from './db'
 import { registerIpcHandlers } from './ipc'
@@ -139,9 +139,9 @@ app.whenReady().then(async () => {
 
   registerGenshinIpc(win)
 
-  electronLocalshortcut.register(win, 'F12', () => {
-    win.webContents.toggleDevTools()
-  })
+  // electronLocalshortcut.register(win, 'F12', () => {
+  //   win.webContents.toggleDevTools()
+  // })
 
   app.on('activate', function () {
     // On macOS it's common to re-create a window in the app when the
