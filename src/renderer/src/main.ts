@@ -7,11 +7,11 @@ import { setupRouter } from './router'
 import i18n from './i18n'
 import { createPinia } from 'pinia'
 import { vuetify, vuetifyLocaleMap } from './plugins/vuetify'
-import { Language, ThemeMode } from '@shared/types/settings'
+import { AppLang, ThemeMode } from '@shared/types/settings'
 
 async function bootstrap(): Promise<void> {
   const theme = (await window.api.settingsApi.getSystemTheme()) as ThemeMode
-  const language = (await window.api.settingsApi.getSystemLanguage()) as Language
+  const language = (await window.api.settingsApi.getSystemLanguage()) as AppLang
 
   vuetify.theme.change(theme)
   vuetify.locale.current.value = vuetifyLocaleMap[language]

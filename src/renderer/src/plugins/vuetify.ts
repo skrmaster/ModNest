@@ -3,9 +3,9 @@ import { createVuetify } from 'vuetify'
 import * as components from 'vuetify/components'
 import * as directives from 'vuetify/directives'
 import { zhHans, en } from 'vuetify/locale'
-import { Language } from '@shared/types/settings'
+import { AppLang } from '@shared/types/settings'
 
-export const vuetifyLocaleMap: Record<Language, string> = {
+export const vuetifyLocaleMap: Record<AppLang, string> = {
   'zh-CN': 'zhHans',
   'en-US': 'en'
 } as const
