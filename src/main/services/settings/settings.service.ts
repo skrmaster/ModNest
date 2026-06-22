@@ -8,7 +8,7 @@ export class SettingsService extends BaseStoreService<SettingsStore> {
 
   private constructor() {
     super('settings', {
-      theme: 'light',
+      theme: 'system',
       language: 'system'
     })
   }

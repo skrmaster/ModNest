@@ -4,7 +4,7 @@ import i18n from '@renderer/i18n'
 import type { Ref } from 'vue'
 import type { ThemeMode, Language, AppTheme, AppLang } from '@shared/types/settings'
 
-const theme = (await window.api.settingsApi.getSystemTheme()) as AppTheme
+const theme = await window.api.settingsApi.getSystemTheme()
 const lang = await window.api.settingsApi.getSystemLanguage()
 
 const themeMode = ref<ThemeMode>('system')
@@ -26,6 +26,7 @@ export function useAppSettings(): {
 
   const applyTheme = async (): Promise<void> => {
     const currentT = await getSystemTheme()
+    console.log(currentT, 'currentT')
 
     appTheme.value = currentT
     theme.change(currentT)

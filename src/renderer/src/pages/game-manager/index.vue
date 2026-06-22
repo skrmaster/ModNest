@@ -123,8 +123,8 @@ function getSortTypeStorageKey(id: string): string {
   return `${SORT_TYPE_KEY_PREFIX}${id}`
 }
 
-function loadSortTypeFromStorage(id: string): string {
-  const saved = localStorage.getItem(getSortTypeStorageKey(id))
+async function loadSortTypeFromStorage(id: string): Promise<string> {
+  const saved = await window.api.settingsApi.get(getSortTypeStorageKey(id))
   return saved === 'ModCount' ? 'ModCount' : 'default'
 }
 
@@ -356,7 +356,7 @@ watch(
       elementMap.set(e.name, e.id)
     })
     game.value = gameStore.getById(newGameId as string)
-    sortType.value = loadSortTypeFromStorage(newGameId as string)
+    sortType.value = await loadSortTypeFromStorage(newGameId as string)
     await getItems()
     observeResize()
   },
@@ -645,11 +645,11 @@ const { snapshot, flip, cleanup, observeResize } = useGridAnimate(containerRef, 
   stagger: 1
 })
 
-function handleSortList(val: (typeof options.value)[0]) {
+async function handleSortList(val: (typeof options.value)[0]) {
   snapshot()
   sortType.value = val.value
   if (gameId.value) {
-    localStorage.setItem(getSortTypeStorageKey(gameId.value), val.value)
+    window.api.settingsApi.set(getSortTypeStorageKey(gameId.value), val.value)
   }
   flip()
 }
@@ -680,17 +680,18 @@ async function confirmDelete() {
   }
 }
 
-const sizes = ref<number[]>(
-  JSON.parse(localStorage.getItem(`${gameId.value}layout-sizes`) ?? '[20,60,20]')
-)
+const sizes = ref<number[]>([20, 60, 20])
 
 function handleResize(payload: SplitpanesResizedPayload) {
   sizes.value = payload.panes.map((pane) => pane.size)
 
-  localStorage.setItem(`${gameId.value}layout-sizes`, JSON.stringify(sizes.value))
+  window.api.settingsApi.set(`${gameId.value}layout-sizes`, JSON.stringify(sizes.value))
 }
 
-onMounted(() => {})
+onMounted(async () => {
+  const data = await window.api.settingsApi.get(`${gameId.value}layout-sizes`)
+  sizes.value = JSON.parse(data)
+})
 
 onUnmounted(() => {
   cleanup()
