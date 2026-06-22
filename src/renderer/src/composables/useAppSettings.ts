@@ -2,15 +2,14 @@ import { ref, watch, onMounted } from 'vue'
 import { useTheme } from 'vuetify'
 import i18n from '@renderer/i18n'
 import type { Ref } from 'vue'
-import type { ThemeMode, Language, AppTheme } from '@shared/types/settings'
+import type { ThemeMode, Language, AppTheme, AppLang } from '@shared/types/settings'
 
 const theme = (await window.api.settingsApi.getSystemTheme()) as AppTheme
-const savedLang = (await window.api.settingsApi.get('language')) as Language | undefined
-const lang = savedLang || ((await window.api.settingsApi.getSystemLanguage()) as Language)
+const lang = await window.api.settingsApi.getSystemLanguage()
 
 const themeMode = ref<ThemeMode>('system')
 const appTheme = ref<AppTheme>(theme)
-const language = ref<Language>(lang)
+const language = ref<AppLang>(lang)
 
 const getSystemTheme = () => window.api.settingsApi.getSystemTheme()
 

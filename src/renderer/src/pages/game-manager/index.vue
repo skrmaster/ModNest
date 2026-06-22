@@ -33,7 +33,7 @@ import 'splitpanes/dist/splitpanes.css'
 import { useAppSettings } from '@renderer/composables/useAppSettings'
 import { useI18n } from 'vue-i18n'
 import { gameImageMap } from '@shared/enums/index'
-// import { wrapGrid } from 'animate-css-grid'
+import { useGridAnimate } from '@renderer/composables/useGridAnimate'
 
 type List = Array<GameItemRow & { element?: string; rarityBg?: string }>
 type TableData = ModInfo & { isChoose: boolean }
@@ -128,13 +128,6 @@ function loadSortTypeFromStorage(id: string): string {
   return saved === 'ModCount' ? 'ModCount' : 'default'
 }
 
-function handleSortList(val: (typeof options.value)[0]) {
-  sortType.value = val.value
-  if (gameId.value) {
-    localStorage.setItem(getSortTypeStorageKey(gameId.value), val.value)
-  }
-}
-
 const filteredItems = computed(() => {
   if (!activeItems.value) return []
 
@@ -189,9 +182,11 @@ const rarityList = computed(() => {
 async function getItems() {
   if (isGettingItems.value) return
   isGettingItems.value = true
+
   try {
     const tmp = (await window.api.itemApi.list(toRaw(queryParams))) as List
 
+    snapshot()
     activeItems.value = tmp.map((e) => {
       let element: string | undefined, rarityBg: string | undefined
       for (const item of e.categoryDtos || []) {
@@ -217,7 +212,15 @@ async function getItems() {
   } finally {
     isGettingItems.value = false
   }
+
+  await nextTick()
+  flip()
 }
+
+watch(searchText, () => {
+  snapshot()
+  nextTick(flip)
+})
 
 const formContentRef = useTemplateRef('formContentRef')
 async function handleDetail(item: GameItemRow) {
@@ -355,7 +358,7 @@ watch(
     game.value = gameStore.getById(newGameId as string)
     sortType.value = loadSortTypeFromStorage(newGameId as string)
     await getItems()
-    initListAnimate()
+    observeResize()
   },
   { immediate: true }
 )
@@ -637,17 +640,18 @@ async function handleConfirmUninstallMod(toTrash = false) {
 }
 
 const containerRef = useTemplateRef('containerRef')
+const { snapshot, flip, cleanup, observeResize } = useGridAnimate(containerRef, {
+  duration: 220,
+  stagger: 1
+})
 
-function initListAnimate() {
-  if (!containerRef.value) {
-    return
+function handleSortList(val: (typeof options.value)[0]) {
+  snapshot()
+  sortType.value = val.value
+  if (gameId.value) {
+    localStorage.setItem(getSortTypeStorageKey(gameId.value), val.value)
   }
-
-  // wrapGrid(containerRef.value, {
-  //   stagger: 0,
-  //   duration: 600,
-  //   easing: 'easeInOut'
-  // })
+  flip()
 }
 
 const deleteDialog = ref(false)
@@ -688,7 +692,9 @@ function handleResize(payload: SplitpanesResizedPayload) {
 
 onMounted(() => {})
 
-onUnmounted(() => {})
+onUnmounted(() => {
+  cleanup()
+})
 </script>
 
 <template>
@@ -763,7 +769,12 @@ onUnmounted(() => {})
               ref="containerRef"
               class="containerRef relative grid gap-2 grid-cols-[repeat(auto-fill,minmax(200px,1fr))]"
             >
-              <div v-for="item in filteredItems" :key="item.id">
+              <div
+                v-for="item in filteredItems"
+                :key="item.id"
+                :data-item-id="item.id"
+                style="min-width: 0"
+              >
                 <v-card
                   class="cursor-pointer py-2 group"
                   variant="tonal"
