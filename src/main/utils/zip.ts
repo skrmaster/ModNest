@@ -6,11 +6,9 @@ import { ModInstallPreview } from '@shared/types/mod'
 import { spawn } from 'child_process'
 import os from 'os'
 import { MOD_IMAGE_PROTOCOL, MOD_PREVIEW_TMP } from '@shared/constants'
-import { app } from 'electron'
+import { getResourcePath } from './resource-path'
 
-const sevenZipPath = app.isPackaged
-  ? path.join(process.resourcesPath, '7zip', '7z.exe')
-  : path.join(process.cwd(), 'resources', '7zip', '7z.exe')
+const sevenZipPath = path.join(getResourcePath(), '7zip', '7z.exe')
 
 const { extractFull, list } = Seven
 

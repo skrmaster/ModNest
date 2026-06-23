@@ -1,6 +1,6 @@
 import { pathToFileURL } from 'url'
-import { ipcMain, protocol, net, app } from 'electron'
-import path, { extname, join } from 'path'
+import { ipcMain, protocol, net } from 'electron'
+import { extname, join } from 'path'
 import {
   IMAGE_PROTOCOL,
   MOD_IMAGE_PROTOCOL,
@@ -9,10 +9,9 @@ import {
 import { FileService } from '../services/file/file.service'
 import { readFile } from 'fs/promises'
 import { ModOpenFolder } from '@shared/types/mod'
+import { getResourcePath } from '../utils/resource-path'
 
-const basePath = app.isPackaged
-  ? join(process.resourcesPath, 'resources')
-  : join(process.cwd(), 'resources')
+const basePath = getResourcePath()
 
 export function register(): void {
   const fileServices = new FileService()
@@ -127,10 +126,7 @@ export function register(): void {
   })
 
   ipcMain.handle('open-download', () => {
-    const downloadPath = app.isPackaged
-      ? path.join(process.resourcesPath, 'download')
-      : path.join(process.cwd(), 'resources', 'download')
-    console.log(downloadPath)
+    const downloadPath = join(getResourcePath(), 'download')
 
     return fileServices.openInExplorer(downloadPath)
   })

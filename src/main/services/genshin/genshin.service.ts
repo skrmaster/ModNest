@@ -12,6 +12,7 @@ import {
   findXXMIFromShortcut,
   findXXMIRoot
 } from '../../utils/file'
+import { getResourcePath } from '../../utils/resource-path'
 
 function extractStrings(buf: Buffer, minLen = 4): string[] {
   const result: string[] = []
@@ -242,13 +243,8 @@ export class Genshin extends EventEmitter {
   }
 
   async prerequisite(replaceFileName: string[]): Promise<void> {
-    const downloadDir = app.isPackaged
-      ? path.join(process.resourcesPath, 'download')
-      : path.join(process.cwd(), 'resources', 'download')
-
-    const _3dmigotoZip = app.isPackaged
-      ? path.join(process.resourcesPath, 'download', '3dmigoto-GIMI-for-playing-mods.zip')
-      : path.join(process.cwd(), 'resources', 'download', '3dmigoto-GIMI-for-playing-mods.zip')
+    const downloadDir = join(getResourcePath(), 'download')
+    const _3dmigotoZip = join(getResourcePath(), 'download', '3dmigoto-GIMI-for-playing-mods.zip')
 
     await unzipToCurrentDir(_3dmigotoZip)
     const zipRoot = join(downloadDir, '3dmigoto')
@@ -303,9 +299,7 @@ export class Genshin extends EventEmitter {
   }
 
   getPs1Path(): string {
-    return app.isPackaged
-      ? path.join(process.resourcesPath, 'download', 'genshin_bad_network.ps1')
-      : path.join(process.cwd(), 'resources', 'download', 'genshin_bad_network.ps1')
+    return path.join(getResourcePath(), 'download', 'genshin_bad_network.ps1')
   }
 
   updatePs1Content(): void {
@@ -322,21 +316,17 @@ export class Genshin extends EventEmitter {
   }
 
   static runBadworkBat(): void {
-    const pathBat = app.isPackaged
-      ? path.join(process.resourcesPath, 'download', 'badwork.bat')
-      : path.join(process.cwd(), 'resources', 'download', 'badwork.bat')
+    const pathBat = path.join(getResourcePath(), 'download', 'badwork.bat')
     shell.openPath(pathBat)
   }
 
   static installXXMI(): void {
-    const msi = app.isPackaged
-      ? path.join(process.resourcesPath, 'download', 'XXMI-Launcher-Installer-Online-v2.2.1.msi')
-      : path.join(
-          process.cwd(),
-          'resources',
-          'download',
-          'XXMI-Launcher-Installer-Online-v2.2.1.msi'
-        )
+    const msi = path.join(
+      getResourcePath(),
+      'download',
+      'XXMI-Launcher-Installer-Online-v2.2.1.msi'
+    )
+
     shell.openPath(msi)
   }
 }
