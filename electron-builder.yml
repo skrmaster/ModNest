@@ -33,7 +33,6 @@ nsis:
   oneClick: false
   perMachine: false
   allowToChangeInstallationDirectory: true
-  allowElevation: false
   deleteAppDataOnUninstall: false
   include: build/installer.nsh
 
