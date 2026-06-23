@@ -634,6 +634,7 @@ async function handleConfirmUninstallMod(toTrash = false) {
   if (errorstr.length === 0) {
     prevDeleteItem.value = []
     selectTableRow.value = undefined
+    chooseAll.value = false
     getModList()
   } else {
     uninstallRef.value?.setError(errorstr.join(','))

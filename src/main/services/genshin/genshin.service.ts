@@ -1,11 +1,17 @@
 import { exec, spawn } from 'child_process'
 import { app, shell } from 'electron'
-import { Dirent, existsSync, readdirSync, readFileSync, statSync, writeFileSync } from 'fs'
+import { Dirent, existsSync, readdirSync, readFileSync, Stats, statSync, writeFileSync } from 'fs'
 import { access, copyFile, mkdir, readFile, rm, unlink, writeFile } from 'fs/promises'
 import path, { join } from 'path'
 import { EventEmitter } from 'events'
 import { TaskRunner } from '../task-engine/TaskRunner'
 import type { StepDefinition, TaskSummary } from '@shared/types/task-engine'
+import {
+  findXXMIFromCommonDirs,
+  findXXMIFromRegistry,
+  findXXMIFromShortcut,
+  findXXMIRoot
+} from '../../utils/file'
 
 function extractStrings(buf: Buffer, minLen = 4): string[] {
   const result: string[] = []
@@ -60,7 +66,7 @@ function findGenshinExe(root: string): string | null {
     }
     for (const f of files) {
       const full = path.join(dir, f)
-      let stat
+      let stat: Stats
       try {
         stat = statSync(full)
       } catch {
@@ -157,7 +163,8 @@ function buildGenshinSteps(instance: Genshin): StepDefinition<Partial<GenshinCtx
       dependsOn: ['getPath'],
       async execute(ctx, signal) {
         if (signal.aborted) throw new DOMException('Cancelled', 'AbortError')
-        const XXMIRootDir = path.dirname(path.dirname(path.dirname(ctx.XXMIPath!)))
+        const XXMIRootDir = findXXMIRoot(ctx.XXMIPath!)
+
         ctx.GIMIDir = join(XXMIRootDir, 'GIMI')
       }
     },
@@ -209,7 +216,6 @@ function buildGenshinSteps(instance: Genshin): StepDefinition<Partial<GenshinCtx
       async execute(ctx, signal) {
         if (signal.aborted) throw new DOMException('Cancelled', 'AbortError')
         await shell.openPath(ctx.replaceFileNames![0])
-        Genshin.closeXXMI()
       }
     }
   ]
@@ -277,20 +283,23 @@ export class Genshin extends EventEmitter {
   }
 
   async getXXMIPath(): Promise<string> {
-    const cmd = `powershell -Command "Get-Process | Where-Object {$_.ProcessName -like '*XXMI*'} | Select-Object -ExpandProperty Path"`
+    let path = await findXXMIFromRegistry()
 
-    return new Promise<string>((resolve, reject) => {
-      exec(cmd, { windowsHide: true }, (error, stdout) => {
-        if (error) {
-          return reject(new Error('xxmiNotFound'))
-        }
-        const xxmiPath = stdout.trim()
-        if (!xxmiPath) {
-          return reject(new Error('xxmiNotFound'))
-        }
-        resolve(xxmiPath)
-      })
-    })
+    console.log(path, '1')
+
+    if (path) return path
+
+    path = await findXXMIFromShortcut()
+    console.log(path, '2')
+
+    if (path) return path
+
+    path = await findXXMIFromCommonDirs()
+    console.log(path, '3')
+
+    if (path) return path
+
+    throw new Error('xxmiNotFound')
   }
 
   getPs1Path(): string {
@@ -329,15 +338,5 @@ export class Genshin extends EventEmitter {
           'XXMI-Launcher-Installer-Online-v2.2.1.msi'
         )
     shell.openPath(msi)
-  }
-
-  static closeXXMI(): void {
-    exec(`taskkill /F /T /IM "XXMI Launcher.exe"`, (err, stdout, stderr) => {
-      if (err) {
-        console.error(stderr || err.message)
-        return
-      }
-      console.log(stdout)
-    })
   }
 }

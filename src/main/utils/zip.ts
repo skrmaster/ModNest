@@ -1,5 +1,4 @@
 import Seven from 'node-7z'
-import { path7za } from '7zip-bin'
 import fs from 'fs/promises'
 import path from 'path'
 import { existsSync } from 'fs'
@@ -9,14 +8,16 @@ import os from 'os'
 import { MOD_IMAGE_PROTOCOL, MOD_PREVIEW_TMP } from '@shared/constants'
 import { app } from 'electron'
 
-const path7zaApp = app.isPackaged ? path.join(process.resourcesPath, '7za.exe') : path7za
+const sevenZipPath = app.isPackaged
+  ? path.join(process.resourcesPath, '7zip', '7z.exe')
+  : path.join(process.cwd(), 'resources', '7zip', '7z.exe')
 
 const { extractFull, list } = Seven
 
 export function extractAll(archivePath: string, targetDir: string): Promise<void> {
   return new Promise((resolve, reject) => {
     const stream = extractFull(archivePath, targetDir, {
-      $bin: path7zaApp
+      $bin: sevenZipPath
     })
 
     stream.on('end', () => resolve())
@@ -30,7 +31,7 @@ export async function getArchiveFiles(archivePath: string): Promise<string[]> {
     const files: string[] = []
 
     const stream = list(archivePath, {
-      $bin: path7zaApp
+      $bin: sevenZipPath
     })
 
     stream.on('data', (data) => {
@@ -56,7 +57,7 @@ export async function extractPreviewImage(
 
   try {
     await new Promise<void>((resolve, reject) => {
-      const child = spawn(path7zaApp, [
+      const child = spawn(sevenZipPath, [
         'e',
         archivePath,
         previewPathInArchive,

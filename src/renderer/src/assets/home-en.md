@@ -20,7 +20,6 @@
 
 For now, do **not focus on the prerequisites, file replacement, configuration changes, or launching steps**. Only check them if the game fails to start after clicking “Start Game”.
 
-<span class="text-red-600">!!!Attention: Please start XXMI first!!!</span>
 If XXMI is not installed, please install it first [`Install`](app-image://open-XXMI.msi) [`Official Website`](https://github.com/SpectrumQT/XXMI-Launcher/releases)
 
 <a href="app-action://start-genshin" style="background:#f0c14b;color:#333;border;border-radius:6px;padding:12px 30px;font-size:20px;font-weight:700;cursor;box-shadow:0 2px 8px rgba(0,0,0,.25);display:inline-block;margin-inline: auto;">🎮 Start Game</a> Wait for the game to launch successfully. When loading reaches the screen shown below:

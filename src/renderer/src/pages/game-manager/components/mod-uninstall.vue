@@ -120,6 +120,7 @@ const handleConfirm = () => {
   } else {
     emit('recycle')
   }
+  isLoading.value = false
   isDialogOpen.value = false
 }
 

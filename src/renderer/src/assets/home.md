@@ -18,7 +18,7 @@
 
 先不用看**前置内容** **替换文件** **修改配置** **启动游戏**，如果点击开始游戏无法启动游戏再进行查看
 
-<span class="text-red-600">!!!注意：请先启动XXMI!!!</span>,如果没有安装XXMI就请先[`安装`](app-image://open-XXMI.msi)&nbsp;&nbsp;&nbsp;&nbsp;[`官网`](https://github.com/SpectrumQT/XXMI-Launcher/releases)
+如果没有安装XXMI就请先[`安装`](app-image://open-XXMI.msi)&nbsp;&nbsp;&nbsp;&nbsp;[`官网`](https://github.com/SpectrumQT/XXMI-Launcher/releases)
 
 <a href="app-action://start-genshin" style="background:#f0c14b;color:#333;border;border-radius:6px;padding:12px 30px;font-size:20px;font-weight:700;cursor;box-shadow:0 2px 8px rgba(0,0,0,.25);display:inline-block;margin-inline: auto;">🎮开始游戏</a>&nbsp;&nbsp;&nbsp;&nbsp;等待游戏运行成功，等到加载进行到如图所示<img src="app-image://seed-images/logo/genshin-loading.png" width="180" style="display:inline;vertical-align:middle;margin-right: 10px;border: 1px solid #eee" />后，点击[`开始断网`](app-action://internet_outage)
 
