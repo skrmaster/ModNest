@@ -13,6 +13,7 @@ import {
   findXXMIRoot
 } from '../../utils/file'
 import { getResourcePath } from '../../utils/resource-path'
+import { writeLog } from '../../utils/log'
 
 function extractStrings(buf: Buffer, minLen = 4): string[] {
   const result: string[] = []
@@ -125,17 +126,30 @@ async function createZip(files: string[], outputDir: string): Promise<string> {
 function unzipToCurrentDir(zipPath: string): Promise<void> {
   return new Promise((resolve, reject) => {
     const outputDir = path.dirname(zipPath)
+    writeLog('zipPath=', zipPath)
+    writeLog('outputDir=', outputDir)
+
     const child = spawn('powershell.exe', [
       '-NoProfile',
       '-Command',
-      'Expand-Archive',
-      '-Path',
-      zipPath,
-      '-DestinationPath',
-      outputDir,
-      '-Force'
+      `Expand-Archive -LiteralPath "${zipPath}" -DestinationPath "${outputDir}" -Force`
     ])
+    child.stdout.on('data', (data) => {
+      writeLog('stdout:', data.toString())
+    })
+
+    child.stderr.on('data', (data) => {
+      writeLog('stderr:', data.toString())
+    })
+
+    child.on('error', (err) => {
+      writeLog('spawn error:', err)
+      reject(err)
+    })
+
     child.on('close', (code) => {
+      writeLog('close code:', code)
+
       code === 0 ? resolve() : reject(new Error(`Decompression failed with code: ${code}`))
     })
   })
@@ -280,19 +294,12 @@ export class Genshin extends EventEmitter {
 
   async getXXMIPath(): Promise<string> {
     let path = await findXXMIFromRegistry()
-
-    console.log(path, '1')
-
     if (path) return path
 
     path = await findXXMIFromShortcut()
-    console.log(path, '2')
-
     if (path) return path
 
     path = await findXXMIFromCommonDirs()
-    console.log(path, '3')
-
     if (path) return path
 
     throw new Error('xxmiNotFound')
