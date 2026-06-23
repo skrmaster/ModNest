@@ -26,7 +26,6 @@ export function useAppSettings(): {
 
   const applyTheme = async (): Promise<void> => {
     const currentT = await getSystemTheme()
-    console.log(currentT, 'currentT')
 
     appTheme.value = currentT
     theme.change(currentT)

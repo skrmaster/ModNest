@@ -633,6 +633,7 @@ async function handleConfirmUninstallMod(toTrash = false) {
 
   if (errorstr.length === 0) {
     prevDeleteItem.value = []
+    selectTableRow.value = undefined
     getModList()
   } else {
     uninstallRef.value?.setError(errorstr.join(','))
@@ -690,7 +691,7 @@ function handleResize(payload: SplitpanesResizedPayload) {
 
 onMounted(async () => {
   const data = await window.api.settingsApi.get(`${gameId.value}layout-sizes`)
-  sizes.value = JSON.parse(data)
+  sizes.value = data ? JSON.parse(data) : [20, 60, 20]
 })
 
 onUnmounted(() => {

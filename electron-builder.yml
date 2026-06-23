@@ -17,6 +17,8 @@ files:
 extraResources:
   - from: resources
     to: resources
+  - from: node_modules/7zip-bin/win/x64/7za.exe
+    to: 7za.exe
 
 asarUnpack:
   - resources/**
@@ -29,7 +31,9 @@ win:
 
 nsis:
   oneClick: false
+  perMachine: false
   allowToChangeInstallationDirectory: true
+  allowElevation: false
   deleteAppDataOnUninstall: false
   include: build/installer.nsh
 

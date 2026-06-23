@@ -7,13 +7,16 @@ import { ModInstallPreview } from '@shared/types/mod'
 import { spawn } from 'child_process'
 import os from 'os'
 import { MOD_IMAGE_PROTOCOL, MOD_PREVIEW_TMP } from '@shared/constants'
+import { app } from 'electron'
+
+const path7zaApp = app.isPackaged ? path.join(process.resourcesPath, '7za.exe') : path7za
 
 const { extractFull, list } = Seven
 
 export function extractAll(archivePath: string, targetDir: string): Promise<void> {
   return new Promise((resolve, reject) => {
     const stream = extractFull(archivePath, targetDir, {
-      $bin: path7za
+      $bin: path7zaApp
     })
 
     stream.on('end', () => resolve())
@@ -27,7 +30,7 @@ export async function getArchiveFiles(archivePath: string): Promise<string[]> {
     const files: string[] = []
 
     const stream = list(archivePath, {
-      $bin: path7za
+      $bin: path7zaApp
     })
 
     stream.on('data', (data) => {
@@ -49,22 +52,34 @@ export async function extractPreviewImage(
   previewPathInArchive: string
 ): Promise<string> {
   const tempDir = path.join(os.tmpdir(), MOD_PREVIEW_TMP, crypto.randomUUID())
-
   await fs.mkdir(tempDir, { recursive: true })
 
-  return new Promise((resolve, reject) => {
-    const child = spawn(path7za, ['e', archivePath, previewPathInArchive, `-o${tempDir}`, '-y'])
-
-    child.on('error', reject)
-
-    child.on('exit', (code) => {
-      if (code === 0) {
-        resolve(path.join(tempDir, path.basename(previewPathInArchive)))
-      } else {
-        reject(new Error(`7za exited with code ${code}`))
-      }
+  try {
+    await new Promise<void>((resolve, reject) => {
+      const child = spawn(path7zaApp, [
+        'e',
+        archivePath,
+        previewPathInArchive,
+        `-o${tempDir}`,
+        '-y'
+      ])
+      child.on('error', reject)
+      child.on('exit', (code) => {
+        code === 0 ? resolve() : reject(new Error(`7za exited with code ${code}`))
+      })
     })
-  })
+
+    const outPath = path.join(tempDir, path.basename(previewPathInArchive))
+    return outPath
+  } catch (err) {
+    await fs.rm(tempDir, { recursive: true, force: true }).catch(() => {})
+    throw err
+  }
+}
+
+export async function cleanPreviewTemp(filePath: string) {
+  const tempDir = path.dirname(filePath)
+  await fs.rm(tempDir, { recursive: true, force: true }).catch(() => {})
 }
 
 export async function inspectArchive(
@@ -82,7 +97,6 @@ export async function inspectArchive(
 
   const archiveStat = await fs.stat(archivePath)
   const createdAt = archiveStat.birthtime.toISOString()
-  console.log(createdAt)
 
   let previewImage: string | undefined
   const previewImageNames = ['preview.png', 'preview.jpg', 'preview.jpeg', 'preview.webp']
