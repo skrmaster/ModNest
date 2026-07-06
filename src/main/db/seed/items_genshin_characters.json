@@ -1,5 +1,12 @@
 [
   {
+    "image": "Sandrone.png",
+    "element": "cryo",
+    "name": "Sandrone",
+    "zhCn": "桑多涅",
+    "rarity": 5
+  },
+  {
     "image": "lohen.png",
     "element": "cryo",
     "name": "Lohen",
@@ -154,9 +161,9 @@
     "rarity": 5
   },
   {
-    "image": "yumegetsu mizuki.png",
+    "image": "Yumemizuki mizuki.png",
     "element": "anemo",
-    "name": "Yumegetsu Mizuki",
+    "name": "Yumemizuki Mizuki",
     "zhCn": "梦见月瑞希",
     "rarity": 5
   },
