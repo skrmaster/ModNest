@@ -45,6 +45,7 @@ router.beforeEach(async (to) => {
   }
 
   const gameId = to.params.gameId as string
+
   const game = await window.api.gameApi.getById(gameId)
 
   if (!game.mod_root_path) {
@@ -885,7 +886,7 @@ onUnmounted(() => {
                 </div>
                 <v-alert
                   v-show="isEnableMutipleMod"
-                  text="请注意,启用了多个MOD,可能会有冲突"
+                  :text="t('common.modConflicts')"
                   type="warning"
                   variant="tonal"
                   closable

@@ -152,7 +152,8 @@
     "allCoverInstall": "Full coverage installation",
     "batchdel": "Batch delete",
     "openModFolder": "Open the MOD directory",
-    "success": "success"
+    "success": "success",
+    "modConflicts": "Please note that enabling multiple mods may cause conflicts."
   },
   "home": {
     "update": "Modify configuration",

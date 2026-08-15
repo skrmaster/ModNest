@@ -14,3 +14,4 @@ export type GameZZZElement =
   | 'auric ink'
   | 'honed edge'
   | 'wind'
+  | 'lumen'

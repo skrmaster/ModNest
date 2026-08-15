@@ -1,5 +1,12 @@
 [
   {
+    "image": "Remielle Dan.png",
+    "element": "lumen",
+    "name": "Remielle Dan",
+    "zhCn": "蕾米埃尔·丹",
+    "rarity": 5
+  },
+  {
     "image": "Norma Hollowell.png",
     "element": "fire",
     "name": "Norma Hollowell",

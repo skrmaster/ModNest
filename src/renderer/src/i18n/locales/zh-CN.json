@@ -158,7 +158,8 @@
     "allCoverInstall": "全部覆盖安装",
     "batchdel": "批量删除",
     "openModFolder": "打开MOD目录",
-    "success": "成功"
+    "success": "成功",
+    "modConflicts": "请注意,启用了多个MOD,可能会有冲突"
   },
   "home": {
     "update": "修改配置",

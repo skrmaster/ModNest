@@ -1,5 +1,19 @@
 [
   {
+    "image": "Odette.png",
+    "element": "cryo",
+    "name": "Odette",
+    "zhCn": "奥黛塔",
+    "rarity": 5
+  },
+  {
+    "image": "Alyosha.png",
+    "element": "electro",
+    "name": "Alyosha",
+    "zhCn": "阿罗夏",
+    "rarity": 4
+  },
+  {
     "image": "Sandrone.png",
     "element": "cryo",
     "name": "Sandrone",
@@ -28,9 +42,9 @@
     "rarity": 4
   },
   {
-    "image": "linea.png",
+    "image": "Linnea.png",
     "element": "geo",
-    "name": "Linea",
+    "name": "Linnea",
     "zhCn": "莉奈娅",
     "rarity": 5
   },
@@ -84,9 +98,9 @@
     "rarity": 5
   },
   {
-    "image": "enno.png",
+    "image": "Aino.png",
     "element": "hydro",
-    "name": "Enno",
+    "name": "Aino",
     "zhCn": "爱诺",
     "rarity": 4
   },
@@ -119,9 +133,9 @@
     "rarity": 5
   },
   {
-    "image": "talia.png",
+    "image": "Dahlia.png",
     "element": "hydro",
-    "name": "Talia",
+    "name": "Dahlia",
     "zhCn": "塔利雅",
     "rarity": 4
   },
@@ -140,9 +154,9 @@
     "rarity": 4
   },
   {
-    "image": "ecofi.png",
+    "image": "Escoffier.png",
     "element": "cryo",
-    "name": "Ecofi",
+    "name": "Escoffier",
     "zhCn": "爱可菲",
     "rarity": 5
   },
@@ -168,9 +182,9 @@
     "rarity": 5
   },
   {
-    "image": "lanyan.png",
+    "image": "Lan yan.png",
     "element": "anemo",
-    "name": "Lanyan",
+    "name": "Lan yan",
     "zhCn": "蓝砚",
     "rarity": 4
   },
@@ -203,16 +217,16 @@
     "rarity": 5
   },
   {
-    "image": "shinon.png",
+    "image": "Xilonen.png",
     "element": "geo",
-    "name": "Shinon",
+    "name": "Xilonen",
     "zhCn": "希诺宁",
     "rarity": 5
   },
   {
-    "image": "kinichi.png",
+    "image": "Kinich.png",
     "element": "dendro",
-    "name": "Kinichi",
+    "name": "Kinich",
     "zhCn": "基尼奇",
     "rarity": 5
   },
@@ -224,16 +238,16 @@
     "rarity": 4
   },
   {
-    "image": "malani.png",
+    "image": "Mualani.png",
     "element": "hydro",
-    "name": "Malani",
+    "name": "Mualani",
     "zhCn": "玛拉妮",
     "rarity": 5
   },
   {
-    "image": "emerie.png",
+    "image": "Emilie.png",
     "element": "dendro",
-    "name": "Emerie",
+    "name": "Emilie",
     "zhCn": "艾梅莉埃",
     "rarity": 5
   },

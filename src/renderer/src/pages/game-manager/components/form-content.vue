@@ -287,11 +287,6 @@ const validateForm = (): boolean => {
   }
   formErrorMessage.value = ''
 
-  // if (!showImageCover.value) {
-  //   formErrorMessage.value += '请完善图片'
-  //   valid = false
-  // }
-
   if (selectedCategoryIds.value.length <= 0) {
     formErrorMessage.value += t('gameManager.selectCategory')
     valid = false
@@ -332,7 +327,6 @@ const saveItem = async (): Promise<void> => {
         cover: extractImageFileName(itemForm.cover),
         category_ids
       }
-      console.log(updateData)
 
       await window.api.itemApi.update(editData.value.id, updateData)
       notify.success(t('common.updateSuccess'))
@@ -397,6 +391,7 @@ const gameElementList = computed(() => {
 async function init(itemData?: GameItemRow, gameId?: string) {
   game_id.value = gameId
   resetForm()
+
   if (itemData) {
     Object.assign(itemForm, itemData)
     showImageCover.value = itemForm.cover || ''
@@ -408,10 +403,11 @@ async function init(itemData?: GameItemRow, gameId?: string) {
         return e.id.toString()
       })
     secondaryCategoryId.value = data.filter((e) => gameElementList.value.includes(e.name))
-    secondaryCategorySelectedId.value = secondaryCategoryId.value[0].id
+    secondaryCategorySelectedId.value = secondaryCategoryId.value[0]?.id
     editData.value = itemData
   } else {
     editData.value = undefined
+    itemForm.is_custom = 1
   }
 
   itemDialog.value = true

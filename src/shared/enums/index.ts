@@ -18,7 +18,8 @@ export const gameZZZElementList: GameZZZElement[] = [
   'frost',
   'auric ink',
   'honed edge',
-  'wind'
+  'wind',
+  'lumen'
 ]
 
 export const gameImageMap: Record<

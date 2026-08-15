@@ -168,5 +168,13 @@
     "name_zh_cn": "凛刃",
     "level": 2,
     "cover": "Zenless Zone Zero/elements/Honed Edge.svg"
+  },
+  {
+    "id": 24,
+    "name": "lumen",
+    "icon": "",
+    "name_zh_cn": "流明",
+    "level": 2,
+    "cover": "Zenless Zone Zero/elements/Lumen.svg"
   }
 ]

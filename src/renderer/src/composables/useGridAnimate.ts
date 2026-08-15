@@ -69,7 +69,6 @@ export function useGridAnimate(
       const prev = cache.get(id)
       const next = getRelativeRect(containerRect, el)
 
-      // 新元素只记录位置，不动画
       if (!prev) {
         cache.set(id, { rect: next })
         return
@@ -91,14 +90,12 @@ export function useGridAnimate(
         return
       }
 
-      // 取消上一次还在跑的动画
       prev.animation?.cancel()
 
       el.style.transformOrigin = '0 0'
       const child = el.children[0] as HTMLElement | undefined
       if (child) child.style.transformOrigin = '0 0'
 
-      // Web Animation API：从旧位置过渡到新位置
       const fromTransform = `translateX(${translateX}px) translateY(${translateY}px) scaleX(${scaleX}) scaleY(${scaleY})`
       const fromChildTransform = `scaleX(${1 / scaleX}) scaleY(${1 / scaleY})`
 
@@ -115,7 +112,6 @@ export function useGridAnimate(
         }
       )
 
-      // 子元素反向 scale 补偿，防止内容被拉伸
       if (child) {
         child.animate([{ transform: fromChildTransform }, { transform: 'scaleX(1) scaleY(1)' }], {
           duration,
@@ -135,7 +131,6 @@ export function useGridAnimate(
     })
   }
 
-  // 监听容器尺寸变化（窗口 resize 导致 grid 重排时自动触发）
   let resizeObserver: ResizeObserver | null = null
 
   function observeResize() {
@@ -144,7 +139,6 @@ export function useGridAnimate(
 
     resizeObserver = new ResizeObserver(() => {
       snapshot()
-      // 两帧后等浏览器重排完成再 flip
       requestAnimationFrame(() => requestAnimationFrame(() => flip()))
     })
 
