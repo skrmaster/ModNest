@@ -1,12 +1,12 @@
 {
-  "name": "Dimension-Workshop",
+  "name": "ModNest",
   "version": "1.0.1",
   "type": "module",
   "description": "Mod Management · Automation Tools · Game Solutions",
   "main": "./out/main/index.js",
   "author": "skrmaster",
   "license": "MIT",
-  "homepage": "https://github.com/skrmaster/dimension-workshop",
+  "homepage": "https://github.com/skrmaster/ModNest",
   "scripts": {
     "format": "prettier --write .",
     "lint": "eslint --cache .",

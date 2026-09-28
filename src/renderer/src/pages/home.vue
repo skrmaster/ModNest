@@ -61,12 +61,6 @@ const onMarkdownClick = async (e: MouseEvent) => {
     return
   }
 
-  if (link.href.startsWith(`app-image://open-XXMI.msi`)) {
-    await window.api.genshinApi.installXXMI()
-
-    return
-  }
-
   if (link.href.startsWith(`${IMAGE_PROTOCOL}://download`)) {
     await window.api.fileApi.openDownload()
     return

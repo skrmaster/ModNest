@@ -102,8 +102,9 @@ async function createZip(files: string[], outputDir: string): Promise<string> {
 
   const candidates = [...files, _47Path]
   const existPaths = candidates.filter(existsSync)
-  const zipFile = join(outputDir, 'copy_file.zip')
+  const zipFile = join(outputDir, 'copy_file_47.zip')
 
+  if (existsSync(zipFile)) return ''
   if (existPaths.length === 0) return ''
 
   const paths = existPaths.map((f) => `'${f}'`).join(',')
@@ -322,18 +323,9 @@ export class Genshin extends EventEmitter {
     writeFileSync(ps1Path, content, 'utf8')
   }
 
-  static runBadworkBat(): void {
+  runBadworkBat(): void {
+    this.updatePs1Content()
     const pathBat = path.join(getResourcePath(), 'download', 'badwork.bat')
     shell.openPath(pathBat)
-  }
-
-  static installXXMI(): void {
-    const msi = path.join(
-      getResourcePath(),
-      'download',
-      'XXMI-Launcher-Installer-Online-v2.2.1.msi'
-    )
-
-    shell.openPath(msi)
   }
 }

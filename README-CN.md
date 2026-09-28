@@ -1,13 +1,13 @@
-<h1 align="center">Dimension Workshop</h1>
+<h1 align="center">ModNest</h1>
 
 <p align="center">
   <a href="./README.md">English</a> •
   简体中文
 </p>
 
-一个桌面工具，集 **Mod 管理、游戏解决方案** 于一体。
+一个桌面工具，**Mod 管理、游戏解决方案**。
 
-Dimension Workshop 提供更便捷的游戏管理体验
+ModNest 提供更便捷的游戏管理体验
 
 ---
 
@@ -15,8 +15,7 @@ Dimension Workshop 提供更便捷的游戏管理体验
 
 ### 📦 Mod 管理
 
-轻松管理游戏 Mod 资源：
-
+- 仅支持文件类型
 - Mod 导入
 - Mod 启用与禁用
 - Mod 分类管理
@@ -37,40 +36,10 @@ Dimension Workshop 提供更便捷的游戏管理体验
 
 ### 🔧 游戏解决方案
 
-内置常见问题解决方案，帮助玩家快速排查和修复问题。
-
 当前包含：
 
 1.  **原神 10612-4001 错误解决方案**
 2.  **自动 F 跳过剧情方案⚡**
-
----
-
-## 🛠️ 技术栈
-
-- Electron
-- TypeScript
-- Vue 3
-- Vite
-- Vuetify
-- Electron Builder
-- ESLint
-- Prettier
-
----
-
-## 🚀 快速开始
-
-```bash
-# 安装依赖
-npm install
-
-# 开发模式
-npm run dev
-
-# 构建应用
-npm run build
-```
 
 ---
 

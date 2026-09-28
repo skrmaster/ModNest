@@ -1,9 +1,30 @@
 [
   {
+    "image": "Roxy Ifrita Pryce.png",
+    "element": "wind",
+    "name": "Roxy Ifrita Pryce",
+    "zhCn": "洛克茜·伊芙莉塔·普莱斯",
+    "rarity": 5
+  },
+  {
+    "image": "Claret Flint.png",
+    "element": "electric",
+    "name": "Claret Flint",
+    "zhCn": "克拉蕾·弗林特",
+    "rarity": 5
+  },
+  {
     "image": "Remielle Dan.png",
     "element": "lumen",
     "name": "Remielle Dan",
     "zhCn": "蕾米埃尔·丹",
+    "rarity": 5
+  },
+  {
+    "image": "Sigrid de L'Azur.png",
+    "element": "ice",
+    "name": "Sigrid de L'Azur",
+    "zhCn": "希格莉德·德拉叙尔",
     "rarity": 5
   },
   {

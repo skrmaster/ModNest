@@ -17,12 +17,10 @@ export const useTaskStore = defineStore('task', () => {
   })
 
   function applyEvent(event: TaskEvent) {
-    // 单步更新
     if (event.type === 'step' && event.step) {
       const idx = steps.value.findIndex((s) => s.id === event.step!.id)
       idx >= 0 ? (steps.value[idx] = event.step) : steps.value.push(event.step)
     }
-    // 终态：用 summary 覆盖，保证最终状态一致
     if (event.summary) {
       status.value = event.summary.status
       durationMs.value = event.summary.durationMs

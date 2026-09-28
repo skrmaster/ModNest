@@ -1,7 +1,7 @@
 appId: com.cygf.app
 buildVersion: 1.0.1
 
-productName: Dimension-Workshop
+productName: ModNest
 
 directories:
   output: dist
@@ -23,7 +23,7 @@ asarUnpack:
   - resources/**
 
 win:
-  executableName: Dimension Workshop
+  executableName: ModNest
   icon: build/icon.ico
   target:
     - nsis
@@ -51,7 +51,7 @@ npmRebuild: false
 publish:
   provider: github
   owner: skrmaster
-  repo: dimension-workshop
+  repo: ModNest
 
 electronDownload:
   mirror: https://npmmirror.com/mirrors/electron/

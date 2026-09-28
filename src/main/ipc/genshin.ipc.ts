@@ -3,11 +3,8 @@ import { Genshin } from '../services/genshin/genshin.service'
 
 export function register(): void {
   ipcMain.handle('genshin:closeNetwork', () => {
-    return Genshin.runBadworkBat()
-  })
-
-  ipcMain.handle('genshin:installXXMI', () => {
-    return Genshin.installXXMI()
+    const gamePath = new Genshin()
+    return gamePath.runBadworkBat()
   })
 
   ipcMain.handle('genshin:path-ps1', (): [boolean, string] => {

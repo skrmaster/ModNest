@@ -1,5 +1,19 @@
 [
   {
+    "image": "Vesna.png",
+    "element": "anemo",
+    "name": "Vesna",
+    "zhCn": "薇斯纳",
+    "rarity": 5
+  },
+  {
+    "image": "Vodyanitsa.png",
+    "element": "hydro",
+    "name": "Vodyanitsa",
+    "zhCn": "沃雅妮莎",
+    "rarity": 5
+  },
+  {
     "image": "Odette.png",
     "element": "cryo",
     "name": "Odette",
