@@ -2,7 +2,7 @@
 
 <p align="center">
   English •
-  <a href="./README_zh-CN.md">简体中文</a>
+  <a href="./README-CN.md">简体中文</a>
 </p>
 
 A desktop tool for **Mod management and game solutions**.
